@@ -1,0 +1,92 @@
+{
+    "ab/m": [
+        "input",
+        "bounded01"
+    ],
+    "abjx/m": [
+        "input",
+        "bounded01"
+    ],
+    "ap/m": [
+        "input",
+        "bounded01"
+    ],
+    "am": [
+        "input",
+        "log",
+        "scale"
+    ],
+    "d_V": [
+        "input"
+    ],
+    "Wwb/i": [
+        "input",
+        "bounded01"
+    ],
+    "Wwbjx/i": [
+        "input",
+        "bounded01"
+    ],
+    "Wwi": [
+        "input",
+        "log",
+        "scale"
+    ],
+    "Ri": [
+        "input",
+        "log",
+        "scale"
+    ],
+    "T_typical": [
+        "input",
+        "scale"
+    ],
+    "acceleration": [
+        "input"
+    ],
+    "weaning": [
+        "input"
+    ],
+    "p_Am": [
+        "output",
+        "log",
+        "scale"
+    ],
+    "kap": [
+        "output",
+        "bounded01"
+    ],
+    "v": [
+        "output",
+        "log",
+        "scale"
+    ],
+    "p_M": [
+        "output",
+        "log",
+        "scale"
+    ],
+    "E_G": [
+        "output",
+        "log",
+        "scale"
+    ],
+    "h_a": [
+        "output",
+        "log",
+        "scale"
+    ],
+    "E_Hb/bjx": [
+        "output",
+        "bounded01"
+    ],
+    "E_Hbjx/p": [
+        "output",
+        "bounded01"
+    ],
+    "E_Hp": [
+        "output",
+        "log",
+        "scale"
+    ]
+}
