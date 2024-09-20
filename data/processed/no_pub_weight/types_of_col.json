@@ -1,15 +1,13 @@
 {
-    "ab/m": [
+    "ab": [
         "input",
-        "bounded01"
+        "log",
+        "scale"
     ],
-    "abjx/m": [
+    "ap": [
         "input",
-        "bounded01"
-    ],
-    "ap/m": [
-        "input",
-        "bounded01"
+        "log",
+        "scale"
     ],
     "am": [
         "input",
@@ -19,13 +17,10 @@
     "d_V": [
         "input"
     ],
-    "Wwb/i": [
+    "Wwb": [
         "input",
-        "bounded01"
-    ],
-    "Wwbjx/i": [
-        "input",
-        "bounded01"
+        "log",
+        "scale"
     ],
     "Wwi": [
         "input",
@@ -41,11 +36,13 @@
         "input",
         "scale"
     ],
-    "acceleration": [
-        "input"
+    "metamorphosis": [
+        "input",
+        "boolean"
     ],
     "weaning": [
-        "input"
+        "input",
+        "boolean"
     ],
     "p_Am": [
         "output",
@@ -66,23 +63,15 @@
         "log",
         "scale"
     ],
-    "E_G": [
-        "output",
-        "log",
-        "scale"
-    ],
     "h_a": [
         "output",
         "log",
         "scale"
     ],
-    "E_Hb/bjx": [
+    "E_Hb": [
         "output",
-        "bounded01"
-    ],
-    "E_Hbjx/p": [
-        "output",
-        "bounded01"
+        "log",
+        "scale"
     ],
     "E_Hp": [
         "output",

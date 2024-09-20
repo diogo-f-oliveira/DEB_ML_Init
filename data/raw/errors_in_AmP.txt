@@ -1,0 +1,137 @@
+For species Abraliopsis_morisii: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Aegopinella_epipedostoma: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Alinda_biplicata: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Ambassis_agassizii: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Ambassis_agassizii: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Ambassis_agassizii: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Ancistrocheirus_lesueurii: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Apteronotus_leptorhynchus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Ariolimax_columbianus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Ariolimax_columbianus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Ariolimax_columbianus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Arion_subfuscus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Arion_subfuscus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Arion_subfuscus: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Atherinomorus_lacunosus
+For species Bathypolypus_arcticus: measurement in unit 'cm' is not compatible with target unit 'g'
+Species Bos_taurus_Angus has no ecocodes defined 
+For species Callianira_antarctica: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Cassiopea_xamachana: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Cepaea_nemoralis: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Cetengraulis_edentulus
+For species Clupea_bentincki: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Clupea_pallasii: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Clupeonella_cultriventris: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Corbicula_fluminea: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Cranchia_scabra: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Decapterus_macrosoma
+Missing files for species Decapterus_russelli
+For species Discus_perspectivus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Discus_rotundatus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Discus_ruderatus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Eidolon_dupreanum: measurement in unit 'g' is not compatible with target unit 'cm'
+Missing files for species Engraulis_capensis
+For species Enoploteuthis_leptura: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Etrumeus_golanii
+Missing files for species Etrumeus_whiteheadi
+Warning: Colon operands must be real scalars. This warning will become an error in a future release. 
+> In mydata_Falcipennis_canadensis (line 323)
+In build_dataset_from_AmP (line 86)
+ 
+Warning: Colon operands must be real scalars. This warning will become an error in a future release. 
+> In mydata_Falcipennis_canadensis (line 581)
+In build_dataset_from_AmP (line 86)
+ 
+For species Faustina_faustina: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Fritillaria_pellucida: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Fundulus_grandis: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Galiteuthis_phyllura: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Gennadas_elegans: measurement in unit 'g' is not compatible with target unit 'cm'
+For species Gennadas_elegans: measurement in unit 'g' is not compatible with target unit 'cm'
+For species Helicodonta_obvoluta: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Histioteuthis_bonnellii: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Histioteuthis_miranda: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Hyperlophus_vittatus
+For species Hypomesus_nipponensis: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Hypomesus_nipponensis: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Hypomesus_nipponensis: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Japetella_diaphana: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Jenkinsia_lamprotaenia
+Missing files for species Karalla_dussumieri
+For species Lepophidium_brevibarbe: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Liocranchia_reinhardtii: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Martialia_hyadesi: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Megaleledone_setebos: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Melanoides_tuberculata: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Muraenolepis_marmorata
+For species Muusoctopus_rigbyae: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Myliobatis_californica: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Nematalosa_vlaminghi
+Missing files for species Nemipterus_randalli
+Missing files for species Ocyurus_chrysurus
+For species Onychoteuthis_banksi: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Ophidion_josephi: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Ophryotrocha_labronica: measurement in unit 'g' is not compatible with target unit 'cm'
+Missing files for species Opsaridium_microcephalum
+For species Ornithoteuthis_antillarum: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Osmerus_eperlanus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Osmerus_mordax: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Paralichthys_orbignyanus
+For species Pareledone_aequipapillae: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Pareledone_charcoti: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Paroctopus_digueti: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Pelea_capreolus: measurement in unit 'g' is not compatible with target unit 'cm'
+For species Perforatella_bidentata: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Platyrhina_sinensis: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Potamalosa_richmondia
+For species Pseudanodonta_complanata: measurement in unit 'cm' is not compatible with target unit 'g'
+Undefined unit '9'.
+For species Pseudopercis_semifasciata: '9' is not a unit.
+Undefined unit '9'.
+For species Pseudopercis_semifasciata: '9' is not a unit.
+For species Pteropus_rufus: measurement in unit 'g' is not compatible with target unit 'cm'
+For species Pterygioteuthis_gemmata: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Puma_concolor: measurement in unit 'g' is not compatible with target unit 'cm'
+For species Punctum_pygmaeum: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Raconda_russeliana
+Missing files for species Ramnogaster_arcuata
+Missing files for species Rastrelliger_kanagurta
+For species Retropinna_semoni: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Retropinna_semoni: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Retropinna_semoni: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Rhinoptera_bonasus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Robsonella_fontaniana: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Rousettus_madagascariensis: measurement in unit 'g' is not compatible with target unit 'cm'
+Missing files for species Sauvagella_robusta
+For species Sepia_apama: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Sepia_apama: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Sepia_elegans: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Sepia_elegans: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Sepia_orbignyana: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Sepia_pharaonis: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Sepia_pharaonis: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Sepiella_inermis: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Sepiella_inermis: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Setipinna_phasa
+Missing files for species Siganus_argenteus
+Missing files for species Sillago_burrus
+Missing files for species Sillago_ciliata
+Missing files for species Sillago_schomburgkii
+Missing files for species Sillago_vittata
+For species Spirinchus_thaleichthys: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Spirinchus_thaleichthys: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Spirinchus_thaleichthys: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Spirula_spirula: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Streptocephalus_vitreus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Succinea_putris: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Taonius_borealis: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Thaleichthys_pacificus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Thaleichthys_pacificus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Thaleichthys_pacificus: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Thymallus_tugarinae: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Todaropsis_eblanae: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Trochulus_hispidus: measurement in unit 'cm' is not compatible with target unit 'g'
+Missing files for species Urophycis_tenuis
+For species Vampyroteuthis_infernalis: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Vestia_elata: measurement in unit 'cm' is not compatible with target unit 'g'
+For species Watasenia_scintillans: measurement in unit 'cm' is not compatible with target unit 'g'

@@ -4,16 +4,6 @@
         "log",
         "scale"
     ],
-    "abjx": [
-        "input",
-        "log",
-        "scale"
-    ],
-    "ap": [
-        "input",
-        "log",
-        "scale"
-    ],
     "am": [
         "input",
         "log",
@@ -27,7 +17,7 @@
         "log",
         "scale"
     ],
-    "Wwbjx": [
+    "Wwp": [
         "input",
         "log",
         "scale"
@@ -47,10 +37,12 @@
         "scale"
     ],
     "metamorphosis": [
-        "input"
+        "input",
+        "boolean"
     ],
     "weaning": [
-        "input"
+        "input",
+        "boolean"
     ],
     "p_Am": [
         "output",
@@ -71,21 +63,12 @@
         "log",
         "scale"
     ],
-    "E_G": [
-        "output",
-        "scale"
-    ],
     "h_a": [
         "output",
         "log",
         "scale"
     ],
     "E_Hb": [
-        "output",
-        "log",
-        "scale"
-    ],
-    "E_Hbjx": [
         "output",
         "log",
         "scale"
