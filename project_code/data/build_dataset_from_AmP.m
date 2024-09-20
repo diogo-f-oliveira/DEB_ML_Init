@@ -4,7 +4,7 @@ format long
 AmPDataFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\DEB Resources\DEBtool\AmPdata\';
 % allStatPath = [AmPDataFolder 'allStat.mat'];
 speciesFolder = [AmPDataFolder 'species\'];
-saveFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\Code\DEB Model Calibration Algorithms\ML_Bijection\data\raw';
+saveFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\Code\DEB Model Calibration Algorithms\DEB_ML_Bijection\data\raw';
 tableSavePath = [saveFolder '\dataset_matlab.csv'];
 
 %% Get list of species
@@ -24,13 +24,14 @@ numSpecies = length(speciesList);
 %% Create the table
 % Define columns
 parameterCols = {'p_Am', 'kap', 'v', 'p_M', 'E_G', 'h_a', 'E_Hb', 'E_Hj', 'E_Hx', 'E_Hp'};
-infoCols = {'family', 'order', 'class', 'phylum'};
+taxonomyCols = {'family', 'order', 'class', 'phylum'};
+ecoCodeCols = {'climate', 'ecozone', 'habitat', 'embryo', 'migrate', 'food', 'gender', 'reprod'};
 ageDataCols = {'ab', 'ah', 'aj', 'ax', 'ap', 'am'};
 timeSinceBirthDataCols = {'tg', 'tb', 'tj', 'tx', 'tp'};
 weightDataCols = {'Wwb', 'Wwj', 'Wwx', 'Wwp', 'Wwi'};
 lengthDataCols = {'Lb', 'Lj', 'Lx', 'Lp', 'Li'};
 otherCols = {'d_V', 'Ri', 'T_typical', 't_0', 'model'};
-columnNames = [parameterCols infoCols ageDataCols timeSinceBirthDataCols weightDataCols lengthDataCols otherCols];
+columnNames = [parameterCols taxonomyCols ecoCodeCols ageDataCols timeSinceBirthDataCols weightDataCols lengthDataCols otherCols];
 numCols = length(columnNames);
 validModelTypes = {'std', 'stf', 'stx', 'abj'};
 
@@ -38,15 +39,15 @@ validModelTypes = {'std', 'stf', 'stx', 'abj'};
 defaultUnits = struct('weight', 'g', 'length', 'cm', 'time', 'd');
 
 % Define variable types based on the column names
-% Assuming 'Name' and 'City' are strings, and 'Age' and 'Height' are doubles
 varTypes = {
-    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', ...
-    'string', 'string', 'string', 'string', ...
-    'double', 'double', 'double', 'double', 'double', 'double',...
-    'double', 'double', 'double', 'double', 'double', ...
-    'double', 'double', 'double', 'double', 'double', ...
-    'double', 'double', 'double', 'double', 'double', ...
-    'double', 'double', 'double', 'double', 'string', ...
+    'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', ... % parameterCols
+    'string', 'string', 'string', 'string', ... % taxonomyCols
+    'string', 'string', 'string', 'string', 'string', 'string', 'string', 'string', ... % ecoCodeCols 
+    'double', 'double', 'double', 'double', 'double', 'double',... %ageDataCols
+    'double', 'double', 'double', 'double', 'double', ... % timeSinceBirthDataCols
+    'double', 'double', 'double', 'double', 'double', ... % weightDataCols
+    'double', 'double', 'double', 'double', 'double', ... % lengthDataCols
+    'double', 'double', 'double', 'double', 'string', ... % otherCols
     };
 
 % Initialize the table with missing values
@@ -55,8 +56,6 @@ T = table('Size', [numSpecies, numCols], 'VariableTypes', varTypes, 'VariableNam
 for i = 1:numCols
     if strcmp(varTypes{i}, 'double')
         T{:, i} = NaN; % Use NaN for double types
-    % elseif strcmp(varTypes{i}, 'string')
-    %     T{:, i} = strings(numSpecies,1); % Use missing for string types
     end
 end
 
@@ -105,15 +104,34 @@ for i=1:numSpecies
     end
     T{speciesName, 'p_Am'} = par.z * par.p_M / par.kap;
 
-    % Fetch info
-    for n=1:length(infoCols)
-        colName = infoCols{n};
+    % Fetch taxonomy
+    for n=1:length(taxonomyCols)
+        colName = taxonomyCols{n};
         T{speciesName, colName} = string(metaData.(colName));
     end
     T{speciesName, 'T_typical'} = metaData.T_typical;
     
+    % Fetch ecocodes
+    for e=1:length(ecoCodeCols)
+        if ~isfield(metaData, 'ecoCode')
+            fprintf('Species %s has no ecocodes defined \n', speciesName)
+            break
+        end
+        colName = ecoCodeCols{e};
+        if isempty(metaData.ecoCode.(colName))
+            continue
+        else
+            T{speciesName, colName} = string(strjoin(metaData.ecoCode.(colName)));
+        end
+    end
+    
     % Get d_V
-    T{speciesName, 'd_V'} = get_d_V(metaData.phylum, metaData.class);
+    if isfield(par, 'd_V')
+        T{speciesName, 'd_V'} = par.d_V;
+    else
+        T{speciesName, 'd_V'} = get_d_V(metaData.phylum, metaData.class);
+    end
+
     % Get t_0
     if isfield(par, 't_0')
         T{speciesName, 't_0'} = par.t_0;
