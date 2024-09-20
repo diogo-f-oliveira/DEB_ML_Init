@@ -341,31 +341,6 @@ if __name__ == '__main__':
                                         stratify=deb_model_column_indices,
                                         )
 
-    # base_model = RandomForestRegressor(n_jobs=-1, random_state=seed)
-    # param_grid = {
-    #     'n_estimators': [500, 1000, 1500],
-    #     'min_samples_split': [2, 3],
-    #     'max_features': [3, 4, 5],
-    #     'criterion': ['squared_error', 'friedman_mse'],
-    # # }
-    #    current_best_params = {
-    #     'p_Am': {'n_estimators': 1000, 'min_samples_split': 3, 'max_features': 4, 'criterion': 'squared_error'},
-    #     'kap': {'n_estimators': 500, 'min_samples_split': 2, 'max_features': 5, 'criterion': 'squared_error'},
-    #     'v': {'n_estimators': 500, 'min_samples_split': 2, 'max_features': 5, 'criterion': 'friedman_mse'},
-    #     'p_M': {'n_estimators': 1500, 'min_samples_split': 2, 'max_features': 3, 'criterion': 'friedman_mse'},
-    #     'h_a': {'n_estimators': 500, 'min_samples_split': 2, 'max_features': 5, 'criterion': 'friedman_mse'},
-    #     'E_Hb': {'n_estimators': 500, 'min_samples_split': 2, 'max_features': 5, 'criterion': 'squared_error'},
-    #     'E_Hbjx': {'n_estimators': 500, 'min_samples_split': 2, 'max_features': 5, 'criterion': 'friedman_mse'},
-    #     'E_Hp': {'n_estimators': 500, 'min_samples_split': 3, 'max_features': 5, 'criterion': 'friedman_mse'},
-    # }
-
-    # base_model = SVR()
-    # param_grid = {
-    #     'kernel': ['rbf', 'sigmoid'],
-    #     'C': [1, 3, 9],
-    #     'epsilon': [0.01, 0.1, 1],
-    #     'gamma': ['scale', 0.05, 0.5],
-    # }
     base_model = SVR
     search_space = {
         'kernel': tune.choice(['linear', 'rbf']),
@@ -373,59 +348,6 @@ if __name__ == '__main__':
         'epsilon': tune.uniform(0.01, 1),
         'gamma': tune.uniform(0.01, 2),
     }
-    # current_best_params = {
-    #     'p_Am': {'kernel': 'rbf', 'gamma': 0.10597850244208856, 'C': 3, 'epsilon': 0.1},
-    #     'kap': {'kernel': 'rbf', 'gamma': 0.10597850244208856, 'C': 9, 'epsilon': 0.01},
-    #     'v': {'kernel': 'rbf', 'gamma': 0.10597850244208856, 'C': 6, 'epsilon': 0.5},
-    #     'p_M': {'kernel': 'rbf', 'gamma': 0.5, 'C': 1, 'epsilon': 0.1},
-    #     'h_a': {'kernel': 'rbf', 'gamma': 0.5, 'C': 9, 'epsilon': 0.1},
-    #     'E_Hb': {'kernel': 'rbf', 'gamma': 0.10597850244208856, 'C': 6, 'epsilon': 0.1},
-    #     'E_Hbjx': {'kernel': 'rbf', 'gamma': 0.10597850244208856, 'C': 3, 'epsilon': 0.1},
-    #     'E_Hp': {'kernel': 'rbf', 'gamma': 0.10597850244208856, 'C': 9, 'epsilon': 0.1},
-    #     # 'E_Hb_bjx': None,
-    #     # 'E_Hbjx_p': None,
-    # }
-
-    # base_model = xgb.XGBRegressor()
-    # param_grid = {
-    #     'n_estimators': [1500, 2000, 2500],
-    #     'learning_rate': [0.0005, 0.001, 0.005, 0.01],
-    #     'grow_policy': ['depthwise', 'lossguide']
-    # }
-    # base_model = xgb.XGBRegressor
-    # search_space = {
-    #     'n_estimators': tune.qrandint(100, 10000, 100),
-    #     'learning_rate': tune.loguniform(1e-4, 1e-1),
-    #     "max_depth": tune.randint(3, 10),
-    #     'grow_policy': tune.choice(['depthwise', 'lossguide']),
-    #     "subsample": tune.uniform(0.5, 1.0),
-    #     "colsample_bytree": tune.uniform(0.5, 1.0),
-    # }
-    current_best_params = {}
-
-    # model_kwargs = {
-    #     # 'scaler_type': 'power_yeo-johnson',
-    #     'scaler_type': 'standard',
-    #     # 'scaler_type': 'minmax',
-    # }
-
-    # search_space['input_scaler_type'] = tune.choice(
-    #     ['standard', 'minmax', 'quantile_uniform', 'quantile_normal', 'none'])
-    # search_space['output_scaler_type'] = tune.choice(
-    #     ['standard', 'minmax', 'quantile_uniform', 'quantile_normal', 'none'])
-
-    # grid_search = grid_search_calibration(base_model=base_model,
-    #                                       param_grid=param_grid,
-    #                                       data=sub_data,
-    #                                       col_types=sub_col_types,
-    #                                       # dataset_name=dataset_name,
-    #                                       scorer=scorer,
-    #                                       save_best_model=True,
-    #                                       save_folder=save_folder,
-    #                                       print_best_model=True,
-    #                                       evaluate_on_test=True,
-    #                                       verbose=1,
-    #                                       )
 
     calibrate_independent_output_models(base_model=base_model,
                                         search_space=search_space,
@@ -440,72 +362,12 @@ if __name__ == '__main__':
                                         stratify=deb_model_column_indices,
                                         )
 
-    # hyperopt_calibration(base_model=base_model,
-    #                      search_space=search_space,
-    #                      data=sub_data,
-    #                      col_types=sub_col_types,
-    #                      run_name=f"{col}__{base_model.__name__}__"
-    #                               f"{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}",
-    #                      current_best_params=[current_best_params[col]] if col in current_best_params else None,
-    #
-    #                      save_folder=save_folder,
-    #                      )
+    # base_model = xgb.XGBRegressor
+    # search_space = {
+    #     'n_estimators': tune.qrandint(100, 10000, 100),
+    #     'learning_rate': tune.loguniform(1e-4, 1e-1),
+    #     "max_depth": tune.randint(3, 10),
+    #     'grow_policy': tune.choice(['depthwise', 'lossguide']),
+    #     "subsample": tune.uniform(0.5, 1.0),
+    #     "colsample_bytree": tune.uniform(0.5, 1.0),
 
-    # evaluate_config(
-    #     config={
-    #         'n_estimators': 500,
-    #         'min_samples_split': 3,
-    #         'max_features': 4,
-    #         'criterion': 'friedman_mse',
-    #     },
-    #     base_model=base_model,
-    #     col_types=sub_col_types,
-    #     X_train=sub_data['train']['input'],
-    #     y_train=sub_data['train']['output'],
-    # )
-    #
-    # base_model = MultiOutputRegressor(estimator=RandomForestRegressor(), n_jobs=-1)
-    # param_grid = {
-    #     'estimator__n_estimators': [500, 750, 1000],
-    #     'estimator__min_samples_split': [2, ],
-    #     'estimator__max_features': [4, 5],
-    # }
-
-    # base_model = MultiOutputRegressor(estimator=xgb.XGBRegressor(), n_jobs=-1)
-    # param_grid = {
-    #     'estimator__n_estimators': [1000, 2000],
-    #     'estimator__learning_rate': [0.005, 0.01, 0.05],
-    #     'estimator__grow_policy': ['depthwise', 'lossguide']
-    # }
-
-    # base_model = MultiOutputRegressor(estimator=SVR(), n_jobs=-1)
-    # param_grid = {
-    #     'estimator__kernel': ['rbf',],
-    #     'estimator__C': [5],
-    #     'estimator__epsilon': [0.01],
-    #     'estimator__gamma': [1.5],
-    # }
-
-    # print(pd.DataFrame(grid_search.cv_results_).sort_values(by='mean_test_score', ascending=False).iloc[1])
-
-    # n_rows = 3
-    # n_cols = 3
-    # fig, axes = plt.subplots(nrows=n_rows, ncols=n_cols, figsize=(20, 12))
-    # for i, estimator in enumerate(grid_search.best_estimator_.regressor_.named_steps['model'].estimators_):
-    #     importances = pd.DataFrame({'importance': estimator.feature_importances_,
-    #                                 'input_col': col_types['input']['all']})
-    #     ax = axes[i // n_cols, i % n_cols]
-    #     sns.barplot(data=importances, x='input_col', y='importance', ax=ax)
-    #     ax.set_xlabel(col_types['output']['all'][i])
-    #
-    # fig.show()
-
-    # base_model = MultiOutputRegressor(estimator=GradientBoostingRegressor(), n_jobs=-1)
-    # param_grid = {
-    #     'estimator__n_estimators': [1500],
-    #     'estimator__learning_rate': [0.01],
-    #     'estimator__max_depth': [4],
-    # }
-
-    #
-    # calibrate_sklearn_model(base_model=base_model, param_grid=param_grid, data=data, col_types=col_types)
