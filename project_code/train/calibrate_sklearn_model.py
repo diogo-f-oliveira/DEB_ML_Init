@@ -1,36 +1,26 @@
 import inspect
 import os
 import random
-from copy import deepcopy
 from functools import partial
 from datetime import datetime as dt
 
 import numpy as np
-import ray
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
-from ray.tune.search.bayesopt import BayesOptSearch
 from ray.tune.search.hyperopt import HyperOptSearch
-from sklearn.model_selection import GridSearchCV, cross_val_score, KFold, StratifiedKFold
-from tabulate import tabulate
-import pandas as pd
+from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold
 import pickle
 
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, AdaBoostRegressor
-from sklearn.linear_model import LinearRegression, Ridge, ElasticNet, Lasso
-from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import Ridge
 from sklearn.svm import SVR
-import sklearn.metrics as metrics
-import xgboost as xgb
 
 from ..train.train_sklearn_model import train_sklearn_model
 from ..utils.results import create_results_directories_for_dataset
 from ..algorithms.build_sklearn_model import build_sklearn_model
 from ..data.load_data import load_data, load_col_types
 from ..data.prepare_data_sklearn import get_features_targets, get_single_output_col_types
-from ..evaluate.prediction_error import compute_metrics
-from ..evaluate.score import make_unscaled_scorer, mean_deb_loss
+from ..evaluate.prediction_error import evaluate_on_data
 
 from ray import train, tune
 
@@ -55,44 +45,6 @@ def format_param_grid(param_grid, model):
 def save_model(model, folder, filename):
     with open(os.path.join(folder, filename), 'wb') as f:
         pickle.dump(model, f)
-
-
-def evaluate_on_data(data, col_types, model, print_score=False, save_score=False, results_save_path=None):
-    y_pred_test = model.predict(data['input']).reshape(-1, 1)
-    y_pred_unscaled_test = model.output_transformer.inverse_transform(y_pred_test).reshape(-1, 1)
-    y_true_test = model.output_transformer.transform(data['output']).reshape(-1, 1)
-    y_true_unscaled_test = data['output'].reshape(-1, 1)
-
-    r2_test_score = model.score(data['input'], data['output'])
-    output_metrics_df = compute_metrics(
-        y_true=y_true_test,
-        y_pred=y_pred_test,
-        metrics=['r2_score',
-                 'mean_squared_error',
-                 'max_error'],
-        output_col_names=col_types['output']['all'],
-    )
-    unscaled_metrics_df = compute_metrics(
-        y_true=y_true_unscaled_test,
-        y_pred=y_pred_unscaled_test,
-        metrics=['mean_absolute_percentage_error',
-                 'mean_gamma_deviance',
-                 ('d2_score', partial(metrics.d2_tweedie_score, power=2)),
-                 mean_deb_loss],
-        output_col_names=col_types['output']['all'],
-    )
-
-    metrics_df = pd.concat([output_metrics_df, unscaled_metrics_df], axis=1)
-
-    if print_score:
-        print("Test set")
-        print(f"R^2 score: {r2_test_score:.4f}")
-        print(tabulate(metrics_df, headers='keys', tablefmt='simple'))
-
-    if save_score:
-        # test_performance_save_folder = os.path.join(save_folder, 'test_performance')
-        # metrics_df.to_csv(os.path.join(test_performance_save_folder, f"{best_model_name}.csv"))
-        metrics_df.to_csv(results_save_path)
 
 
 def grid_search_calibration(base_model, search_space, data, col_types, scorer=None,
