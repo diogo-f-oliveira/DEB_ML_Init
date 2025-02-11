@@ -1,7 +1,8 @@
 import os
-
 import numpy as np
+from sklearn.preprocessing import LabelEncoder
 
+from ..utils.models import save_sklearn_model
 from ..data.prepare_data_sklearn import get_features_targets
 from ..evaluate.prediction_error import evaluate_parameter_predictions_on_data
 from ..train.calibrate_sklearn_model import evaluate_config
@@ -23,31 +24,41 @@ if __name__ == '__main__':
     create_results_directories_for_dataset(dataset_name, output_cols=col_types['output']['all'],
                                            results_path='results')
 
-    # Instantiate and use the encoder
-    encoder = TaxonomicLabelEncoder(
+    # Encode taxonomy labels
+    taxonomy_encoder = TaxonomicLabelEncoder(
         all_col_names=col_types['input']['all'] + col_types['output']['all'],
         taxonomy_col_names=col_types['input']['category']
     )
-    encoded_dfs = {'train': None, 'test': None}
-    encoded_dfs['train'] = encoder.fit_transform(dfs['train'])
-    encoded_dfs['test'] = encoder.transform(dfs['test'])
+    encoded_dfs = {
+        'train': taxonomy_encoder.fit_transform(dfs['train']),
+        'test': taxonomy_encoder.transform(dfs['test'])
+    }
+    # Encode the DEB model type
+    deb_model_encoder = LabelEncoder().fit(encoded_dfs['train']['model'])
+    for split, df in encoded_dfs.items():
+        df['model'] = deb_model_encoder.transform(df['model'])
 
     data = get_features_targets(data=encoded_dfs, col_types=col_types)
 
     base_model = TaxonomicKNNRegressor
     config = {
         'n_neighbors': 1,
-        'col_types': col_types
+        'col_types': col_types,
+        'output_scaler_type': 'none',
+        'taxonomy_encoder': taxonomy_encoder,
+        'deb_model_encoder': deb_model_encoder,
     }
-    # save_trained_model = True
-    # evaluate_on_test = True
+    save_trained_model = True
+    evaluate_on_test = True
 
     mape_list = evaluate_config(config=config,
-                    base_model=base_model,
-                    col_types=col_types,
-                    X_train=data['train']['input'],
-                    y_train=data['train']['output'],
-                    report_metrics=False)
+                                base_model=base_model,
+                                col_types=col_types,
+                                X_train=data['train']['input'],
+                                y_train=data['train']['output'],
+                                report_metrics=False,
+                                stratify=col_types['input']['all'].index('model'),
+                                )
     cv_mape = np.mean(mape_list)
     print(mape_list, cv_mape)
 
@@ -57,17 +68,23 @@ if __name__ == '__main__':
         col_types=col_types,
         data=data['train']
     )
+    # print(taxo1nn.predict(data['train']['input']))
 
-    model_name = base_model.__class__.__name__
+    model_name = base_model.__name__
     formatted_score = format(cv_mape, '.4e').replace('.', '')
     best_model_name = f'MAPE_{formatted_score}_{model_name}'
 
     save_folder = f'results/{dataset_name}/all'
     test_performance_save_folder = os.path.join(save_folder, 'test_performance')
     test_performance_save_file = os.path.join(test_performance_save_folder, f"{best_model_name}.csv")
-    evaluate_parameter_predictions_on_data(data=data['test'],
-                                           col_types=col_types,
-                                           model=taxo1nn,
-                                           print_score=True,
-                                           save_score=True,
-                                           results_save_path=test_performance_save_file)
+    if evaluate_on_test:
+        evaluate_parameter_predictions_on_data(data=data['test'],
+                                               col_types=col_types,
+                                               model=taxo1nn,
+                                               print_score=True,
+                                               save_score=True,
+                                               results_save_path=test_performance_save_file)
+    if save_trained_model:
+        save_sklearn_model(taxo1nn,
+                           folder=os.path.join(save_folder, 'models'),
+                           filename=f"{best_model_name}.pkl")

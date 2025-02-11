@@ -66,17 +66,33 @@ class TaxonomicLabelEncoder:
 class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
     """
     A k-NN Regressor based on taxonomic distance between species. Ties are broken with the numerical column maximum
-    weight Wwi
+    weight Wwi. A large penalty is imposed if the species do not share the same DEB model type.
     """
-    def __init__(self, col_types, n_neighbors=1):
+    WEIGHT_FACTOR = 0.01
+    DEB_MODEL_FACTOR = 100
+
+    def __init__(self, col_types, taxonomy_encoder, deb_model_encoder, n_neighbors=1):
         self.n_neighbors = n_neighbors
         self.col_types = col_types
+
+        self.taxonomy_encoder = taxonomy_encoder
+        if not len(self.taxonomy_encoder.taxonomy_col_names):
+            raise Exception("Missing taxonomic columns in dataset.")
+        self.taxonomy_cols = [col_types['input']['all'].index(taxon) for taxon in taxonomy_encoder.taxonomy_col_names]
+
+        if 'Wwi' not in col_types['input']['all']:
+            raise Exception("Missing maximum weight column 'Wwi' in dataset.")
         self.wi_col = col_types['input']['all'].index('Wwi')
-        self.taxonomy_cols = [col_types['input']['all'].index(taxon) for taxon in col_types['input']['category']]
+
+        if 'model' not in col_types['input']['all']:
+            raise Exception("Missing DEB model type column 'model' in dataset.")
+        self.deb_model_col = col_types['input']['all'].index('model')
+        self.deb_model_encoder = deb_model_encoder
+
         self.knn_model = None
         self.train_data = None
         self.train_targets = None
-        self.train_weights = None
+        self.train_deb_model_types = None
 
     @staticmethod
     def _taxonomy_distance(tax1, tax2):
@@ -85,19 +101,34 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
         for i in range(len(tax1)):
             if tax1[i] != tax2[i]:
                 # Assign a penalty based on the taxonomic level
-                distance += 2 ** (len(tax1) - i - 1)
+                distance += 2 ** i
         return distance
 
-    def _compute_distance_matrix(self, data_a, data_b, weights_a, weights_b):
+    def _compute_distance_matrix(self, data_a, data_b, data_split='test'):
         # Compute pairwise distances between all elements in data_a and data_b
-        n_a, n_b = len(data_a), len(data_b)
+        n_a, n_b = data_a.shape[0], data_b.shape[0]
         distance_matrix = np.zeros((n_a, n_b))
 
         for i in range(n_a):
             for j in range(n_b):
-                taxonomy_distance = self._taxonomy_distance(data_a[i], data_b[j])
-                weight_distance = abs(weights_a[i] - weights_b[j]) if taxonomy_distance == 0 else 0
-                distance = taxonomy_distance + weight_distance * 0.01  # Small weight to break ties
+                # Get taxonomy distance
+                taxonomy_distance = self._taxonomy_distance(
+                    tax1=data_a[i, self.taxonomy_cols],
+                    tax2=data_b[j, self.taxonomy_cols]
+                )
+                # Get weight distance
+                weight_distance = abs(data_a[i, self.wi_col] - data_b[j, self.wi_col]) if taxonomy_distance == 0 else 0
+                # Compare deb model types
+                deb_model_type_distance = data_a[i, self.deb_model_col] != data_b[j, self.deb_model_col]
+                # Add distance between weights to break ties with a small factor
+                distance = (taxonomy_distance +
+                            weight_distance * self.WEIGHT_FACTOR +
+                            self.DEB_MODEL_FACTOR * deb_model_type_distance)
+
+                # In case distance is zero for multiple species during training, add small factor to ensure the nearest
+                # neighbor is itself
+                if distance == 0 and data_split == 'train' and i != j:
+                    distance += 1e-10
                 distance_matrix[i, j] = distance
 
         return distance_matrix
@@ -105,13 +136,11 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
     def fit(self, X, y):
         if self.wi_col is None:
             raise ValueError("wi_col must be specified when initializing the regressor.")
-        self.train_data = X[:, self.taxonomy_cols]
+        self.train_data = X
         self.train_targets = y
-        self.train_weights = X[:, self.wi_col]
 
         # Compute pairwise distances within the training set
-        train_distance_matrix = self._compute_distance_matrix(self.train_data, self.train_data, self.train_weights,
-                                                              self.train_weights)
+        train_distance_matrix = self._compute_distance_matrix(self.train_data, self.train_data, data_split='train')
 
         # Fit the 1-NN model using the training distance matrix
         self.knn_model = NearestNeighbors(n_neighbors=self.n_neighbors, metric='precomputed')
@@ -125,17 +154,21 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
                 "This TaxonomicKNNRegressor instance is not fitted yet. Call 'fit' with appropriate arguments before "
                 "using this estimator.")
 
-        test_data = X[:, self.taxonomy_cols]
-        test_weights = X[:, self.wi_col]
-
         # Compute distances from each test sample to each training sample
-        test_distance_matrix = self._compute_distance_matrix(test_data, self.train_data, test_weights,
-                                                             self.train_weights)
+        test_distance_matrix = self._compute_distance_matrix(X, self.train_data, data_split='test')
 
+        return self.get_predictions_from_distance_matrix(test_distance_matrix)
+
+    def get_predictions_from_distance_matrix(self, distance_matrix):
         # Find the nearest neighbor in the training set for each test sample
-        distances, indices = self.knn_model.kneighbors(test_distance_matrix)
+        distances, indices = self.knn_model.kneighbors(distance_matrix)
 
         # Predict the target values based on the nearest neighbors
         predictions = [self.train_targets[idx[0]] for idx in indices]
 
         return np.array(predictions)
+
+    def encode_data(self, df):
+        encoded_df = self.taxonomy_encoder.transform(df)
+        encoded_df['model'] = self.deb_model_encoder.transform(encoded_df['model'])
+        return encoded_df
