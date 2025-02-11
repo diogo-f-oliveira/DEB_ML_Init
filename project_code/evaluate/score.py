@@ -25,8 +25,186 @@ def make_unscaled_scorer(metric, **metrics_kws):
 def mean_deb_loss(y_true, y_pred, sample_weights=None, multioutput='raw_values'):
     if sample_weights is None:
         sample_weights = np.ones((len(y_true), 1)) / len(y_true)
+    y_true = np.array(y_true)
+    y_pred = np.array(y_pred)
     raw_values = sample_weights * (np.power(y_true - y_pred, 2)) / (np.power(y_true, 2) + np.power(y_pred, 2))
     if multioutput == 'raw_values':
         return np.mean(raw_values, axis=0)
     elif multioutput == 'uniform_average':
         return np.mean(raw_values)
+
+
+def geometric_error_factor(y_true, y_pred, *, multioutput="uniform_average"):
+    """
+    Compute the geometric error factor between true and predicted values.
+
+    The geometric error factor is defined as:
+        GEF = exp( mean( | ln( y_pred / y_true ) | ) )
+    For multioutput data, the metric is computed per output (i.e. along axis 0) and then
+    aggregated according to the `multioutput` parameter.
+
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,) or (n_samples, n_outputs)
+        True (target) values. All elements must be positive.
+
+    y_pred : array-like of shape (n_samples,) or (n_samples, n_outputs)
+        Predicted values. All elements must be positive.
+
+    multioutput : {"raw_values", "uniform_average"} or array-like of shape (n_outputs,), default="uniform_average"
+        Defines aggregating of multiple output errors:
+          - If "raw_values", then a numpy array of shape (n_outputs,) is returned.
+          - If "uniform_average", then the average of the errors is returned.
+          - If array-like, then weighted average is computed with the provided weights.
+
+    Returns
+    -------
+    score : float or ndarray of floats
+        The geometric error factor, either as a single aggregated value or as an array
+        of values per output.
+
+    Raises
+    ------
+    ValueError
+        If any value in y_true or y_pred is not positive.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> y_true = np.array([[10, 100], [20, 200], [30, 300]])
+    >>> y_pred = np.array([[11, 95], [19, 210], [29, 310]])
+    >>> # Return a weighted average (default uniform average)
+    >>> geometric_error_factor(y_true, y_pred)
+    1.055...
+    >>> # Return raw error per output
+    >>> geometric_error_factor(y_true, y_pred, multioutput="raw_values")
+    array([1.052..., 1.058...])
+    """
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+
+    # If the arrays are one-dimensional, reshape them to 2D (n_samples, 1)
+    if y_true.ndim == 1:
+        y_true = y_true.reshape(-1, 1)
+        y_pred = y_pred.reshape(-1, 1)
+
+    # Ensure that all values are positive
+    if np.any(y_true <= 0):
+        raise ValueError("All true values must be positive.")
+    if np.any(y_pred <= 0):
+        raise ValueError("All predicted values must be positive.")
+
+    # Compute the absolute log error for each element
+    log_errors = np.abs(np.log(y_pred / y_true))
+
+    # Compute the mean of the log errors over the samples (axis=0)
+    mean_log_error = np.mean(log_errors, axis=0)
+
+    # Exponentiate the mean log error to get the geometric error factor per output
+    gef = np.exp(mean_log_error)
+
+    # Aggregate results according to multioutput parameter
+    if multioutput == "raw_values":
+        return gef
+    elif multioutput == "uniform_average":
+        return np.mean(gef)
+    elif isinstance(multioutput, (list, np.ndarray)):
+        weights = np.asarray(multioutput)
+        if weights.shape[0] != gef.shape[0]:
+            raise ValueError("Weights must have the same length as the number of outputs.")
+        return np.average(gef, weights=weights)
+    else:
+        raise ValueError("multioutput must be 'raw_values', 'uniform_average', or array-like of weights.")
+
+
+def symmetric_mean_absolute_percentage_error(y_true, y_pred, *, percentage=True, normalize=True,
+                                             multioutput="uniform_average"):
+    """
+    Compute the symmetric Mean Absolute Percentage Error (sMAPE).
+
+    The unnormalized sMAPE is defined as:
+        sMAPE = mean( |y_true - y_pred| / ((|y_true| + |y_pred|)/2) )
+    When `normalize=True`, the result is divided by 2 so that it ranges between 0 and 1
+    (or 0 and 100% if percentage=True). For multioutput data, the metric is computed per output
+    (i.e. along axis 0) and then aggregated according to the `multioutput` parameter.
+
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,) or (n_samples, n_outputs)
+        Ground truth (correct) target values.
+    y_pred : array-like of shape (n_samples,) or (n_samples, n_outputs)
+        Estimated target values.
+    percentage : bool, default=True
+        If True, the result is multiplied by 100 (i.e., returned as a percentage).
+    normalize : bool, default=True
+        If True, divide the sMAPE by 2 so that the range is [0, 1] (or [0, 100] when percentage=True).
+    multioutput : {"raw_values", "uniform_average"} or array-like of shape (n_outputs,), default="uniform_average"
+        Defines aggregating of multiple output errors:
+          - If "raw_values", then a numpy array of shape (n_outputs,) is returned.
+          - If "uniform_average", then the average of the errors is returned.
+          - If array-like, then a weighted average is computed using the provided weights.
+
+    Returns
+    -------
+    smape : float or ndarray of floats
+        The symmetric mean absolute percentage error, either as a single aggregated value or
+        as an array of values per output.
+
+    Raises
+    ------
+    ValueError
+        If any denominator element is zero (i.e., if |y_true| + |y_pred| == 0 for any sample).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> y_true = np.array([[100, 200], [300, 400], [500, 600]])
+    >>> y_pred = np.array([[110, 190], [290, 410], [510, 590]])
+    >>> # Uniform average (default)
+    >>> symmetric_mean_absolute_percentage_error(y_true, y_pred)
+    3.57...
+    >>> # Raw values per output
+    >>> symmetric_mean_absolute_percentage_error(y_true, y_pred, multioutput="raw_values")
+    array([3.45..., 3.69...])
+    """
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+
+    # If one-dimensional, reshape to 2D (n_samples, 1)
+    if y_true.ndim == 1:
+        y_true = y_true.reshape(-1, 1)
+        y_pred = y_pred.reshape(-1, 1)
+
+    # Compute denominator: average of absolute true and predicted values
+    denominator = (np.abs(y_true) + np.abs(y_pred)) / 2.0
+
+    # Check for zeros in the denominator
+    if np.any(denominator == 0):
+        raise ValueError("sMAPE is not defined when any |y_true| + |y_pred| equals 0.")
+
+    # Compute absolute percentage errors for each sample
+    errors = np.abs(y_true - y_pred) / denominator
+
+    # Compute the mean error for each output (axis=0)
+    smape_per_output = np.mean(errors, axis=0)
+
+    # Normalize if desired
+    if normalize:
+        smape_per_output = smape_per_output / 2.0
+
+    # Multiply by 100 if percentage output is desired
+    if percentage:
+        smape_per_output = smape_per_output * 100.0
+
+    # Aggregate according to the multioutput parameter
+    if multioutput == "raw_values":
+        return smape_per_output
+    elif multioutput == "uniform_average":
+        return np.mean(smape_per_output)
+    elif isinstance(multioutput, (list, np.ndarray)):
+        weights = np.asarray(multioutput)
+        if weights.shape[0] != smape_per_output.shape[0]:
+            raise ValueError("Weights must have the same length as the number of outputs.")
+        return np.average(smape_per_output, weights=weights)
+    else:
+        raise ValueError("multioutput must be 'raw_values', 'uniform_average', or array-like of weights.")
