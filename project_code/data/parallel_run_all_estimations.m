@@ -15,30 +15,9 @@ outputFileName = [saveFolder '\full_estimation_from_AmP_pars_subset_minimum.csv'
 
 %% Get list of species
 
-% Get a list of all files and folders in the specified directory
-allFiles = dir(allSpeciesFolder);
+% speciesList = getAllSpeciesNames(allSpeciesFolder);
+speciesList = {'Caenorhabditis_elegans', 'Caranx_ignobilis', 'Geococcyx_californianus', 'Torpedo_marmorata', 'Pleurobrachia_pileus', 'Turdus_merula', 'Gallotia_galloti', 'Diplectrum_formosum', 'Octopus_joubini', 'Myiarchus_cinerascens', 'Somateria_mollissima', 'Paranotothenia_magellanica', 'Sillago_sihama', 'Stolephorus_waitei', 'Rhombosolea_plebeia', 'Pseudopleuronectes_yokohamae', 'Microcondylaea_bonellii', 'Trichiurus_lepturus', 'Aerodramus_fuciphagus', 'Sula_dactylatra', 'Scomberomorus_maculatus', 'Macquaria_ambigua', 'Apteryx_mantelli', 'Anchoa_panamensis', 'Synodontis_nebulosus', 'Euthynnus_alletteratus', };
 
-% Filter the list to include only directories
-isDir = [allFiles.isdir]; % Logical index for directories
-speciesList = {allFiles(isDir).name}; % Extract names of directories
-
-% Remove '.' and '..' from the list (current and parent directory)
-speciesList = speciesList(~ismember(speciesList, {'.', '..'}));
-allFiles = allFiles(~ismember(speciesList, {'.', '..'}));
-
-
-speciesList = {
-        'Siphateles_bicolor',
-        'Macquaria_novemaculeata',
-        'Prionotus_albirostris',
-        'Decapterus_macrosoma',
-        'Etropus_crossotus',
-        'Myripristis_murdjan',
-        'Cerastoderma_edule',
-        'Acipenser_stellatus',
-        'Mormyrus_kannume',
-        'Mysis_mixta',    
-};
 numSpecies = length(speciesList);
 
 
@@ -59,11 +38,14 @@ varTypes = {
 estimationResultsTable = table('Size', [numSpecies, numCols], 'VariableTypes', varTypes, 'VariableNames', columnNames, 'RowNames', speciesList);
 
 %% Settings
-maxRuns = 200; % Single run
 saveParsList = {'z', 'kap', 'v', 'p_M', 'E_Hb', 'E_Hp',};
 saveResultsTableEvery = 200;
+saveResultsMatFile = true;
+saveParsInitFile = true;
+
 % Max execution time per species
 maxTime = 15*60*60; % in seconds
+maxRuns = 200; 
 
 %% Set up parallel pool
 pool = gcp('nocreate');
@@ -86,7 +68,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         speciesName = speciesList{i};
 
         % Submit parfeval task
-        fut = parfeval(pool, @processSpecies, 6, speciesName, allSpeciesFolder, maxRuns, saveParsList);
+        fut = parfeval(pool, @processSpecies, 6, speciesName, allSpeciesFolder, maxRuns, saveParsList, saveResultsMatFile, saveParsInitFile);
         % Record the future, species name, start time
         startTime = tic;
         nFutures = length(inProgressFutures);
@@ -179,36 +161,36 @@ fprintf('Table saved in %s\n', outputFileName);
 
 %% Functions to set global variables
 function setGlobalVars
-    global lossfunction report max_step_number max_fun_evals tol_simplex tol_fun simplex_size covRules tol_restart;
-    lossfunction = 'sb';
-    report = 0;
-    max_step_number = 5e2;
-    max_fun_evals = 5e3;
-    tol_simplex = 1e-4;
-    tol_fun = 1e-4;
-    simplex_size = 0.02;
-    covRules = 0;
-    tol_restart = 1e-4;
+global lossfunction report max_step_number max_fun_evals tol_simplex tol_fun simplex_size covRules tol_restart;
+lossfunction = 'sb';
+report = 0;
+max_step_number = 5e2;
+max_fun_evals = 5e3;
+tol_simplex = 1e-4;
+tol_fun = 1e-4;
+simplex_size = 0.02;
+covRules = 0;
+tol_restart = 1e-4;
 end
 
 function alternateSimplexSize
-    global simplex_size
-    simplex_size = -simplex_size;
+global simplex_size
+simplex_size = -simplex_size;
 end
 
 function setGlobalPetsVar(speciesName)
-    global pets
-    pets = {speciesName};
+global pets
+pets = {speciesName};
 end
 
 %% Function to process each species
-function [initLoss, initParValues, finalLoss, finalParValues, estimStats, predictError] = processSpecies(speciesName, allSpeciesFolder, maxRuns, saveParsList)
+function [initLoss, initParValues, finalLoss, finalParValues, estimStats, predictError] = processSpecies(speciesName, allSpeciesFolder, maxRuns, saveParsList, saveResultsMatFile, saveParsInitFile)
 
 % Initialize output variables
-initLoss = nan; 
+initLoss = nan;
 finalLoss = nan;
 nanValues = num2cell(NaN(size(saveParsList)));
-initParValues = cell2struct(nanValues(:), saveParsList(:)); 
+initParValues = cell2struct(nanValues(:), saveParsList(:));
 finalParValues = cell2struct(nanValues(:), saveParsList(:));
 estimStats = struct('convergence', false, 'numRuns', 0, 'numIter', 0);
 predictError = false;
@@ -223,12 +205,14 @@ if isfolder(speciesFolder)
     % Run mydata.m
     [data, auxData, metaData, ~, weights] = feval(['mydata_' speciesName]);
     % Run pars_init.m
-    [par, metaPar, ~] = feval(['pars_init_' speciesName], metaData);
+    [par, metaPar, txtPar] = feval(['pars_init_' speciesName], metaData);
 
     % Get initial parameter values
     for p=1:length(saveParsList)
         parName = saveParsList{p};
-        initParValues.(parName) = par.(parName);
+        if isfield(par, parName)
+            initParValues.(parName) = par.(parName);
+        end
     end
     % Compute initial loss
     [prdData, info] = feval(['predict_' speciesName], par, data, auxData);
@@ -246,25 +230,25 @@ if isfolder(speciesFolder)
     filternm = ['filter_' metaPar.model];
     % setGlobalVars();
     setGlobalPetsVar(speciesName);
-    
+
     % Run estimation
     global tol_restart
-    q = par;
+    estimatedPar = par;
     numRuns = 0;
     numIter = 0;
     converged = false;
-    currentLoss = initLoss; 
+    currentLoss = initLoss;
     prevLoss = inf;
     while ~converged && numRuns < maxRuns && (prevLoss - currentLoss) > tol_restart
         prevLoss = currentLoss;
-        [q, converged, itercount, currentLoss] = petregr_f('predict_pets', q, dataStruct, auxDataStruct, weightsStruct, filternm);
+        [estimatedPar, converged, itercount, currentLoss] = petregr_f('predict_pets', estimatedPar, dataStruct, auxDataStruct, weightsStruct, filternm);
         numRuns = numRuns + 1;
         numIter = numIter + itercount;
         alternateSimplexSize();
     end
     % Save estimation stats
     estimStats.convergence = converged;
-    estimStats.numRuns = numRuns; 
+    estimStats.numRuns = numRuns;
     estimStats.numIter = numIter;
 
     % Set final loss
@@ -272,11 +256,32 @@ if isfolder(speciesFolder)
     % Get final parameter values
     for p=1:length(saveParsList)
         parName = saveParsList{p};
-        finalParValues.(parName) = q.(parName);
+        if isfield(estimatedPar, parName)
+            finalParValues.(parName) = estimatedPar.(parName);
+        end
     end
 
+    if saveResultsMatFile
+        par = estimatedPar;
+        save(['results_' speciesName '.mat'], 'par', 'metaData', 'metaPar', 'txtPar')
+        if saveParsInitFile
+            mat2pars_init(speciesName)
+        end
+    end
 
 else
     error('Folder for species "%s" does not exist.', speciesName);
 end
+end
+
+function speciesList = getAllSpeciesNames(allSpeciesFolder)
+% Get a list of all files and folders in the specified directory
+allFiles = dir(allSpeciesFolder);
+
+% Filter the list to include only directories
+isDir = [allFiles.isdir]; % Logical index for directories
+speciesList = {allFiles(isDir).name}; % Extract names of directories
+
+% Remove '.' and '..' from the list (current and parent directory)
+speciesList = speciesList(~ismember(speciesList, {'.', '..'}));
 end
