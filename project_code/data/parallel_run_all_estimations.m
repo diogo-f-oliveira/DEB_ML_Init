@@ -5,13 +5,12 @@ clear all
 format long
 
 %% Define paths to files
-
-AmPDataFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\DEB Resources\DEBtool\AmPdata\';
-allSpeciesFolder = [AmPDataFolder 'species\'];
-saveFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\Code\DEB Model Calibration Algorithms\DEB_ML_Bijection\data\raw';
+filePathsCSVPath = '..\..\filepaths.csv';
+pathsTable = readtable(filePathsCSVPath, 'Delimiter', ',', 'ReadVariableNames', true, 'ReadRowNames', true);
+allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
+saveFolder = '..\..\data\raw';
 % Output file
-% outputFileName = [saveFolder '\estimation_from_AmP_pars.csv'];
-outputFileName = [saveFolder '\full_estimation_from_AmP_pars_subset_minimum.csv'];
+outputFileName = [saveFolder '\full_estimation_from_AmP_pars_subset_test_set.csv'];
 
 %% Get list of species
 
