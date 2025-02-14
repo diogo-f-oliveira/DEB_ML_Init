@@ -8,9 +8,10 @@ format long
 filePathsCSVPath = '..\..\filepaths.csv';
 pathsTable = readtable(filePathsCSVPath, 'Delimiter', ',', 'ReadVariableNames', true, 'ReadRowNames', true);
 allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
-saveFolder = '..\..\data\raw';
+saveFolder = '..\..\data\estimation_runs';
 % Output file
-outputFileName = [saveFolder '\full_estimation_from_AmP_pars_subset_test_set.csv'];
+% outputFileName = [saveFolder '\full_estimation_from_AmP_pars_subset_test_set.csv'];
+outputFileName = [saveFolder '\compare_pars_init_matfile_subset_test_set.csv'];
 
 %% Get list of species
 
@@ -38,9 +39,9 @@ estimationResultsTable = table('Size', [numSpecies, numCols], 'VariableTypes', v
 
 %% Settings
 saveParsList = {'z', 'kap', 'v', 'p_M', 'E_Hb', 'E_Hp',};
-saveResultsTableEvery = 200;
-saveResultsMatFile = true;
-saveParsInitFile = true;
+saveResultsTableEvery = 20;
+saveResultsMatFile = false;
+saveParsInitFile = false;
 
 % Max execution time per species
 maxTime = 15*60*60; % in seconds
