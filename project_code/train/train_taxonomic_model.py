@@ -33,10 +33,6 @@ if __name__ == '__main__':
         'train': taxonomy_encoder.fit_transform(dfs['train']),
         'test': taxonomy_encoder.transform(dfs['test'])
     }
-    # Encode the DEB model type
-    deb_model_encoder = LabelEncoder().fit(encoded_dfs['train']['model'])
-    for split, df in encoded_dfs.items():
-        df['model'] = deb_model_encoder.transform(df['model'])
 
     data = get_features_targets(data=encoded_dfs, col_types=col_types)
 
@@ -46,12 +42,12 @@ if __name__ == '__main__':
         'col_types': col_types,
         'output_scaler_type': 'none',
         'taxonomy_encoder': taxonomy_encoder,
-        'deb_model_encoder': deb_model_encoder,
+        'use_scaling_relationships': True,
     }
-    save_trained_model = True
+    save_trained_model = False
     evaluate_on_test = True
 
-    mape_list = evaluate_config(config=config,
+    cv_metrics_df = evaluate_config(config=config,
                                 base_model=base_model,
                                 col_types=col_types,
                                 X_train=data['train']['input'],
@@ -59,8 +55,10 @@ if __name__ == '__main__':
                                 report_metrics=False,
                                 stratify=col_types['input']['all'].index('model'),
                                 )
-    cv_mape = np.mean(mape_list)
-    print(mape_list, cv_mape)
+
+    cv_gef = cv_metrics_df['GEF'].mean()
+    print(cv_metrics_df)
+    print(f"CV GEF:  {cv_gef:.4f} \n")
 
     taxo1nn = train_sklearn_model(
         base_model=base_model,
@@ -71,8 +69,8 @@ if __name__ == '__main__':
     # print(taxo1nn.predict(data['train']['input']))
 
     model_name = base_model.__name__
-    formatted_score = format(cv_mape, '.4e').replace('.', '')
-    best_model_name = f'MAPE_{formatted_score}_{model_name}'
+    formatted_score = format(cv_gef, '.4e').replace('.', '')
+    best_model_name = f'GEF_{formatted_score}_{model_name}'
 
     save_folder = f'results/{dataset_name}/all'
     test_performance_save_folder = os.path.join(save_folder, 'test_performance')
@@ -82,7 +80,7 @@ if __name__ == '__main__':
                                                col_types=col_types,
                                                model=taxo1nn,
                                                print_score=True,
-                                               save_score=True,
+                                               save_score=save_trained_model,
                                                results_save_path=test_performance_save_file)
     if save_trained_model:
         save_sklearn_model(taxo1nn,

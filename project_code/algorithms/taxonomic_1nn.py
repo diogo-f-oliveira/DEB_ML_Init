@@ -66,14 +66,16 @@ class TaxonomicLabelEncoder:
 class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
     """
     A k-NN Regressor based on taxonomic distance between species. Ties are broken with the numerical column maximum
-    weight Wwi. A large penalty is imposed if the species do not share the same DEB model type.
+    weight Wwi.
     """
     WEIGHT_FACTOR = 0.01
-    DEB_MODEL_FACTOR = 100
+    LINEAR_SCALING_COLS = ['p_Am', 'h_a']
+    CUBE_SCALING_COLS = ['E_Hb', 'E_Hj', 'E_Hx', 'E_Hp']
 
-    def __init__(self, col_types, taxonomy_encoder, deb_model_encoder, n_neighbors=1):
+    def __init__(self, col_types, taxonomy_encoder, n_neighbors=1, use_scaling_relationships=True):
         self.n_neighbors = n_neighbors
         self.col_types = col_types
+        self.output_col_idx_dict = {col: i for i, col in enumerate(col_types['output']['all'])}
 
         self.taxonomy_encoder = taxonomy_encoder
         if not len(self.taxonomy_encoder.taxonomy_col_names):
@@ -84,15 +86,15 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
             raise Exception("Missing maximum weight column 'Wwi' in dataset.")
         self.wi_col = col_types['input']['all'].index('Wwi')
 
-        if 'model' not in col_types['input']['all']:
-            raise Exception("Missing DEB model type column 'model' in dataset.")
-        self.deb_model_col = col_types['input']['all'].index('model')
-        self.deb_model_encoder = deb_model_encoder
+        self.use_scaling_relationships = use_scaling_relationships
 
         self.knn_model = None
         self.train_data = None
         self.train_targets = None
-        self.train_deb_model_types = None
+
+    def encode_data(self, df):
+        encoded_df = self.taxonomy_encoder.transform(df)
+        return encoded_df
 
     @staticmethod
     def _taxonomy_distance(tax1, tax2):
@@ -101,7 +103,7 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
         for i in range(len(tax1)):
             if tax1[i] != tax2[i]:
                 # Assign a penalty based on the taxonomic level
-                distance += 2 ** i
+                distance += 1
         return distance
 
     def _compute_distance_matrix(self, data_a, data_b, data_split='test'):
@@ -118,12 +120,8 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
                 )
                 # Get weight distance
                 weight_distance = abs(data_a[i, self.wi_col] - data_b[j, self.wi_col]) if taxonomy_distance == 0 else 0
-                # Compare deb model types
-                deb_model_type_distance = data_a[i, self.deb_model_col] != data_b[j, self.deb_model_col]
                 # Add distance between weights to break ties with a small factor
-                distance = (taxonomy_distance +
-                            weight_distance * self.WEIGHT_FACTOR +
-                            self.DEB_MODEL_FACTOR * deb_model_type_distance)
+                distance = (taxonomy_distance + weight_distance * self.WEIGHT_FACTOR)
 
                 # In case distance is zero for multiple species during training, add small factor to ensure the nearest
                 # neighbor is itself
@@ -157,7 +155,13 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
         # Compute distances from each test sample to each training sample
         test_distance_matrix = self._compute_distance_matrix(X, self.train_data, data_split='test')
 
-        return self.get_predictions_from_distance_matrix(test_distance_matrix)
+        # Get parameter values for closest species
+        y_hat, indices = self.get_predictions_from_distance_matrix(test_distance_matrix)
+
+        # Apply scaling laws
+        y_hat = self.apply_scaling_relationships(X, y_hat, indices)
+
+        return y_hat
 
     def get_predictions_from_distance_matrix(self, distance_matrix):
         # Find the nearest neighbor in the training set for each test sample
@@ -166,9 +170,26 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
         # Predict the target values based on the nearest neighbors
         predictions = [self.train_targets[idx[0]] for idx in indices]
 
-        return np.array(predictions)
+        return np.array(predictions), indices
 
-    def encode_data(self, df):
-        encoded_df = self.taxonomy_encoder.transform(df)
-        encoded_df['model'] = self.deb_model_encoder.transform(encoded_df['model'])
-        return encoded_df
+    def apply_scaling_relationships(self, X, y, indices):
+        if not self.use_scaling_relationships:
+            return y
+
+        # Get zoom factor ratios
+        train_maximum_weights = self.train_data[indices, self.wi_col].ravel()
+        target_maximum_weights = X[:, self.wi_col]
+        zoom_factor_ratios = np.exp((target_maximum_weights - train_maximum_weights) / 3)
+
+        # Scale parameters by 'z'
+        for col in self.LINEAR_SCALING_COLS:
+            if col in self.output_col_idx_dict:
+                col_idx = self.output_col_idx_dict[col]
+                y[:, col_idx] *= zoom_factor_ratios
+        # Scale parameters by 'z^3'
+        for col in self.CUBE_SCALING_COLS:
+            if col in self.output_col_idx_dict:
+                col_idx = self.output_col_idx_dict[col]
+                y[:, col_idx] *= np.power(zoom_factor_ratios, 3)
+
+        return y
