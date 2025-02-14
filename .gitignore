@@ -164,3 +164,11 @@ tune/
 
 # Ignore files on the paper
 paper/
+
+# Ignore the file where paths are set
+filepaths.csv
+
+# MATLAB autosave files
+*.asv
+
+
