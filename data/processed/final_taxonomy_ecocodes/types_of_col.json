@@ -1,0 +1,209 @@
+{
+    "ab": [
+        "input",
+        "log",
+        "scale",
+        "quantile"
+    ],
+    "am": [
+        "input",
+        "log",
+        "scale",
+        "quantile"
+    ],
+    "d_V": [
+        "input"
+    ],
+    "Wwb": [
+        "input",
+        "log",
+        "scale",
+        "quantile"
+    ],
+    "Wwp": [
+        "input",
+        "log",
+        "scale",
+        "quantile"
+    ],
+    "Wwi": [
+        "input",
+        "log",
+        "scale",
+        "quantile"
+    ],
+    "Ri": [
+        "input",
+        "log",
+        "scale",
+        "quantile"
+    ],
+    "T_typical": [
+        "input",
+        "scale",
+        "quantile"
+    ],
+    "metamorphosis": [
+        "input",
+        "boolean"
+    ],
+    "p_Am": [
+        "output",
+        "log",
+        "scale",
+        "quantile"
+    ],
+    "1-kap": [
+        "output",
+        "log",
+        "scale",
+        "bounded01",
+        "quantile"
+    ],
+    "v": [
+        "output",
+        "log",
+        "scale",
+        "quantile"
+    ],
+    "s_p_M": [
+        "output",
+        "log",
+        "scale",
+        "bounded01",
+        "quantile"
+    ],
+    "s_Hb_bj": [
+        "output",
+        "log",
+        "scale",
+        "bounded01",
+        "quantile"
+    ],
+    "s_Hbj_p": [
+        "output",
+        "log",
+        "scale",
+        "bounded01",
+        "quantile"
+    ],
+    "E_Hp": [
+        "output",
+        "log",
+        "scale",
+        "quantile"
+    ],
+    "k_J": [
+        "output",
+        "log",
+        "scale",
+        "quantile"
+    ],
+    "1/s_M": [
+        "output",
+        "log",
+        "scale",
+        "bounded01",
+        "quantile"
+    ],
+    "class_other": [
+        "input",
+        "boolean"
+    ],
+    "class_Aves": [
+        "input",
+        "boolean"
+    ],
+    "class_Actinopterygii": [
+        "input",
+        "boolean"
+    ],
+    "class_Reptilia": [
+        "input",
+        "boolean"
+    ],
+    "class_Chondrichthyes": [
+        "input",
+        "boolean"
+    ],
+    "class_Amphibia": [
+        "input",
+        "boolean"
+    ],
+    "class_Mammalia": [
+        "input",
+        "boolean"
+    ],
+    "class_Bivalvia": [
+        "input",
+        "boolean"
+    ],
+    "class_Branchiopoda": [
+        "input",
+        "boolean"
+    ],
+    "class_Malacostraca": [
+        "input",
+        "boolean"
+    ],
+    "climate_A": [
+        "input",
+        "boolean"
+    ],
+    "climate_B": [
+        "input",
+        "boolean"
+    ],
+    "climate_C": [
+        "input",
+        "boolean"
+    ],
+    "climate_D": [
+        "input",
+        "boolean"
+    ],
+    "climate_E": [
+        "input",
+        "boolean"
+    ],
+    "habitat_T": [
+        "input",
+        "boolean"
+    ],
+    "habitat_F": [
+        "input",
+        "boolean"
+    ],
+    "habitat_S": [
+        "input",
+        "boolean"
+    ],
+    "habitat_M": [
+        "input",
+        "boolean"
+    ],
+    "migrate_T": [
+        "input",
+        "boolean"
+    ],
+    "food_other": [
+        "input",
+        "boolean"
+    ],
+    "food_P": [
+        "input",
+        "boolean"
+    ],
+    "food_O": [
+        "input",
+        "boolean"
+    ],
+    "food_H": [
+        "input",
+        "boolean"
+    ],
+    "food_C": [
+        "input",
+        "boolean"
+    ]
+}
