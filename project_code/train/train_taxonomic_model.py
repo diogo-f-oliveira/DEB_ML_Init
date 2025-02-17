@@ -21,8 +21,7 @@ if __name__ == '__main__':
 
     # Variables to save results
     results_folder = f'results/{dataset_name}'
-    create_results_directories_for_dataset(dataset_name, output_cols=col_types['output']['all'],
-                                           results_path='results')
+    create_results_directories_for_dataset(dataset_name)
 
     # Encode taxonomy labels
     taxonomy_encoder = TaxonomicLabelEncoder(

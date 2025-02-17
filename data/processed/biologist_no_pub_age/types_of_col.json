@@ -1,0 +1,63 @@
+{
+    "Wwi": [
+        "input",
+        "log"
+    ],
+    "genus": [
+        "input",
+        "category"
+    ],
+    "family": [
+        "input",
+        "category"
+    ],
+    "order": [
+        "input",
+        "category"
+    ],
+    "class": [
+        "input",
+        "category"
+    ],
+    "phylum": [
+        "input",
+        "category"
+    ],
+    "model": [
+        "input",
+        "category"
+    ],
+    "p_Am": [
+        "output"
+    ],
+    "kap": [
+        "output"
+    ],
+    "v": [
+        "output"
+    ],
+    "p_M": [
+        "output"
+    ],
+    "E_G": [
+        "output"
+    ],
+    "h_a": [
+        "output"
+    ],
+    "E_Hb": [
+        "output"
+    ],
+    "E_Hx": [
+        "output"
+    ],
+    "E_Hj": [
+        "output"
+    ],
+    "E_Hp": [
+        "output"
+    ],
+    "k_J": [
+        "output"
+    ]
+}
