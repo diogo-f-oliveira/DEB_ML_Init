@@ -5,22 +5,25 @@ from functools import partial
 from datetime import datetime as dt
 
 import numpy as np
+import pandas as pd
 from ray.tune import CLIReporter
 from ray.tune.schedulers import ASHAScheduler
 from ray.tune.search.hyperopt import HyperOptSearch
 from sklearn.model_selection import GridSearchCV, KFold, StratifiedKFold
-import pickle
 
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge, Lasso, MultiTaskElasticNet
+from sklearn.neighbors import KNeighborsRegressor
 from sklearn.svm import SVR
+import xgboost as xgb
 
+from ..utils.models import save_sklearn_model
 from ..train.train_sklearn_model import train_sklearn_model
 from ..utils.results import create_results_directories_for_dataset
 from ..algorithms.build_sklearn_model import build_sklearn_model
 from ..data.load_data import load_data, load_col_types
 from ..data.prepare_data_sklearn import get_features_targets, get_single_output_col_types
-from ..evaluate.prediction_error import evaluate_on_data
+from ..evaluate.prediction_error import evaluate_on_data, evaluate_parameter_predictions_on_data, METRIC_LABEL_TO_NAME
 
 from ray import train, tune
 
@@ -40,11 +43,6 @@ def format_param_grid(param_grid, model):
             formatted_param_grid[f"{param_base_str}__{param_name}"] = param_options
     # param_grid = {'regressor__model__' + param: options for param, options in param_grid.items()}
     return formatted_param_grid
-
-
-def save_model(model, folder, filename):
-    with open(os.path.join(folder, filename), 'wb') as f:
-        pickle.dump(model, f)
 
 
 def grid_search_calibration(base_model, search_space, data, col_types, scorer=None,
@@ -71,9 +69,9 @@ def grid_search_calibration(base_model, search_space, data, col_types, scorer=No
     formatted_score = format(grid_search.best_score_, '.4f').replace('.', '')
     best_model_name = f'R2_{formatted_score}_{base_model.__class__.__name__}'
     if save_best_model:
-        save_model(grid_search.best_estimator_,
-                   folder=os.path.join(save_folder, 'models'),
-                   filename=f"{best_model_name}.pkl")
+        save_sklearn_model(grid_search.best_estimator_,
+                           folder=os.path.join(save_folder, 'models'),
+                           filename=f"{best_model_name}.pkl")
 
     if evaluate_on_test:
         test_performance_save_folder = os.path.join(save_folder, 'test_performance')
@@ -83,12 +81,14 @@ def grid_search_calibration(base_model, search_space, data, col_types, scorer=No
                          model=grid_search.best_estimator_,
                          print_score=print_best_model,
                          save_score=save_best_model,
-                         results_save_path=test_performance_save_file)
+                         results_save_path=test_performance_save_file
+                         )
 
     return grid_search
 
 
-def evaluate_config(config, base_model, col_types, X_train, y_train, random_state=42, n_splits=5, stratify=None):
+def evaluate_config(config, base_model, col_types, X_train, y_train, random_state=42, n_splits=5, stratify=None,
+                    report_metrics=True):
     if random_state in inspect.signature(base_model.__init__).parameters:
         config['random_state'] = random_state
     # configured_base_model = base_model(**config)
@@ -96,13 +96,17 @@ def evaluate_config(config, base_model, col_types, X_train, y_train, random_stat
     if stratify is None:
         cv = KFold(n_splits=n_splits, random_state=random_state, shuffle=True)
         stratify_col = None
-    elif isinstance(stratify, (list, int, tuple)):
+    elif isinstance(stratify, (list, tuple)):
         stratify_col = np.apply_along_axis(lambda row: '_'.join(row), 1, X_train[:, stratify].astype(str))
         cv = StratifiedKFold(n_splits=n_splits, random_state=random_state, shuffle=True)
-    scores = []
+    elif isinstance(stratify, int):
+        stratify_col = X_train[:, stratify]
+        cv = StratifiedKFold(n_splits=n_splits, random_state=random_state, shuffle=True)
+
+    cv_metrics_df = pd.DataFrame(columns=list(METRIC_LABEL_TO_NAME.values()))
     for i, (train_index, val_index) in enumerate(cv.split(X_train, stratify_col)):
         # Get fold training data
-        fold_data = {
+        fold_train_data = {
             'input': X_train[train_index],
             'output': y_train[train_index],
         }
@@ -111,27 +115,40 @@ def evaluate_config(config, base_model, col_types, X_train, y_train, random_stat
             base_model=base_model,
             config=config,
             col_types=col_types,
-            data=fold_data,
+            data=fold_train_data,
             random_state=random_state
         )
         # Evaluate on fold validation data
-        r2_score = model.score(X_train[val_index], y_train[val_index])
-        scores.append(r2_score)
+        fold_val_data = {'input': X_train[val_index], 'output': y_train[val_index]}
+        fold_metrics_df = evaluate_parameter_predictions_on_data(
+            data=fold_val_data,
+            col_types=col_types,
+            model=model
+        )
+        cv_metrics_df.loc[i] = fold_metrics_df.mean().rename(METRIC_LABEL_TO_NAME)
         # Report metrics
-        train.report({f'r2': np.mean(scores)})
+        if report_metrics:
+            train.report({m: cv_metrics_df[m].mean() for m in METRIC_LABEL_TO_NAME.values()})
 
-    # scores = cross_val_score(model, X_train, y_train, cv=cv, scoring=None, n_jobs=1,
-    #                          )
     # Report the CV R2 score to Ray Tune
-    train.report({f'r2': np.mean(scores)})
+    if report_metrics:
+        train.report({m: cv_metrics_df[m].mean() for m in METRIC_LABEL_TO_NAME.values()})
+    else:
+        return cv_metrics_df
 
 
 def hyperopt_calibration(base_model, search_space, data, col_types, current_best_params=None,
-                         num_samples=100, metric='r2', mode='max',
+                         num_samples=100, metric='MAPE', mode='min', max_concurrent_trials=None,
                          run_name=None, evaluate_on_test=False, print_test_score=False, save_best_model=False,
                          save_folder='', random_state=42, **evaluate_config_options):
+    if hasattr(base_model, '__name__'):
+        model_name = base_model.__name__
+    elif hasattr(base_model, '__class__'):
+        model_name = base_model.__class__.__name__
     if run_name is None:
-        f"{'__'.join(col_types['output']['all'])}__{base_model.__name__}__{dt.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+        targets_str = '__'.join(col_types['output']['all'])
+        time_str = dt.now().strftime('%Y-%m-%d_%H-%M-%S')
+        run_name = f"{targets_str}__{model_name}__{time_str}"
     alg = HyperOptSearch(metric=metric, mode=mode,
                          points_to_evaluate=current_best_params, random_state_seed=random_state)
 
@@ -140,6 +157,7 @@ def hyperopt_calibration(base_model, search_space, data, col_types, current_best
                 X_train=data['train']['input'], y_train=data['train']['output'], **evaluate_config_options),
         tune_config=tune.TuneConfig(
             search_alg=alg,
+            max_concurrent_trials=max_concurrent_trials,
             num_samples=num_samples,
             trial_dirname_creator=lambda t: t.trial_id,
             scheduler=ASHAScheduler(metric=metric, mode=mode, grace_period=2, max_t=6),
@@ -149,7 +167,7 @@ def hyperopt_calibration(base_model, search_space, data, col_types, current_best
             verbose=1,
             progress_reporter=CLIReporter(
                 metric=metric, mode=mode,
-                metric_columns=[metric],
+                metric_columns=list(METRIC_LABEL_TO_NAME.values()),
                 parameter_columns=list(search_space.keys()),
                 sort_by_metric=True,
                 max_report_frequency=60,
@@ -169,26 +187,26 @@ def hyperopt_calibration(base_model, search_space, data, col_types, current_best
         data=data['train'],
         random_state=random_state
     )
-    formatted_score = format(best_result.metrics[metric], '.4f').replace('.', '')
-    best_model_name = f'R2_{formatted_score}_{base_model.__name__}'
+    formatted_score = format(best_result.metrics[metric], '.4e').replace('.', '')
+    best_model_name = f'MAPE_{formatted_score}_{model_name}'
 
     print("Best parameters found: ", best_result.config)
     print(f"Best score: {best_result.metrics[metric]:.4f}")
 
     if save_best_model:
-        save_model(best_model,
-                   folder=os.path.join(save_folder, 'models'),
-                   filename=f"{best_model_name}.pkl")
+        save_sklearn_model(best_model,
+                           folder=os.path.join(save_folder, 'models'),
+                           filename=f"{best_model_name}.pkl")
 
     if evaluate_on_test:
         test_performance_save_folder = os.path.join(save_folder, 'test_performance')
         test_performance_save_file = os.path.join(test_performance_save_folder, f"{best_model_name}.csv")
-        evaluate_on_data(data=data['test'],
-                         col_types=col_types,
-                         model=best_model,
-                         print_score=print_test_score,
-                         save_score=save_best_model,
-                         results_save_path=test_performance_save_file)
+        evaluate_parameter_predictions_on_data(data=data['test'],
+                                               col_types=col_types,
+                                               model=best_model,
+                                               print_score=print_test_score,
+                                               save_score=save_best_model,
+                                               results_save_path=test_performance_save_file)
 
     return best_model
 
@@ -203,10 +221,10 @@ def calibrate_independent_output_models(base_model, search_space, dataset_name, 
 
     if save_folder is None:
         save_folder = f'results/{dataset_name}'
-        create_results_directories_for_dataset(dataset_name, output_cols=col_types['output']['all'])
+        create_results_directories_for_dataset(dataset_name)
 
     for i, col in enumerate(col_types['output']['all']):
-        if col in []:
+        if col not in ['kap', 'E_Hb_p']:
             continue
         so_col_types = get_single_output_col_types(col_types=col_types, output_col=col)
         so_data = get_features_targets(data=dfs, col_types=so_col_types)
@@ -235,7 +253,8 @@ if __name__ == '__main__':
     # dataset_name = 'ratio_output_no_pub_weight'
 
     # dataset_name = 'no_pub_age'
-    dataset_name = 'ratio_output_no_pub_age'
+    # dataset_name = 'ratio_output_no_pub_age'
+    dataset_name = 'all_constraints_no_pub_age'
 
     # dataset_name = 'bijection_input'
 
@@ -245,81 +264,118 @@ if __name__ == '__main__':
     # Load the data
     dfs = load_data(dataset_name=dataset_name, data_split='train_test')
     col_types = load_col_types(dataset_name=dataset_name)
+    n_targets = len(col_types['output']['all'])
     data = get_features_targets(dfs, col_types)
     deb_model_dummy_cols = ['metamorphosis', 'weaning']
     deb_model_column_indices = [dfs['train'].columns.get_loc(col) for col in deb_model_dummy_cols]
 
     os.environ['RAY_AIR_NEW_OUTPUT'] = '0'
+    num_samples = 100
 
-    # base_model = Ridge(random_state=seed)
-    # base_model = Lasso(random_state=seed, max_iter=10000)
-    # param_grid = {
-    #     'alpha': [1e-4, 5e-3, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 0.5, 1, 5]
-    # }
-
-    base_model = RandomForestRegressor
-    search_space = {
-        'n_estimators': tune.qrandint(100, 10000, 100),
-        'min_samples_split': tune.randint(2, 7),
-        'max_features': tune.randint(2, len(col_types['input']['all']) + 1),
-        'criterion': tune.choice(['squared_error', 'friedman_mse']),
-    }
-    calibrate_independent_output_models(base_model=base_model,
-                                        search_space=search_space,
-                                        dataset_name=dataset_name,
-                                        calibration_function=hyperopt_calibration,
-                                        dfs=dfs,
-                                        col_types=col_types,
-                                        evaluate_on_test=True,
-                                        print_test_score=True,
-                                        save_best_model=True,
-                                        num_samples=100,
-                                        stratify=deb_model_column_indices,
-                                        )
-
-    base_model = Ridge
-    # base_model = Lasso
-    search_space = {'alpha': tune.loguniform(1e-4, 1e4)}
-    calibrate_independent_output_models(base_model=base_model,
-                                        search_space=search_space,
-                                        dataset_name=dataset_name,
-                                        calibration_function=hyperopt_calibration,
-                                        dfs=dfs,
-                                        col_types=col_types,
-                                        evaluate_on_test=True,
-                                        print_test_score=True,
-                                        save_best_model=True,
-                                        num_samples=100,
-                                        stratify=deb_model_column_indices,
-                                        )
-
-    base_model = SVR
-    search_space = {
-        'kernel': tune.choice(['linear', 'rbf']),
-        'C': tune.loguniform(1e-3, 1e2),
-        'epsilon': tune.uniform(0.01, 1),
-        'gamma': tune.uniform(0.01, 2),
+    ## Train independent output models
+    base_models = {
+        'Ridge': Ridge,
+        'Lasso': Lasso,
+        'SVR': SVR,
+        'RandomForestRegressor': RandomForestRegressor,
+        'XGBRegressor': xgb.XGBRegressor,
+        'KNeighborsRegressor': KNeighborsRegressor,
+        'MultiTaskElasticNet': MultiTaskElasticNet,
     }
 
-    calibrate_independent_output_models(base_model=base_model,
-                                        search_space=search_space,
-                                        dataset_name=dataset_name,
-                                        calibration_function=hyperopt_calibration,
-                                        dfs=dfs,
-                                        col_types=col_types,
-                                        evaluate_on_test=True,
-                                        print_test_score=True,
-                                        save_best_model=True,
-                                        num_samples=100,
-                                        stratify=deb_model_column_indices,
-                                        )
+    search_spaces = {
+        'Ridge': {'alpha': tune.loguniform(1e-4, 1e4)},
+        'Lasso': {'alpha': tune.loguniform(1e-4, 1e4)},
+        'MultiTaskElasticNet': {
+            'l1_ratio': tune.uniform(0, 1),
+            'alpha': tune.loguniform(1e-4, 1e4),
+            # 'input_scaler_type': tune.choice(['standard', 'quantile_normal', 'quantile_uniform']),
+            # 'output_scaler_type': tune.choice(['standard', 'quantile_normal', 'quantile_uniform']),
+        },
+        'SVR': {
+            'kernel': tune.choice(['linear', 'rbf']),
+            'C': tune.loguniform(1e-3, 1e2),
+            'epsilon': tune.uniform(0.01, 1),
+            'gamma': tune.uniform(0.01, 2),
+        },
+        'RandomForestRegressor': {
+            'n_estimators': tune.qrandint(100, 10000, 100),
+            # 'min_samples_split': tune.randint(2, 4),
+            'max_features': tune.randint(2, len(col_types['input']['all']) + 1),
+            'criterion': tune.choice(['squared_error', 'friedman_mse']),
+        },
+        'XGBRegressor': {
+            'n_estimators': tune.qrandint(100, 10000, 100),
+            'learning_rate': tune.loguniform(1e-4, 1e-1),
+            "max_depth": tune.randint(1, 10),
+            'grow_policy': tune.choice(['depthwise', 'lossguide']),
+            "subsample": tune.uniform(0.5, 1.0),
+            "colsample_bytree": tune.uniform(0.5, 1.0),
+        },
+        'KNeighborsRegressor': {
+            'n_neighbors': tune.randint(1, 10),
+            'weights': tune.choice(['uniform', 'distance']),
+            'p': tune.uniform(1, 3),
+        },
+    }
 
-    # base_model = xgb.XGBRegressor
-    # search_space = {
-    #     'n_estimators': tune.qrandint(100, 10000, 100),
-    #     'learning_rate': tune.loguniform(1e-4, 1e-1),
-    #     "max_depth": tune.randint(3, 10),
-    #     'grow_policy': tune.choice(['depthwise', 'lossguide']),
-    #     "subsample": tune.uniform(0.5, 1.0),
-    #     "colsample_bytree": tune.uniform(0.5, 1.0),
+    single_output_models_to_train = []
 
+    for model_name in single_output_models_to_train:
+        print(f"Training model {model_name}\n")
+        base_model = base_models[model_name]
+        search_space = search_spaces[model_name]
+        calibrate_independent_output_models(base_model=base_model,
+                                            search_space=search_space,
+                                            dataset_name=dataset_name,
+                                            calibration_function=hyperopt_calibration,
+                                            dfs=dfs,
+                                            col_types=col_types,
+                                            evaluate_on_test=True,
+                                            print_test_score=True,
+                                            save_best_model=True,
+                                            num_samples=num_samples,
+                                            stratify=deb_model_column_indices,
+                                            )
+
+    # print(col_types)
+    # base_model = RandomForestRegressor
+    # model = train_sklearn_model(
+    #     base_model=base_model,
+    #     config={},
+    #     data=data['train'],
+    #     col_types=col_types,
+    # )
+    #
+    # evaluate_config(config={},
+    #                 base_model=base_model,
+    #                 col_types=col_types,
+    #                 X_train=data['train']['input'],
+    #                 y_train=data['train']['output'],
+    #                 report_metrics=False)
+
+    # Train multioutput models
+    multi_output_models_to_train = [
+        # 'MultiTaskElasticNet',
+        'RandomForestRegressor',
+    ]
+
+    for model_name in multi_output_models_to_train:
+        print(f"Training model {model_name} on dataset {dataset_name}")
+        base_model = base_models[model_name]
+        search_space = search_spaces[model_name]
+        hyperopt_calibration(
+            base_model=base_model,
+            search_space=search_space,
+            data=data,
+            col_types=col_types,
+            evaluate_on_test=True,
+            print_test_score=True,
+            save_best_model=True,
+            save_folder=f'results/{dataset_name}/all',
+            run_name='all_RF_test',
+            metric='sMAPE',
+            mode='min',
+            num_samples=150,
+            max_concurrent_trials=12,
+        )
