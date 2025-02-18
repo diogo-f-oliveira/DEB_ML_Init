@@ -1,40 +1,19 @@
 import numpy as np
-import sklearn.metrics
-from functools import partial
 
 
-def make_unscaled_scorer(metric, **metrics_kws):
-    if not callable(metric):
-        metric = getattr(sklearn.metrics, metric)
-    if len(metrics_kws):
-        metric = partial(metric, **metrics_kws)
-
-    # Unscale both the predictions and the true values
-    def unscaled_scorer(estimator, X, y):
-        y_pred = estimator.predict(X)
-        y_pred_unscaled = estimator.output_transformer.inverse_transform(y_pred)
-        # print(y_pred_unscaled)
-        y_unscaled = estimator.output_transformer.inverse_transform(y)
-        # print(y_unscaled)
-
-        return metric(y_unscaled, y_pred_unscaled)
-
-    return unscaled_scorer
-
-
-def mean_deb_loss(y_true, y_pred, sample_weights=None, multioutput='raw_values'):
-    if sample_weights is None:
-        sample_weights = np.ones((len(y_true), 1)) / len(y_true)
+def mean_deb_loss(y_true, y_pred, sample_weight=None, multioutput='raw_values'):
+    if sample_weight is None:
+        sample_weight = np.ones_like(y_true)
     y_true = np.array(y_true)
     y_pred = np.array(y_pred)
-    raw_values = sample_weights * (np.power(y_true - y_pred, 2)) / (np.power(y_true, 2) + np.power(y_pred, 2))
+    raw_values = sample_weight * (np.power(y_true - y_pred, 2)) / (np.power(y_true, 2) + np.power(y_pred, 2))
     if multioutput == 'raw_values':
         return np.mean(raw_values, axis=0)
     elif multioutput == 'uniform_average':
         return np.mean(raw_values)
 
 
-def geometric_error_factor(y_true, y_pred, *, multioutput="uniform_average"):
+def geometric_error_factor(y_true, y_pred, *, sample_weight=None, multioutput='raw_values'):
     """
     Compute the geometric error factor between true and predicted values.
 
@@ -97,8 +76,14 @@ def geometric_error_factor(y_true, y_pred, *, multioutput="uniform_average"):
     # Compute the absolute log error for each element
     log_errors = np.abs(np.log(y_pred / y_true))
 
-    # Compute the mean of the log errors over the samples (axis=0)
-    mean_log_error = np.mean(log_errors, axis=0)
+    # Compute the mean of the log errors over samples (axis=0), using sample_weight if provided.
+    if sample_weight is not None:
+        sample_weight = np.asarray(sample_weight)
+        if sample_weight.ndim != 1 or sample_weight.shape[0] != y_true.shape[0]:
+            raise ValueError("sample_weight must be a 1D array with the same length as the number of samples.")
+        mean_log_error = np.average(log_errors, axis=0, weights=sample_weight)
+    else:
+        mean_log_error = np.mean(log_errors, axis=0)
 
     # Exponentiate the mean log error to get the geometric error factor per output
     gef = np.exp(mean_log_error)
@@ -117,8 +102,8 @@ def geometric_error_factor(y_true, y_pred, *, multioutput="uniform_average"):
         raise ValueError("multioutput must be 'raw_values', 'uniform_average', or array-like of weights.")
 
 
-def symmetric_mean_absolute_percentage_error(y_true, y_pred, *, percentage=True, normalize=True,
-                                             multioutput="uniform_average"):
+def symmetric_mean_absolute_percentage_error(y_true, y_pred, *, sample_weight=None, percentage=True, normalize=True,
+                                             multioutput='raw_values'):
     """
     Compute the symmetric Mean Absolute Percentage Error (sMAPE).
 
@@ -185,8 +170,14 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred, *, percentage=True,
     # Compute absolute percentage errors for each sample
     errors = np.abs(y_true - y_pred) / denominator
 
-    # Compute the mean error for each output (axis=0)
-    smape_per_output = np.mean(errors, axis=0)
+    # Compute the mean error for each output (axis=0), using sample_weight if provided.
+    if sample_weight is not None:
+        sample_weight = np.asarray(sample_weight)
+        if sample_weight.ndim != 1 or sample_weight.shape[0] != y_true.shape[0]:
+            raise ValueError("sample_weight must be a 1D array with the same length as the number of samples.")
+        smape_per_output = np.average(errors, axis=0, weights=sample_weight)
+    else:
+        smape_per_output = np.mean(errors, axis=0)
 
     # Normalize if desired
     if normalize:

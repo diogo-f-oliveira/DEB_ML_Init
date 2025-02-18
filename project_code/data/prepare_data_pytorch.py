@@ -1,5 +1,9 @@
 import torch
+from sklearn.preprocessing import QuantileTransformer
 from torch.utils.data import TensorDataset, DataLoader
+from ..inference.parameters import impute_predictions_for_DEB_model_dependent_outputs
+
+DEFAULT_TORCH_DTYPE = torch.float32
 
 
 class LogScaleTensorTransformer:
@@ -20,7 +24,7 @@ class LogScaleTensorTransformer:
 
         # Fit the scaler on the log-transformed data
         if self.scale_cols:
-            self.std, self.mean = torch.std_mean(x_log[:, self.scale_cols], 0)
+            self.std, self.mean = torch.std_mean(x_log[:, self.scale_cols], dim=0)
 
         return self
 
@@ -51,7 +55,7 @@ class LogScaleTensorTransformer:
         return x_inverse
 
 
-def prepare_data_tensors(data, col_types, batch_size):
+def log_standardize_data(data, col_types):
     input_cols = col_types['input']['all']
     output_cols = col_types['output']['all']
 
@@ -60,8 +64,17 @@ def prepare_data_tensors(data, col_types, batch_size):
     for split, df in data.items():
         data_tensors[split] = {
             'input': torch.tensor(df[input_cols].astype('float').values, dtype=torch.float32),
-            'output': torch.tensor(df[output_cols].astype('float').values, dtype=torch.float32)
+            'output': torch.tensor(df[output_cols].astype('float').values, dtype=torch.float32),
         }
+
+        # Compute weights from ´metamorphosis´ column
+        split_mask = torch.zeros_like(data_tensors[split]['output'], dtype=torch.float32)
+        # Sets predictions to 1 for outputs that should not be predicted
+        split_mask = impute_predictions_for_DEB_model_dependent_outputs(
+            y=split_mask, X=data_tensors[split]['input'], col_types=col_types,
+        )
+        # Complement to have weight of 0 for outputs that should not be predicted
+        data_tensors[split]['mask'] = 1 - split_mask
 
     # Scale the data
     scalers = {}
@@ -83,17 +96,103 @@ def prepare_data_tensors(data, col_types, batch_size):
         scale_cols=output_scale_cols
     ).fit(data_tensors['train']['output'])
 
+    scaled_data_tensors = {}
+    for split in data_tensors:
+        scaled_data_tensors[split] = {}
+        for subset in ('input', 'output'):
+            scaled_data_tensors[split][subset] = scalers[subset].transform(data_tensors[split][subset])
+
+    return data_tensors, scalers, scaled_data_tensors
+
+
+class QuantileTensorTransformer:
+    DTYPE = torch.float32
+
+    def __init__(self, all_cols, quantile_cols=None):
+        self.all_col_names = all_cols
+        self.quantile_col_names = quantile_cols
+        self.quantile_cols = [i for i, col in enumerate(self.all_col_names) if col in self.quantile_col_names]
+        self.quantile_transformer = QuantileTransformer(random_state=42)
+
+    def fit(self, x):
+        x_quantile = x.copy()
+        if self.quantile_cols:
+            self.quantile_transformer.fit(x_quantile[:, self.quantile_cols])
+
+        return self
+
+    def transform(self, x):
+        if torch.is_tensor(x):
+            x = x.numpy()
+        x_transformed = x.copy()
+        if self.quantile_cols:
+            x_transformed[:, self.quantile_cols] = self.quantile_transformer.transform(
+                x_transformed[:, self.quantile_cols])
+        return torch.tensor(x_transformed, dtype=DEFAULT_TORCH_DTYPE)
+
+    def inverse_transform(self, x):
+        if torch.is_tensor(x):
+            x = x.numpy()
+        x_inverse = x.copy()
+        if self.quantile_cols:
+            x_inverse[:, self.quantile_cols] = self.quantile_transformer.inverse_transform(
+                x_inverse[:, self.quantile_cols])
+
+        return torch.tensor(x_inverse, dtype=DEFAULT_TORCH_DTYPE)
+
+
+def quantile_transform_data(data, col_types):
+    data_tensors = {}
+    scalers = {}
+    scaled_data_tensors = {}
+    for split, df in data.items():
+        data_tensors[split] = {}
+        scaled_data_tensors[split] = {}
+        for subset in ('input', 'output'):
+            subset_cols = col_types[subset]['all']
+
+            # Convert original data to tensors
+            data_tensors[split][subset] = torch.tensor(df[subset_cols].astype('float').values,
+                                                       dtype=DEFAULT_TORCH_DTYPE)
+
+            # Fit the quantile transformer
+            if split == 'train':
+                scalers[subset] = QuantileTensorTransformer(
+                    all_cols=subset_cols,
+                    quantile_cols=col_types[subset]['quantile'],
+                ).fit(df[subset_cols].astype('float').values)
+
+            # Transform the data
+            scaled_data_tensors[split][subset] = scalers[subset].transform(data_tensors[split][subset])
+
+    return data_tensors, scalers, scaled_data_tensors
+
+
+def prepare_data_tensors(data, col_types, batch_size, scaling_type, device):
+    if scaling_type == 'log_standardize':
+        data_tensors, scalers, scaled_data_tensors = log_standardize_data(data, col_types)
+    if scaling_type == 'quantile':
+        data_tensors, scalers, scaled_data_tensors = quantile_transform_data(data, col_types)
+
     datasets = {}
     dataloaders = {}
     for split in data_tensors:
+        # Move data to device
+        data_tensors[split]['input'] = data_tensors[split]['input'].to(device)
+        data_tensors[split]['output'] = data_tensors[split]['output'].to(device)
+        data_tensors[split]['mask'] = data_tensors[split]['mask'].to(device)
+
+        # Create dataset
         datasets[split] = TensorDataset(
             scalers['input'].transform(data_tensors[split]['input']),
             scalers['output'].transform(data_tensors[split]['output']),
+            data_tensors[split]['mask'],
         )
+        # Create dataloader
         dataloaders[split] = DataLoader(
             datasets[split],
-            batch_size=batch_size,
-            shuffle=False if split == 'train' else True,
+            batch_size=batch_size if split == 'train' else len(datasets[split]),
+            shuffle=True if split == 'train' else False,
         )
 
-    return dataloaders, datasets, scalers
+    return data_tensors, dataloaders, datasets, scalers

@@ -23,7 +23,7 @@ from ..utils.results import create_results_directories_for_dataset
 from ..algorithms.build_sklearn_model import build_sklearn_model
 from ..data.load_data import load_data, load_col_types
 from ..data.prepare_data_sklearn import get_features_targets, get_single_output_col_types
-from ..evaluate.prediction_error import evaluate_on_data, evaluate_parameter_predictions_on_data, METRIC_LABEL_TO_NAME
+from ..evaluate.prediction_error import evaluate_parameter_predictions_on_data, METRIC_LABEL_TO_NAME
 
 from ray import train, tune
 
@@ -87,12 +87,16 @@ def grid_search_calibration(base_model, search_space, data, col_types, scorer=No
     return grid_search
 
 
-def evaluate_config(config, base_model, col_types, X_train, y_train, random_state=42, n_splits=5, stratify=None,
+def evaluate_config(config, base_model, col_types, data, random_state=42, n_splits=5, stratify=None,
                     report_metrics=True):
+    X_train = data['input']
+    y_train = data['output']
+    mask_train = data['mask']
+    # Set random state
     if random_state in inspect.signature(base_model.__init__).parameters:
         config['random_state'] = random_state
-    # configured_base_model = base_model(**config)
-    # model = build_sklearn_model(base_model=configured_base_model, col_types=col_types)
+
+    # Create KFold class with stratification
     if stratify is None:
         cv = KFold(n_splits=n_splits, random_state=random_state, shuffle=True)
         stratify_col = None
@@ -103,12 +107,14 @@ def evaluate_config(config, base_model, col_types, X_train, y_train, random_stat
         stratify_col = X_train[:, stratify]
         cv = StratifiedKFold(n_splits=n_splits, random_state=random_state, shuffle=True)
 
+    # Run K-Fold cross validation
     cv_metrics_df = pd.DataFrame(columns=list(METRIC_LABEL_TO_NAME.values()))
     for i, (train_index, val_index) in enumerate(cv.split(X_train, stratify_col)):
         # Get fold training data
         fold_train_data = {
             'input': X_train[train_index],
             'output': y_train[train_index],
+            'mask': mask_train[train_index],
         }
         # Train model
         model = train_sklearn_model(
@@ -119,7 +125,7 @@ def evaluate_config(config, base_model, col_types, X_train, y_train, random_stat
             random_state=random_state
         )
         # Evaluate on fold validation data
-        fold_val_data = {'input': X_train[val_index], 'output': y_train[val_index]}
+        fold_val_data = {'input': X_train[val_index], 'output': y_train[val_index], 'mask': mask_train[val_index]}
         fold_metrics_df = evaluate_parameter_predictions_on_data(
             data=fold_val_data,
             col_types=col_types,
@@ -137,30 +143,35 @@ def evaluate_config(config, base_model, col_types, X_train, y_train, random_stat
         return cv_metrics_df
 
 
-def hyperopt_calibration(base_model, search_space, data, col_types, current_best_params=None,
-                         num_samples=100, metric='MAPE', mode='min', max_concurrent_trials=None,
-                         run_name=None, evaluate_on_test=False, print_test_score=False, save_best_model=False,
-                         save_folder='', random_state=42, **evaluate_config_options):
-    if hasattr(base_model, '__name__'):
-        model_name = base_model.__name__
-    elif hasattr(base_model, '__class__'):
-        model_name = base_model.__class__.__name__
+def hyperopt_calibration(base_model, search_space, data, col_types,
+                         num_samples=100, metric='GEF', mode='min', current_best_params=None,
+                         run_name=None, model_name=None, tune_dir=None, max_concurrent_trials=None,
+                         evaluate_on_test=False, save_best_model=False,
+                         save_folder='', random_state=42,
+                         **evaluate_config_options):
+    if model_name is None:
+        if hasattr(base_model, '__name__'):
+            model_name = base_model.__name__
+        elif hasattr(base_model, '__class__'):
+            model_name = base_model.__class__.__name__
     if run_name is None:
-        targets_str = '__'.join(col_types['output']['all'])
         time_str = dt.now().strftime('%Y-%m-%d_%H-%M-%S')
-        run_name = f"{targets_str}__{model_name}__{time_str}"
-    alg = HyperOptSearch(metric=metric, mode=mode,
-                         points_to_evaluate=current_best_params, random_state_seed=random_state)
+        run_name = f"{model_name}__{time_str}"
+    if tune_dir is None:
+        tune_dir = os.path.abspath(f'tune')
+
+    alg = HyperOptSearch(metric=metric, mode=mode, points_to_evaluate=current_best_params,
+                         random_state_seed=random_state)
 
     tuner = tune.Tuner(
-        partial(evaluate_config, base_model=base_model, col_types=col_types,
-                X_train=data['train']['input'], y_train=data['train']['output'], **evaluate_config_options),
+        partial(evaluate_config, base_model=base_model, col_types=col_types, data=data['train'],
+                **evaluate_config_options),
         tune_config=tune.TuneConfig(
             search_alg=alg,
             max_concurrent_trials=max_concurrent_trials,
             num_samples=num_samples,
             trial_dirname_creator=lambda t: t.trial_id,
-            scheduler=ASHAScheduler(metric=metric, mode=mode, grace_period=2, max_t=6),
+            scheduler=ASHAScheduler(metric=metric, mode=mode, grace_period=2, max_t=100),
         ),
         run_config=train.RunConfig(
             name=run_name,
@@ -168,13 +179,13 @@ def hyperopt_calibration(base_model, search_space, data, col_types, current_best
             progress_reporter=CLIReporter(
                 metric=metric, mode=mode,
                 metric_columns=list(METRIC_LABEL_TO_NAME.values()),
-                parameter_columns=list(search_space.keys()),
+                parameter_columns=[p for p, s in search_space.items() if isinstance(s, tune.search.sample.Domain)],
                 sort_by_metric=True,
                 max_report_frequency=60,
-            )
-            # storage_path=f"{save_folder}/model_calibration",
+            ),
+            storage_path=tune_dir,
         ),
-        param_space=search_space
+        param_space=search_space,
     )
     results = tuner.fit()
 
@@ -188,7 +199,7 @@ def hyperopt_calibration(base_model, search_space, data, col_types, current_best
         random_state=random_state
     )
     formatted_score = format(best_result.metrics[metric], '.4e').replace('.', '')
-    best_model_name = f'MAPE_{formatted_score}_{model_name}'
+    best_model_name = f'{metric}_{formatted_score}_{model_name}'
 
     print("Best parameters found: ", best_result.config)
     print(f"Best score: {best_result.metrics[metric]:.4f}")
@@ -204,7 +215,7 @@ def hyperopt_calibration(base_model, search_space, data, col_types, current_best
         evaluate_parameter_predictions_on_data(data=data['test'],
                                                col_types=col_types,
                                                model=best_model,
-                                               print_score=print_test_score,
+                                               print_score=True,
                                                save_score=save_best_model,
                                                results_save_path=test_performance_save_file)
 
@@ -266,8 +277,6 @@ if __name__ == '__main__':
     col_types = load_col_types(dataset_name=dataset_name)
     n_targets = len(col_types['output']['all'])
     data = get_features_targets(dfs, col_types)
-    deb_model_dummy_cols = ['metamorphosis', 'weaning']
-    deb_model_column_indices = [dfs['train'].columns.get_loc(col) for col in deb_model_dummy_cols]
 
     os.environ['RAY_AIR_NEW_OUTPUT'] = '0'
     num_samples = 100
@@ -335,7 +344,7 @@ if __name__ == '__main__':
                                             print_test_score=True,
                                             save_best_model=True,
                                             num_samples=num_samples,
-                                            stratify=deb_model_column_indices,
+                                            stratify='metamorphosis',
                                             )
 
     # print(col_types)
@@ -374,7 +383,7 @@ if __name__ == '__main__':
             save_best_model=True,
             save_folder=f'results/{dataset_name}/all',
             run_name='all_RF_test',
-            metric='sMAPE',
+            metric='GEF',
             mode='min',
             num_samples=150,
             max_concurrent_trials=12,

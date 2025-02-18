@@ -130,6 +130,19 @@ class LogScaleClipTransformer(BaseEstimator, TransformerMixin):
         return X_unflatten, flattened
 
 
+def get_output_mask(y, X, col_types):
+    output_mask = np.ones_like(y, dtype='float')
+    metamorphosis_idx = col_types['input']['all'].index('metamorphosis')
+    metamorphosis_mask = X[:, metamorphosis_idx] == 1
+
+    for col in ['s_M', '1/s_M', 's_Hb_bj', 'E_Hj']:
+        if col in col_types['output']['all']:
+            col_idx = col_types['output']['all'].index(col)
+            output_mask[metamorphosis_mask, col_idx] = 0
+
+    return output_mask
+
+
 def get_features_targets(data, col_types):
     input_cols = col_types['input']['all']
     output_cols = col_types['output']['all']
@@ -141,9 +154,13 @@ def get_features_targets(data, col_types):
         output_values = df[output_cols].astype('float').values
         if output_values.shape[1] == 1:
             output_values = output_values.ravel()
+        # Compute output mask
+        mask = get_output_mask(output_values, input_values, col_types)
+        # Pack data
         features_targets[split] = {
             'input': input_values,
             'output': output_values,
+            'mask': mask
         }
     return features_targets
 

@@ -1,6 +1,4 @@
 import os
-import numpy as np
-from sklearn.preprocessing import LabelEncoder
 
 from ..utils.models import save_sklearn_model
 from ..data.prepare_data_sklearn import get_features_targets
@@ -37,23 +35,24 @@ if __name__ == '__main__':
 
     base_model = TaxonomicKNNRegressor
     config = {
+        'weight_factor': 0.1,
         'n_neighbors': 1,
         'col_types': col_types,
         'output_scaler_type': 'none',
         'taxonomy_encoder': taxonomy_encoder,
         'use_scaling_relationships': True,
     }
+
     save_trained_model = False
     evaluate_on_test = True
 
     cv_metrics_df = evaluate_config(config=config,
-                                base_model=base_model,
-                                col_types=col_types,
-                                X_train=data['train']['input'],
-                                y_train=data['train']['output'],
-                                report_metrics=False,
-                                stratify=col_types['input']['all'].index('model'),
-                                )
+                                    base_model=base_model,
+                                    col_types=col_types,
+                                    data=data['train'],
+                                    report_metrics=False,
+                                    stratify=col_types['input']['all'].index('metamorphosis'),
+                                    )
 
     cv_gef = cv_metrics_df['GEF'].mean()
     print(cv_metrics_df)
@@ -65,9 +64,8 @@ if __name__ == '__main__':
         col_types=col_types,
         data=data['train']
     )
-    # print(taxo1nn.predict(data['train']['input']))
 
-    model_name = base_model.__name__
+    model_name = 'SRTaxo1NN' if config['use_scaling_relationships'] else 'Taxo1NN'
     formatted_score = format(cv_gef, '.4e').replace('.', '')
     best_model_name = f'GEF_{formatted_score}_{model_name}'
 
