@@ -23,9 +23,9 @@
         "input",
         "category"
     ],
-    "model": [
+    "metamorphosis": [
         "input",
-        "category"
+        "boolean"
     ],
     "p_Am": [
         "output"
@@ -55,6 +55,9 @@
         "output"
     ],
     "k_J": [
+        "output"
+    ],
+    "s_M": [
         "output"
     ]
 }
