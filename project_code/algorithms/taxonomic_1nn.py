@@ -68,11 +68,10 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
     A k-NN Regressor based on taxonomic distance between species. Ties are broken with the numerical column maximum
     weight Wwi.
     """
-    WEIGHT_FACTOR = 0.01
     LINEAR_SCALING_COLS = ['p_Am', 'h_a']
     CUBE_SCALING_COLS = ['E_Hb', 'E_Hj', 'E_Hx', 'E_Hp']
 
-    def __init__(self, col_types, taxonomy_encoder, n_neighbors=1, use_scaling_relationships=True):
+    def __init__(self, col_types, taxonomy_encoder, n_neighbors=1, use_scaling_relationships=True, weight_factor=0.01):
         self.n_neighbors = n_neighbors
         self.col_types = col_types
         self.output_col_idx_dict = {col: i for i, col in enumerate(col_types['output']['all'])}
@@ -85,6 +84,7 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
         if 'Wwi' not in col_types['input']['all']:
             raise Exception("Missing maximum weight column 'Wwi' in dataset.")
         self.wi_col = col_types['input']['all'].index('Wwi')
+        self.weight_factor = weight_factor
 
         self.use_scaling_relationships = use_scaling_relationships
 
@@ -119,9 +119,9 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
                     tax2=data_b[j, self.taxonomy_cols]
                 )
                 # Get weight distance
-                weight_distance = abs(data_a[i, self.wi_col] - data_b[j, self.wi_col]) if taxonomy_distance == 0 else 0
+                weight_distance = abs(data_a[i, self.wi_col] - data_b[j, self.wi_col])
                 # Add distance between weights to break ties with a small factor
-                distance = (taxonomy_distance + weight_distance * self.WEIGHT_FACTOR)
+                distance = (taxonomy_distance + weight_distance * self.weight_factor)
 
                 # In case distance is zero for multiple species during training, add small factor to ensure the nearest
                 # neighbor is itself
