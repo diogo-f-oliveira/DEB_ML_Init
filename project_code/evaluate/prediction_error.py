@@ -1,14 +1,10 @@
-from functools import partial
-
 import numpy as np
 import sklearn.metrics
 import pandas as pd
-import inspect
 import torch
-from sklearn import metrics as metrics
 from tabulate import tabulate
 
-from .score import mean_deb_loss, geometric_error_factor, symmetric_mean_absolute_percentage_error
+from .metrics import mean_deb_loss, geometric_error_factor, symmetric_mean_absolute_percentage_error
 from ..inference.parameters import convert_output_to_parameter_predictions, PARAMETER_COLS, \
     impute_predictions_for_DEB_model_dependent_outputs
 
@@ -25,10 +21,9 @@ def evaluate_parameter_predictions_on_data(data, col_types, model, print_score=F
     output_col_names = col_types['output']['all']
     y_true = data['output'].reshape(-1, n_outputs)
     y_pred = model.predict(data['input']).reshape(-1, n_outputs)
-    y_pred = impute_predictions_for_DEB_model_dependent_outputs(y=y_pred, X=data['input'], col_types=col_types)
     # Convert predictions to parameters
-    target_df = convert_output_to_parameter_predictions(y_true, output_col_names)
-    pred_df = convert_output_to_parameter_predictions(y_pred, output_col_names)
+    target_df = convert_output_to_parameter_predictions(y_true, data['input'], output_col_names)
+    pred_df = convert_output_to_parameter_predictions(y_pred, data['input'], output_col_names)
 
     metrics_df = compute_metrics(
         y_true=target_df.values,
@@ -38,7 +33,7 @@ def evaluate_parameter_predictions_on_data(data, col_types, model, print_score=F
         metrics=['mean_absolute_percentage_error',
                  geometric_error_factor,
                  symmetric_mean_absolute_percentage_error,
-                 # mean_deb_loss,
+                 mean_deb_loss,
                  ]
     )
     if print_score:

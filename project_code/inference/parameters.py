@@ -53,8 +53,9 @@ def impute_predictions_for_DEB_model_dependent_outputs(y, X, col_types):
     return y
 
 
-def convert_output_to_parameter_predictions(y, output_col_names):
-    pars_df = pd.DataFrame(y, columns=output_col_names)
+def convert_output_to_parameter_predictions(y, X, col_types):
+    y_imputed = impute_predictions_for_DEB_model_dependent_outputs(y=y, X=X, col_types=col_types)
+    pars_df = pd.DataFrame(y_imputed, columns=col_types['output']['all'])
 
     # If the model did not predict 'k_J', set it to default value
     if 'k_J' not in pars_df.columns:
@@ -105,10 +106,18 @@ def convert_output_to_parameter_predictions(y, output_col_names):
     return pars_df
 
 
-def get_core_parameter_predictions(dfs, pred_df):
-    pars_df = pred_df.copy()
-    pars_df.index.name = 'species'
-    pars_df = convert_output_to_parameter_predictions(pars_df, pars_df.columns)
+def get_core_parameter_predictions(dfs, pred_df, col_types):
+    pred_df.index.name = 'species'
+    X = pd.concat([dfs[ds][col_types['input']['all']] for ds in pred_df['data_split'].unique()]).values
+    y = pred_df.drop(columns=['data_split']).values
+    converted_output_df = convert_output_to_parameter_predictions(y=y, X=X, col_types=col_types)
+    pars_df = pd.DataFrame(converted_output_df.values,
+                           columns=list(converted_output_df.columns),
+                           index=pred_df.index)
+    pars_df['data_split'] = pred_df['data_split']
+    for col in pred_df.columns:
+        if col in AmP_CORE_DEB_PARS and col not in pars_df.columns:
+            pars_df[col] = pred_df[col]
 
     # If the model predicts 'p_Am' instead of 'z', compute 'z'
     if 'z' not in pars_df.columns:
@@ -135,3 +144,16 @@ def get_core_parameter_predictions(dfs, pred_df):
 
     # Return only the predicitons for core parameters
     return pars_df[['data_split'] + AmP_CORE_DEB_PARS].copy()
+
+
+if __name__ == '__main__':
+    from ..data.load_data import load_data, load_col_types
+
+    dataset_name = 'biologist_no_pub_age'
+    results_folder = f'results'
+    dfs = load_data(dataset_name=dataset_name, data_split='train_test')
+    col_types = load_col_types(dataset_name=dataset_name)
+    gt_df = pd.concat({ds: dfs[ds][col_types['output']['all']] for ds in ('train', 'test')}).reset_index(level=0,
+                                                                                                         names='data_split')
+    gt_pars_df = get_core_parameter_predictions(dfs, pred_df=gt_df, col_types=col_types)
+    gt_pars_df.to_csv(f'{results_folder}/parameter_predictions/AmP_predictions.csv', float_format='%.6e')
