@@ -102,7 +102,7 @@ if __name__ == '__main__':
 
     device = torch.device('cpu')
 
-    dataset_name = 'all_constraints_no_pub_age'
+    dataset_name = 'final'
     dataset_name += '_taxonomy'
     dataset_name += '_ecocodes'
 
@@ -113,13 +113,14 @@ if __name__ == '__main__':
         # Architecture hyperparameters
         'n_shared_layers': tune.randint(1, 5),
         'shared_hidden_size': tune.choice([16, 32, 64, 96, 128]),
-        # 'n_par_layers': tune.randint(1, 5),
-        # 'par_hidden_size': tune.choice([8, 16, 32, 64]),
+        'n_par_layers': tune.randint(1, 5),
+        'par_hidden_size': tune.choice([8, 16, 32, 64]),
+        'use_skip_connections': tune.choice([True, False]),
         # 'dropout_prob': tune.uniform(0, 0.4),
         # Fixed options
         'dropout_prob': 0.0,
-        'n_par_layers': 0,
-        'par_hidden_size': 0,
+        # 'n_par_layers': 0,
+        # 'par_hidden_size': 0,
         'scaling_type': 'log_standardize',
         'max_epochs': 500,
         'early_stopping_metric': 'GEF',
@@ -157,7 +158,7 @@ if __name__ == '__main__':
                          datasets_folder=os.path.abspath('data/processed'),
                          save_best_model=True,
                          evaluate_on_test=True,
-                         save_folder=f'results/{dataset_name}/all',
+                         save_folder=f'results/{dataset_name}',
                          model_name=model_name,
                          patience=10,
                          grace_period=50,

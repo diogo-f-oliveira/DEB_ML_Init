@@ -12,6 +12,14 @@ def format_results_into_dataframe(results_array, col_types, species_list):
 
 
 def create_results_directories_for_dataset(dataset_name, results_path='results'):
+    # Create folders to evaluate initialization performance
+    deb_model_results_folders = ['parameter_predictions', 'feasibility', 'deb_model_loss', 'initialization']
+    for results_type in deb_model_results_folders:
+        deb_results_folder = os.path.join(results_path, results_type)
+        if not os.path.exists(deb_results_folder):
+            os.makedirs(deb_results_folder)
+
+    # Create dataset folder
     base_dataset_folder = os.path.join(results_path, dataset_name)
     if not os.path.exists(base_dataset_folder):
         os.makedirs(base_dataset_folder)
@@ -26,11 +34,7 @@ def create_results_directories_for_dataset(dataset_name, results_path='results')
     if not os.path.exists(test_performance_folder):
         os.makedirs(test_performance_folder)
 
-    deb_model_results_folders = ['parameter_predictions', 'feasibility', 'deb_model_loss', 'initialization']
-    for results_type in deb_model_results_folders:
-        deb_results_folder = os.path.join(base_dataset_folder, results_type)
-        if not os.path.exists(deb_results_folder):
-            os.makedirs(deb_results_folder)
+
 
 
 def fetch_best_results_per_model(results_folder, save=False):
@@ -240,7 +244,7 @@ if __name__ == '__main__':
     # dataset_name += '_taxonomy'
     # dataset_name += '_ecocodes'
     #
-    # dataset_results_folder = f'results/{dataset_name}/all'
+    # dataset_results_folder = f'results/{dataset_name}'
     #
     # model_file = get_best_model_file(
     #     results_folder=dataset_results_folder,

@@ -43,7 +43,7 @@ if __name__ == '__main__':
         'use_scaling_relationships': True,
     }
 
-    save_trained_model = False
+    save_trained_model = True
     evaluate_on_test = True
 
     cv_metrics_df = evaluate_config(config=config,
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     formatted_score = format(cv_gef, '.4e').replace('.', '')
     best_model_name = f'GEF_{formatted_score}_{model_name}'
 
-    save_folder = f'results/{dataset_name}/all'
+    save_folder = f'results/{dataset_name}'
     test_performance_save_folder = os.path.join(save_folder, 'test_performance')
     test_performance_save_file = os.path.join(test_performance_save_folder, f"{best_model_name}.csv")
     if evaluate_on_test:
