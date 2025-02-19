@@ -34,8 +34,8 @@ class MSEInfeasibilityLoss(nn.Module):
         self.output_transformer = output_transformer
 
         # Compute upper bounds in model scale
-        upper_bounds = torch.zeros(3, dtype=DEFAULT_TORCH_DTYPE)
-        bounded_col_idx = torch.zeros(3, dtype=torch.long)
+        upper_bounds = torch.zeros(4, dtype=DEFAULT_TORCH_DTYPE)
+        bounded_col_idx = torch.zeros(4, dtype=torch.long)
         for i, col in enumerate(['1-kap', 's_p_M', 's_Hb_bj', 's_Hbj_p']):
             idx = col_types['output']['all'].index(col)
             bounded_col_idx[i] = idx
@@ -61,7 +61,7 @@ class MSEInfeasibilityLoss(nn.Module):
         # Must reach puberty
         reach_pub_loss = self.reach_puberty_loss(outputs)
         # Maturity levels must increase
-        mat_levels_loss = self.maturity_levels_loss(outputs)
+        mat_levels_loss = self.maturity_levels_loss(outputs, mask)
 
         self.loss_values = torch.stack([mse_loss, kappa_loss, reach_pub_loss, mat_levels_loss])
 
@@ -81,7 +81,7 @@ class MSEInfeasibilityLoss(nn.Module):
         # Penalty for E_Hj > E_Hb
         idx_s_Hb_bj = self.bounded_col_idx[2]
         ub_s_Hb_bj = self.upper_bounds[2]
-        penalty_s_Hb_bj = torch.square(torch.relu(outputs[:, idx_s_Hb_bj] - ub_s_Hb_bj))
+        penalty_s_Hb_bj = mask[:, idx_s_Hb_bj] * torch.square(torch.relu(outputs[:, idx_s_Hb_bj] - ub_s_Hb_bj))
 
         # Penalty for E_Hj > E_Hb
         idx_s_Hbj_p = self.bounded_col_idx[3]
