@@ -8,12 +8,13 @@ from ..inference.parameters import UPPER_BOUNDS
 
 class DEBNet(nn.Module):
     def __init__(self, col_types, shared_hidden_layers, par_hidden_layers, dropout_prob, output_transformer,
-                 input_transformer):
+                 input_transformer, use_skip_connection=True):
         super(DEBNet, self).__init__()
 
         self.n_inputs = len(col_types['input']['all'])
         self.input_transformer = input_transformer
         self.output_transformer = output_transformer
+        self.use_skip_connection = use_skip_connection
         # Shared hidden layers
         layers = []
         prev_dim = self.n_inputs
@@ -33,7 +34,7 @@ class DEBNet(nn.Module):
         self.par_hidden_layers = nn.ModuleList()
         for _ in range(self.n_outputs):
             layers = []
-            prev_dim = shared_hidden_layers[-1]
+            prev_dim = shared_hidden_layers[-1] + self.use_skip_connection * self.n_inputs
             # Create hidden layers for each output parameter
             for hidden_dim in par_hidden_layers:
                 hidden_layer = nn.Linear(prev_dim, hidden_dim)
@@ -50,7 +51,11 @@ class DEBNet(nn.Module):
 
     def forward(self, x):
         shared_out = self.shared_layers(x)
-        outputs = [layer(shared_out).squeeze(-1) for layer in self.par_hidden_layers]
+        if self.use_skip_connection:
+            input_par_layers = torch.cat([shared_out, x], dim=1)
+        else:
+            input_par_layers = shared_out
+        outputs = [layer(input_par_layers).squeeze(-1) for layer in self.par_hidden_layers]
         return torch.stack(outputs, dim=-1)
 
     def predict(self, x):
@@ -117,9 +122,9 @@ class LogScaleOutputClamp(nn.Module):
 
 class DEBNetHC(DEBNet):
     def __init__(self, col_types, shared_hidden_layers, par_hidden_layers, dropout_prob, output_transformer,
-                 input_transformer, clamp_function='logsigmoid'):
+                 input_transformer, use_skip_connection=True, clamp_function='logsigmoid'):
         super(DEBNetHC, self).__init__(col_types, shared_hidden_layers, par_hidden_layers, dropout_prob,
-                                       output_transformer, input_transformer)
+                                       output_transformer, input_transformer, use_skip_connection=use_skip_connection)
         self.log_bounded_col_indices = [i for i, col in enumerate(col_types['output']['all']) if
                                         (col in col_types['output']['bounded01']) and
                                         (col in col_types['output']['log'])]
