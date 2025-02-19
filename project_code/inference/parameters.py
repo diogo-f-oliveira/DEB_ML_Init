@@ -150,10 +150,9 @@ if __name__ == '__main__':
     from ..data.load_data import load_data, load_col_types
 
     dataset_name = 'biologist_no_pub_age'
-    results_folder = f'results'
     dfs = load_data(dataset_name=dataset_name, data_split='train_test')
     col_types = load_col_types(dataset_name=dataset_name)
-    gt_df = pd.concat({ds: dfs[ds][col_types['output']['all']] for ds in ('train', 'test')}).reset_index(level=0,
-                                                                                                         names='data_split')
+    gt_df = pd.concat({ds: dfs[ds][col_types['output']['all']] for ds in ('train', 'test')})
+    gt_df.reset_index(level=0, names='data_split', inplace=True)
     gt_pars_df = get_core_parameter_predictions(dfs, pred_df=gt_df, col_types=col_types)
-    gt_pars_df.to_csv(f'{results_folder}/parameter_predictions/AmP_predictions.csv', float_format='%.6e')
+    gt_pars_df.to_csv(f'results/parameter_predictions/AmP_predictions.csv', float_format='%.6e')

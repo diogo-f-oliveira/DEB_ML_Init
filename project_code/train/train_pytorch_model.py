@@ -14,7 +14,6 @@ from ..data.load_data import load_data, load_col_types
 from ..data.prepare_data_pytorch import prepare_data_tensors
 from ..evaluate.prediction_error import evaluate_parameter_predictions_on_data, evaluate_pytorch_model, \
     METRIC_LABEL_TO_NAME
-from ..inference.parameters import impute_predictions_for_DEB_model_dependent_outputs
 from ..utils.models import save_pytorch_model
 from ..utils.results import create_results_directories_for_dataset
 
@@ -103,8 +102,6 @@ def train_neural_network(config, model_class, dataset_name,
         for i, (X_batch, y_batch, mask) in enumerate(dataloaders['train']):
             # Get model outputs
             outputs = model(X_batch)
-            # Impute predictions
-            # outputs = impute_predictions_for_DEB_model_dependent_outputs(y=outputs, X=X_batch, col_types=col_types)
             # Compute loss
             loss = criterion(outputs, y_batch, mask)
             loss.backward()
@@ -174,7 +171,7 @@ def train_neural_network(config, model_class, dataset_name,
     if report_val_scores:
         report_metrics_dict = traces_df.loc[report_epoch].to_dict()
         report_metrics_dict.pop('train_loss')
-        report_metrics_dict['epoch'] = epoch
+        report_metrics_dict['epoch'] = best_epoch
         return report_metrics_dict
     else:
         return model, traces_df.loc[report_epoch]
@@ -197,11 +194,12 @@ if __name__ == '__main__':
         'shared_hidden_layers': 3 * [64],
         'par_hidden_layers': 0 * [32],
         'lambdas': [1, 1, 1, 1],
-        'loss_function': 'mse',
+        'loss_function': 'mse_infeasibility',
         'output_weight_strategy': '',
-        # 'dropout_prob': 0,
-        'dropout_prob': 0.1,
+        'dropout_prob': 0,
+        # 'dropout_prob': 0.1,
         'clamp_function': 'relu',
+        'use_skip_connections': False,
     }
 
     model_name = 'MLP'

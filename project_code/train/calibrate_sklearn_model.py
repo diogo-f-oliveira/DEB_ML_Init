@@ -381,7 +381,7 @@ if __name__ == '__main__':
             evaluate_on_test=True,
             print_test_score=True,
             save_best_model=True,
-            save_folder=f'results/{dataset_name}/all',
+            save_folder=f'results/{dataset_name}',
             run_name='all_RF_test',
             metric='GEF',
             mode='min',
