@@ -15,7 +15,6 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import Ridge, Lasso, MultiTaskElasticNet
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.svm import SVR
-import xgboost as xgb
 
 from ..utils.models import save_sklearn_model
 from ..train.train_sklearn_model import train_sklearn_model
@@ -88,7 +87,7 @@ def grid_search_calibration(base_model, search_space, data, col_types, scorer=No
 
 
 def evaluate_config(config, base_model, col_types, data, random_state=42, n_splits=5, stratify=None,
-                    report_metrics=True):
+                    report_metrics=False):
     X_train = data['input']
     y_train = data['output']
     mask_train = data['mask']
@@ -165,7 +164,7 @@ def hyperopt_calibration(base_model, search_space, data, col_types,
 
     tuner = tune.Tuner(
         partial(evaluate_config, base_model=base_model, col_types=col_types, data=data['train'],
-                **evaluate_config_options),
+                report_metrics=True, **evaluate_config_options),
         tune_config=tune.TuneConfig(
             search_alg=alg,
             max_concurrent_trials=max_concurrent_trials,
@@ -259,16 +258,7 @@ if __name__ == '__main__':
     np.random.seed(seed)
     random.seed(seed)
 
-    # dataset_name = 'no_pub_weight'
-    # dataset_name = 'ratio_no_pub_weight'
-    # dataset_name = 'ratio_output_no_pub_weight'
-
-    # dataset_name = 'no_pub_age'
-    # dataset_name = 'ratio_output_no_pub_age'
-    dataset_name = 'all_constraints_no_pub_age'
-
-    # dataset_name = 'bijection_input'
-
+    dataset_name = 'final'
     dataset_name += '_taxonomy'
     dataset_name += '_ecocodes'
 
@@ -301,25 +291,11 @@ if __name__ == '__main__':
             # 'input_scaler_type': tune.choice(['standard', 'quantile_normal', 'quantile_uniform']),
             # 'output_scaler_type': tune.choice(['standard', 'quantile_normal', 'quantile_uniform']),
         },
-        'SVR': {
-            'kernel': tune.choice(['linear', 'rbf']),
-            'C': tune.loguniform(1e-3, 1e2),
-            'epsilon': tune.uniform(0.01, 1),
-            'gamma': tune.uniform(0.01, 2),
-        },
         'RandomForestRegressor': {
             'n_estimators': tune.qrandint(100, 10000, 100),
             # 'min_samples_split': tune.randint(2, 4),
             'max_features': tune.randint(2, len(col_types['input']['all']) + 1),
             'criterion': tune.choice(['squared_error', 'friedman_mse']),
-        },
-        'XGBRegressor': {
-            'n_estimators': tune.qrandint(100, 10000, 100),
-            'learning_rate': tune.loguniform(1e-4, 1e-1),
-            "max_depth": tune.randint(1, 10),
-            'grow_policy': tune.choice(['depthwise', 'lossguide']),
-            "subsample": tune.uniform(0.5, 1.0),
-            "colsample_bytree": tune.uniform(0.5, 1.0),
         },
         'KNeighborsRegressor': {
             'n_neighbors': tune.randint(1, 10),
@@ -328,44 +304,17 @@ if __name__ == '__main__':
         },
     }
 
-    single_output_models_to_train = []
-
-    for model_name in single_output_models_to_train:
-        print(f"Training model {model_name}\n")
-        base_model = base_models[model_name]
-        search_space = search_spaces[model_name]
-        calibrate_independent_output_models(base_model=base_model,
-                                            search_space=search_space,
-                                            dataset_name=dataset_name,
-                                            calibration_function=hyperopt_calibration,
-                                            dfs=dfs,
-                                            col_types=col_types,
-                                            evaluate_on_test=True,
-                                            print_test_score=True,
-                                            save_best_model=True,
-                                            num_samples=num_samples,
-                                            stratify='metamorphosis',
-                                            )
-
-    # print(col_types)
-    # base_model = RandomForestRegressor
-    # model = train_sklearn_model(
-    #     base_model=base_model,
-    #     config={},
-    #     data=data['train'],
-    #     col_types=col_types,
-    # )
-    #
-    # evaluate_config(config={},
-    #                 base_model=base_model,
-    #                 col_types=col_types,
-    #                 X_train=data['train']['input'],
-    #                 y_train=data['train']['output'],
-    #                 report_metrics=False)
+    evaluate_config(
+        config={},
+        base_model=MultiTaskElasticNet,
+        col_types=col_types,
+        data=data['train'],
+        stratify=col_types['input']['all'].index('metamorphosis'),
+    )
 
     # Train multioutput models
     multi_output_models_to_train = [
-        # 'MultiTaskElasticNet',
+        'MultiTaskElasticNet',
         'RandomForestRegressor',
     ]
 
@@ -379,10 +328,8 @@ if __name__ == '__main__':
             data=data,
             col_types=col_types,
             evaluate_on_test=True,
-            print_test_score=True,
             save_best_model=True,
             save_folder=f'results/{dataset_name}',
-            run_name='all_RF_test',
             metric='GEF',
             mode='min',
             num_samples=150,

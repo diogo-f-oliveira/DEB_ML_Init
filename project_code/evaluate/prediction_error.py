@@ -22,8 +22,8 @@ def evaluate_parameter_predictions_on_data(data, col_types, model, print_score=F
     y_true = data['output'].reshape(-1, n_outputs)
     y_pred = model.predict(data['input']).reshape(-1, n_outputs)
     # Convert predictions to parameters
-    target_df = convert_output_to_parameter_predictions(y_true, data['input'], output_col_names)
-    pred_df = convert_output_to_parameter_predictions(y_pred, data['input'], output_col_names)
+    target_df = convert_output_to_parameter_predictions(y_true, data['input'], col_types)
+    pred_df = convert_output_to_parameter_predictions(y_pred, data['input'], col_types)
 
     metrics_df = compute_metrics(
         y_true=target_df.values,
