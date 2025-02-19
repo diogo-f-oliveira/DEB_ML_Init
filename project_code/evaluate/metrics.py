@@ -1,16 +1,116 @@
 import numpy as np
 
 
-def mean_deb_loss(y_true, y_pred, sample_weight=None, multioutput='raw_values'):
+#
+# def mean_deb_loss(y_true, y_pred, sample_weight=None, multioutput='raw_values'):
+#     if sample_weight is None:
+#         sample_weight = np.ones_like(y_true)
+#     y_true = np.array(y_true)
+#     y_pred = np.array(y_pred)
+#     raw_values = sample_weight * (np.power(y_true - y_pred, 2)) / (np.power(y_true, 2) + np.power(y_pred, 2))
+#     if multioutput == 'raw_values':
+#         return np.mean(raw_values, axis=0)
+#     elif multioutput == 'uniform_average':
+#         return np.mean(raw_values)
+
+
+def mean_deb_loss(y_true, y_pred, *, sample_weight=None, multioutput="raw_values"):
+    """
+    Compute the mean DEB loss between true and predicted values.
+
+    The loss is defined as:
+
+        loss = ( (y_true - y_pred)^2 ) / ( y_true^2 + y_pred^2 )
+
+    For multioutput data, the loss is computed for each output (i.e., along axis=0) and then
+    aggregated according to the `multioutput` parameter. If `sample_weight` is provided, the mean is
+    computed as a weighted average over the samples.
+
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,) or (n_samples, n_outputs)
+        True parameter values.
+
+    y_pred : array-like of shape (n_samples,) or (n_samples, n_outputs)
+        Predicted parameter values.
+
+    sample_weight : array-like of shape (n_samples,), default=None
+        Sample weights used to compute a weighted average over the samples.
+
+    multioutput : {"raw_values", "uniform_average"} or array-like of shape (n_outputs,), default="raw_values"
+        Defines aggregating of multiple output losses:
+          - If "raw_values", then a numpy array of shape (n_outputs,) is returned.
+          - If "uniform_average", then the average of the losses is returned.
+          - If array-like, then a weighted average is computed using the provided weights.
+
+    Returns
+    -------
+    loss : float or ndarray of floats
+         The mean DEB loss, either as a single aggregated value or as an array of values per output.
+
+    Raises
+    ------
+    ValueError
+        If sample_weight is not a 1D array with length equal to the number of samples, or if a zero
+        denominator is encountered.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> y_true = np.array([[1, 10], [2, 20], [3, 30]])
+    >>> y_pred = np.array([[1.1, 9], [1.9, 21], [3.2, 29]])
+    >>> # Return loss for each output
+    >>> mean_deb_loss(y_true, y_pred, multioutput="raw_values")
+    array([...])
+    >>> # Return a uniform average of the losses
+    >>> mean_deb_loss(y_true, y_pred, multioutput="uniform_average")
+    0.0123...
+    >>> # Using sample weights
+    >>> sample_weight = np.array([0.2, 0.3, 0.5])
+    >>> mean_deb_loss(y_true, y_pred, sample_weight=sample_weight, multioutput="raw_values")
+    array([...])
+    """
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+
+    # If inputs are 1D, reshape them to (n_samples, 1)
+    if y_true.ndim == 1:
+        y_true = y_true.reshape(-1, 1)
+        y_pred = y_pred.reshape(-1, 1)
+
+    n_samples = y_true.shape[0]
+
+    # Validate sample_weight: if None, use ones; else ensure it is 1D with shape (n_samples,)
     if sample_weight is None:
-        sample_weight = np.ones_like(y_true)
-    y_true = np.array(y_true)
-    y_pred = np.array(y_pred)
-    raw_values = sample_weight * (np.power(y_true - y_pred, 2)) / (np.power(y_true, 2) + np.power(y_pred, 2))
-    if multioutput == 'raw_values':
-        return np.mean(raw_values, axis=0)
-    elif multioutput == 'uniform_average':
-        return np.mean(raw_values)
+        sample_weight = np.ones(n_samples)
+    else:
+        sample_weight = np.asarray(sample_weight)
+        if sample_weight.ndim != 1 or sample_weight.shape[0] != n_samples:
+            raise ValueError("sample_weight must be a 1D array with the same number of samples as y_true.")
+
+    # Compute the denominator: y_true^2 + y_pred^2
+    denominator = np.power(y_true, 2) + np.power(y_pred, 2)
+    if np.any(denominator == 0):
+        raise ValueError("Encountered zero in the denominator (y_true^2 + y_pred^2).")
+
+    # Compute the loss for each sample and output
+    raw_values = np.power(y_true - y_pred, 2) / denominator
+
+    # Compute the weighted average across samples (axis=0) for each output.
+    loss_per_output = np.average(raw_values, axis=0, weights=sample_weight)
+
+    # Aggregate outputs according to the multioutput parameter.
+    if multioutput == "raw_values":
+        return loss_per_output
+    elif multioutput == "uniform_average":
+        return np.mean(loss_per_output)
+    elif isinstance(multioutput, (list, np.ndarray)):
+        weights = np.asarray(multioutput)
+        if weights.shape[0] != loss_per_output.shape[0]:
+            raise ValueError("Weights must have the same length as the number of outputs.")
+        return np.average(loss_per_output, weights=weights)
+    else:
+        raise ValueError("multioutput must be 'raw_values', 'uniform_average', or array-like of weights.")
 
 
 def geometric_error_factor(y_true, y_pred, *, sample_weight=None, multioutput='raw_values'):
