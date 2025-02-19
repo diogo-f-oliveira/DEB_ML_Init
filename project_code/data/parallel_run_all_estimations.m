@@ -11,13 +11,14 @@ allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 saveFolder = '..\..\data\estimation_runs';
 % Output file
 % outputFileName = [saveFolder '\full_estimation_from_AmP_pars_subset_test_set.csv'];
-outputFileName = [saveFolder '\compare_pars_init_matfile_subset_test_set.csv'];
+outputFileName = [saveFolder '\run_val_set_until_minimum.csv'];
 
 %% Get list of species
 
 % speciesList = getAllSpeciesNames(allSpeciesFolder);
-speciesList = {'Caenorhabditis_elegans', 'Caranx_ignobilis', 'Geococcyx_californianus', 'Torpedo_marmorata', 'Pleurobrachia_pileus', 'Turdus_merula', 'Gallotia_galloti', 'Diplectrum_formosum', 'Octopus_joubini', 'Myiarchus_cinerascens', 'Somateria_mollissima', 'Paranotothenia_magellanica', 'Sillago_sihama', 'Stolephorus_waitei', 'Rhombosolea_plebeia', 'Pseudopleuronectes_yokohamae', 'Microcondylaea_bonellii', 'Trichiurus_lepturus', 'Aerodramus_fuciphagus', 'Sula_dactylatra', 'Scomberomorus_maculatus', 'Macquaria_ambigua', 'Apteryx_mantelli', 'Anchoa_panamensis', 'Synodontis_nebulosus', 'Euthynnus_alletteratus', };
-
+datasetPath = '../../data/processed/biologist_no_pub_age/val.csv';
+datasetTable = readtable(datasetPath, 'Delimiter', ',', 'ReadVariableNames', true);
+speciesList = datasetTable.species;
 numSpecies = length(speciesList);
 
 
@@ -39,9 +40,9 @@ estimationResultsTable = table('Size', [numSpecies, numCols], 'VariableTypes', v
 
 %% Settings
 saveParsList = {'z', 'kap', 'v', 'p_M', 'E_Hb', 'E_Hp',};
-saveResultsTableEvery = 20;
-saveResultsMatFile = false;
-saveParsInitFile = false;
+saveResultsTableEvery = 50;
+saveResultsMatFile = true;
+saveParsInitFile = true;
 
 % Max execution time per species
 maxTime = 15*60*60; % in seconds
