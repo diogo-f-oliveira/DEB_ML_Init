@@ -46,7 +46,7 @@ saveParsInitFile = true;
 
 % Max execution time per species
 maxTime = 15*60*60; % in seconds
-maxRuns = 200; 
+maxRuns = 200;
 
 %% Set up parallel pool
 pool = gcp('nocreate');
@@ -246,6 +246,9 @@ if isfolder(speciesFolder)
         numRuns = numRuns + 1;
         numIter = numIter + itercount;
         alternateSimplexSize();
+        if saveResultsMatFile
+            saveEstimationResultsFiles(estimatedPar, metaData, metaPar, txtPar, saveParsInitFile)
+        end
     end
     % Save estimation stats
     estimStats.convergence = converged;
@@ -262,13 +265,7 @@ if isfolder(speciesFolder)
         end
     end
 
-    if saveResultsMatFile
-        par = estimatedPar;
-        save(['results_' speciesName '.mat'], 'par', 'metaData', 'metaPar', 'txtPar')
-        if saveParsInitFile
-            mat2pars_init(speciesName)
-        end
-    end
+
 
 else
     error('Folder for species "%s" does not exist.', speciesName);
@@ -285,4 +282,11 @@ speciesList = {allFiles(isDir).name}; % Extract names of directories
 
 % Remove '.' and '..' from the list (current and parent directory)
 speciesList = speciesList(~ismember(speciesList, {'.', '..'}));
+end
+
+function saveEstimationResultsFiles(par, metaData, metaPar, txtPar, saveParsInitFile)
+    save(['results_' speciesName '.mat'], 'par', 'metaData', 'metaPar', 'txtPar')
+    if saveParsInitFile
+        mat2pars_init(speciesName)
+    end
 end
