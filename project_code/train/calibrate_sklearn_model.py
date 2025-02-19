@@ -265,7 +265,6 @@ if __name__ == '__main__':
     # Load the data
     dfs = load_data(dataset_name=dataset_name, data_split='train_test')
     col_types = load_col_types(dataset_name=dataset_name)
-    n_targets = len(col_types['output']['all'])
     data = get_features_targets(dfs, col_types)
 
     os.environ['RAY_AIR_NEW_OUTPUT'] = '0'
@@ -277,7 +276,6 @@ if __name__ == '__main__':
         'Lasso': Lasso,
         'SVR': SVR,
         'RandomForestRegressor': RandomForestRegressor,
-        'XGBRegressor': xgb.XGBRegressor,
         'KNeighborsRegressor': KNeighborsRegressor,
         'MultiTaskElasticNet': MultiTaskElasticNet,
     }
@@ -304,18 +302,10 @@ if __name__ == '__main__':
         },
     }
 
-    evaluate_config(
-        config={},
-        base_model=MultiTaskElasticNet,
-        col_types=col_types,
-        data=data['train'],
-        stratify=col_types['input']['all'].index('metamorphosis'),
-    )
-
     # Train multioutput models
     multi_output_models_to_train = [
         'MultiTaskElasticNet',
-        'RandomForestRegressor',
+        # 'RandomForestRegressor',
     ]
 
     for model_name in multi_output_models_to_train:
@@ -330,8 +320,9 @@ if __name__ == '__main__':
             evaluate_on_test=True,
             save_best_model=True,
             save_folder=f'results/{dataset_name}',
-            metric='GEF',
+            metric='sMAPE',
             mode='min',
-            num_samples=150,
+            num_samples=50,
             max_concurrent_trials=12,
+            stratify=col_types['input']['all'].index('metamorphosis'),
         )

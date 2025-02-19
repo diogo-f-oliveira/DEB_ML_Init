@@ -133,12 +133,12 @@ class LogScaleClipTransformer(BaseEstimator, TransformerMixin):
 def get_output_mask(y, X, col_types):
     output_mask = np.ones_like(y, dtype='float')
     metamorphosis_idx = col_types['input']['all'].index('metamorphosis')
-    metamorphosis_mask = X[:, metamorphosis_idx] == 1
+    no_metamorphosis_mask = X[:, metamorphosis_idx] == 0
 
     for col in ['s_M', '1/s_M', 's_Hb_bj', 'E_Hj']:
         if col in col_types['output']['all']:
             col_idx = col_types['output']['all'].index(col)
-            output_mask[metamorphosis_mask, col_idx] = 0
+            output_mask[no_metamorphosis_mask, col_idx] = 0
 
     return output_mask
 
