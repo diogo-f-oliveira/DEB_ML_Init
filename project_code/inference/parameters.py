@@ -4,7 +4,7 @@ import torch
 
 from ..algorithms.theoretical import predict_E_G_from_theory
 
-PARAMETER_COLS = ['p_Am', 'kap', 'v', 'p_M', 'E_Hb', 'E_Hp', 'k_J', 'E_Hj', 's_M']
+PARAMETER_COLS = ['p_Am', 'kap', 'v', 'p_M', 'E_Hb', 'E_Hj', 'E_Hp', 'k_J', 's_M']
 AmP_CORE_DEB_PARS = ['z', 'p_M', 'kap', 'v', 'E_G', 'E_Hb', 'E_Hx', 'E_Hj', 'E_Hp', 'k_J']
 DEFAULT_VALUES = {
     'h_a': 3.0e-9,
