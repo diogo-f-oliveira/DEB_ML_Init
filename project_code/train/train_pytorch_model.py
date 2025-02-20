@@ -190,9 +190,9 @@ if __name__ == '__main__':
         'scaling_type': 'log_standardize',
         'batch_size': 4,
         'max_epochs': 300,
-        'learning_rate': 2.5e-4,
+        'learning_rate': 5e-5,
         'shared_hidden_layers': 3 * [64],
-        'par_hidden_layers': 0 * [32],
+        'par_hidden_layers': 2 * [32],
         'lambdas': [1, 1, 1, 1],
         'loss_function': 'mse_infeasibility',
         'output_weight_strategy': '',
@@ -204,7 +204,7 @@ if __name__ == '__main__':
 
     model_name = 'MLP'
     model_class = DEBNetHC
-    save_model = True
+    save_model = False
     save_folder = f'results/{dataset_name}'
     evaluate_on_test = True
     # early_stopping_metric = None

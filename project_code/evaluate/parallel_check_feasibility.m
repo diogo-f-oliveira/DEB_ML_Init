@@ -1,8 +1,8 @@
 % function parallel_check_feasibility(allSpeciesFolder, resultsFolder, datasetName, modelName, copyMaturities)
 
 % Define file paths
-parameterPredictionFile = [resultsFolder datasetName '\parameter_predictions\' modelName '_predictions.csv'];
-outputFileName = [resultsFolder datasetName '\feasibility\' modelName '_feasibility.csv'];
+parameterPredictionFile = [resultsFolder '\parameter_predictions\' modelName '_predictions.csv'];
+outputFileName = [resultsFolder '\feasibility\' modelName '_feasibility.csv'];
 
 % Read the parameter prediction file
 parameterEstimates = readtable(parameterPredictionFile, 'ReadRowNames', true);

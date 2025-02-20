@@ -1,7 +1,6 @@
-parameterPredictionFile = [resultsFolder datasetName '\parameter_predictions\' modelName '_predictions.csv'];
-% feasibleFile = [resultsFolder datasetName '\feasibility\' modelName '_feasibility.csv'];
-debLossFile = [resultsFolder datasetName '\deb_model_loss\' modelName '_deb_model_loss.csv'];
-outputFileName = [resultsFolder datasetName '\initialization\' modelName '_initialization.csv'];
+parameterPredictionFile = [resultsFolder '\parameter_predictions\' modelName '_predictions.csv'];
+debLossFile = [resultsFolder '\deb_model_loss\' modelName '_deb_model_loss.csv'];
+outputFileName = [resultsFolder '\initialization\' modelName '_initialization.csv'];
 
 % Read the parameter prediction file
 parameterEstimates = readtable(parameterPredictionFile, 'ReadRowNames', true);
@@ -13,16 +12,24 @@ debLossTable = readtable(debLossFile, 'ReadRowNames', true);
 speciesList = debLossTable.Properties.RowNames(logical(debLossTable.success));
 numSpecies = length(speciesList);
 
-% Set global variables used in estimation function
-parfevalOnAll(@setGlobalVars, 0);
+
 
 %% Initialize table
-columnNames = {'data_split', 'deb_loss', 'convergence', 'n_restarts', 'n_iter', 'execution_time', 'error', 'error_message'};
+columnNames = {'data_split', 'deb_loss', 'convergence', 'n_runs', 'n_iter', 'execution_time', 'error', 'error_message'};
 numCols = length(columnNames);
 varTypes = {'string', 'double', 'logical', 'int16', 'int16', 'double', 'logical', 'string'};
 initResultsTable = table('Size', [numSpecies, numCols], 'VariableTypes', varTypes, 'VariableNames', columnNames, 'RowNames', speciesList);
 % debLossTable{:, 'data_split'} = parameterEstimates{:, 'data_split'};
 initResultsTable{:, 'data_split'} = "test";
+
+
+%% Settings
+% Max execution time per future
+maxTime = 15*60*60; % in seconds
+maxRuns = 200;
+saveResultsTableEvery = 30;
+
+
 
 %% Set up parallel pool
 pool = gcp('nocreate');
@@ -31,8 +38,8 @@ if isempty(pool)
 end
 numWorkers = pool.NumWorkers;
 
-% Max execution time per future
-maxTime = 15*60; % in seconds
+% Set global variables used in estimation function
+parfevalOnAll(@setGlobalVars, 0);
 
 % Initialize variables
 i = 1; % Index of species to submit
@@ -48,7 +55,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         speciesParameterEstimates = parameterEstimates(speciesName, :);
 
         % Submit parfeval task
-        fut = parfeval(pool, @processSpecies, 4, speciesName, speciesParameterEstimates, allSpeciesFolder, predParNames);
+        fut = parfeval(pool, @processSpecies, 4, speciesName, speciesParameterEstimates, allSpeciesFolder, predParNames, maxRuns);
         % Record the future, species name, start time
         startTime = tic;
         nFutures = length(inProgressFutures);
@@ -56,11 +63,15 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         inProgressFutures(nFutures+1).i = i;
         inProgressFutures(nFutures+1).speciesName = speciesName;
         inProgressFutures(nFutures+1).startTime = startTime;
-        % inProgressFutures(end+1) = struct('future', fut, 'speciesName', speciesName, 'startTime', startTime);
         fprintf('[%4d / %d | %50s] SUBMIT \n', i, numSpecies, speciesName)
 
-        % fprintf('Submitted species %s (%d/%d)\n', speciesName, i, numSpecies);
         i = i + 1;
+
+        % Write results to .csv file every once in a while
+        if mod(i, saveResultsTableEvery) == 0
+            writetable(initResultsTable, outputFileName,'WriteRowNames',true);
+            fprintf('Table saved in %s\n', outputFileName);
+        end
     end
 
     % Check futures for completion or timeout
@@ -70,7 +81,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         if strcmp(futInfo.future.State, 'finished')
             % Fetch outputs
             try
-                [n_restarts, converged, n_iter, fval] = fetchOutputs(futInfo.future);
+                [numRuns, converged, numIter, fval] = fetchOutputs(futInfo.future);
                 executionTime = toc(futInfo.startTime);
                 fprintf('[%4d / %d | %50s] RESULT: %d %.2f \n', futInfo.i, numSpecies, futInfo.speciesName, converged, executionTime)
 
@@ -78,8 +89,8 @@ while i <= numSpecies || ~isempty(inProgressFutures)
                 initResultsTable{futInfo.speciesName, 'execution_time'} = executionTime;
                 initResultsTable{futInfo.speciesName, 'deb_loss'} = fval;
                 initResultsTable{futInfo.speciesName, 'convergence'} = converged;
-                initResultsTable{futInfo.speciesName, 'n_restarts'} = n_restarts;
-                initResultsTable{futInfo.speciesName, 'n_iter'} = n_iter;
+                initResultsTable{futInfo.speciesName, 'n_runs'} = numRuns;
+                initResultsTable{futInfo.speciesName, 'n_iter'} = numIter;
 
             catch ME
                 % Handle error
@@ -115,6 +126,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
 
     % Optionally, pause for a short time to avoid busy waiting
     pause(0.1);
+
 end
 
 %% Write results to a .csv file
@@ -123,24 +135,30 @@ fprintf('Table saved in %s\n', outputFileName);
 
 %% Functions to set global variables
 function setGlobalVars
-    global lossfunction report max_step_number max_fun_evals tol_simplex tol_fun simplex_size covRules;
-    lossfunction = 'sb';
-    report = 0;
-    max_step_number = 5e2;
-    max_fun_evals = 5e3;
-    tol_simplex = 1e-4;
-    tol_fun = 1e-4;
-    simplex_size = 0.05;
-    covRules = 0;
+global lossfunction report max_step_number max_fun_evals tol_simplex tol_fun simplex_size covRules tol_restart;
+lossfunction = 'sb';
+report = 0;
+max_step_number = 5e2;
+max_fun_evals = 5e3;
+tol_simplex = 1e-4;
+tol_fun = 1e-4;
+simplex_size = 0.02;
+covRules = 0;
+tol_restart = 1e-4;
+end
+
+function alternateSimplexSize
+global simplex_size
+simplex_size = -simplex_size;
 end
 
 function setGlobalPetsVar(speciesName)
-    global pets
-    pets = {speciesName};
+global pets
+pets = {speciesName};
 end
 
 %% Function to process each species
-function [n_restarts, converged, n_iter, fval] = processSpecies(speciesName, speciesParameterEstimates, allSpeciesFolder, predParNames)
+function [numRuns, converged, numIter, finalLoss] = processSpecies(speciesName, speciesParameterEstimates, allSpeciesFolder, predParNames, maxRuns)
 % Set up data for the species
 speciesFolder = fullfile(allSpeciesFolder, speciesName);
 % Check if the species folder exists
@@ -171,20 +189,24 @@ if isfolder(speciesFolder)
     auxDataStruct = struct(speciesName, auxData);
     weightsStruct = struct(speciesName, weights);
     filternm = ['filter_' metaPar.model];
-
-    setGlobalVars();
     setGlobalPetsVar(speciesName);
 
-    q = predPar;
-    n_restarts = 0;
-    n_iter = 0;
+     % Run estimation
+    global tol_restart
+    estimatedPar = par;
+    numRuns = 0;
+    numIter = 0;
     converged = false;
-    while ~converged && n_restarts < 5
-        [q, converged, itercount, fval] = petregr_f('predict_pets', q, dataStruct, auxDataStruct, weightsStruct, filternm);
-        n_restarts = n_restarts + 1;
-        n_iter = n_iter + itercount;
+    currentLoss = 0;
+    prevLoss = inf;
+    while ~converged && numRuns < maxRuns && (prevLoss - currentLoss) > tol_restart
+        prevLoss = currentLoss;
+        [estimatedPar, converged, itercount, currentLoss] = petregr_f('predict_pets', estimatedPar, dataStruct, auxDataStruct, weightsStruct, filternm);
+        numRuns = numRuns + 1;
+        numIter = numIter + itercount;
+        alternateSimplexSize();
     end
-
+    finalLoss = currentLoss;
 else
     error('Folder for species "%s" does not exist.', speciesName);
 end

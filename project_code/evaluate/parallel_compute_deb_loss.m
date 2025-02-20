@@ -1,8 +1,8 @@
 % function parallel_compute_deb_loss(allSpeciesFolder, resultsFolder, datasetName, modelName)
 
-parameterPredictionFile = [resultsFolder datasetName '\parameter_predictions\' modelName '_predictions.csv'];
-feasibleFile = [resultsFolder datasetName '\feasibility\' modelName '_feasibility.csv'];
-outputFileName = [resultsFolder datasetName '\deb_model_loss\' modelName '_deb_model_loss.csv'];
+parameterPredictionFile = [resultsFolder '\parameter_predictions\' modelName '_predictions.csv'];
+feasibleFile = [resultsFolder '\feasibility\' modelName '_feasibility.csv'];
+outputFileName = [resultsFolder '\deb_model_loss\' modelName '_deb_model_loss.csv'];
 
 % Read the parameter prediction file
 parameterEstimates = readtable(parameterPredictionFile, 'ReadRowNames', true);

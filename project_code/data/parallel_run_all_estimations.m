@@ -79,6 +79,12 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         inProgressFutures(nFutures+1).startTime = startTime;
         fprintf('[%4d / %d | %50s] SUBMIT \n', i, numSpecies, speciesName)
         i = i + 1;
+
+        % Write results to .csv file every once in a while
+        if mod(i, saveResultsTableEvery) == 0
+            writetable(estimationResultsTable, outputFileName,'WriteRowNames',true);
+            fprintf('Table saved in %s\n', outputFileName);
+        end
     end
 
     % Check futures for completion or timeout
@@ -148,12 +154,6 @@ while i <= numSpecies || ~isempty(inProgressFutures)
 
     % Pause for a short time to avoid busy waiting
     pause(0.1);
-
-    % Write results to .csv file every once in a while
-    if mod(i, saveResultsTableEvery) == 0
-        writetable(estimationResultsTable, outputFileName,'WriteRowNames',true);
-        fprintf('Table saved in %s\n', outputFileName);
-    end
 end
 
 %% Write results to a .csv file
@@ -229,7 +229,6 @@ if isfolder(speciesFolder)
     auxDataStruct = struct(speciesName, auxData);
     weightsStruct = struct(speciesName, weights);
     filternm = ['filter_' metaPar.model];
-    % setGlobalVars();
     setGlobalPetsVar(speciesName);
 
     % Run estimation

@@ -33,14 +33,14 @@ if __name__ == '__main__':
 
     base_model = TaxonomicKNNRegressor
     search_space = {
-        'weight_factor': tune.loguniform(1e-6, 1e1),
+        'weight_factor': tune.loguniform(1e-6, 1e2),
 
         # Fixed params
         'n_neighbors': 1,
         'col_types': col_types,
         'output_scaler_type': 'none',
         'taxonomy_encoder': taxonomy_encoder,
-        'use_scaling_relationships': True,
+        'use_scaling_relationships': False,
     }
 
     model_name = 'SRTaxo1NN' if search_space['use_scaling_relationships'] else 'Taxo1NN'
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         col_types=col_types,
         metric='GEF',
         mode='min',
-        num_samples=150,
+        num_samples=100,
         max_concurrent_trials=12,
         evaluate_on_test=True,
         save_best_model=True,

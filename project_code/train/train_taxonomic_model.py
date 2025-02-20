@@ -43,7 +43,7 @@ if __name__ == '__main__':
         'use_scaling_relationships': True,
     }
 
-    save_trained_model = False
+    save_trained_model = True
     evaluate_on_test = True
 
     cv_metrics_df = evaluate_config(config=config,
