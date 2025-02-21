@@ -206,7 +206,7 @@ def copy_debtool_results_files(species_list, destination_folder, copy_pars_init_
                                all_species_folder=None):
     if all_species_folder is None:
         filepaths = {}
-        with open('../../filepaths.csv', 'r') as f:
+        with open('filepaths.csv', 'r') as f:
             for line in f:
                 name, path = line.rstrip('\n').split(',')
                 filepaths[name] = os.path.abspath(path)
@@ -266,7 +266,7 @@ if __name__ == '__main__':
                       'Microcondylaea_bonellii', 'Trichiurus_lepturus', 'Aerodramus_fuciphagus', 'Sula_dactylatra',
                       'Scomberomorus_maculatus', 'Macquaria_ambigua', 'Apteryx_mantelli', 'Anchoa_panamensis',
                       'Synodontis_nebulosus', 'Euthynnus_alletteratus', ],
-        destination_folder=r"C:\Users\diogo\Downloads\pars_init files in the loss function minimum",
+        destination_folder=r"C:\Users\dmoliveira\Downloads\pars_init files in the loss function minimum",
         copy_pars_init_file=True,
         copy_results_mat_file=False,
     )

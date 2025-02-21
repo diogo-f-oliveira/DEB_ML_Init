@@ -11,14 +11,20 @@ allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 saveFolder = '..\..\data\estimation_runs';
 % Output file
 % outputFileName = [saveFolder '\full_estimation_from_AmP_pars_subset_test_set.csv'];
-outputFileName = [saveFolder '\run_val_set_until_minimum.csv'];
+outputFileName = [saveFolder '\run_train_val_sets_until_minimum.csv'];
 
 %% Get list of species
 
 % speciesList = getAllSpeciesNames(allSpeciesFolder);
-datasetPath = '../../data/processed/biologist_no_pub_age/val.csv';
-datasetTable = readtable(datasetPath, 'Delimiter', ',', 'ReadVariableNames', true);
-speciesList = datasetTable.species;
+speciesList = {};
+datasetSplits = {'train', 'val'};
+for s=1:length(datasetSplits)
+    sp = datasetSplits{s};
+    datasetPath = ['../../data/processed/biologist_no_pub_age/' sp '.csv'];
+    datasetTable = readtable(datasetPath, 'Delimiter', ',', 'ReadVariableNames', true);
+    speciesList = [speciesList; datasetTable.species];
+end
+% speciesList = {'Pseudunio_auricularius'};
 numSpecies = length(speciesList);
 
 
@@ -40,7 +46,7 @@ estimationResultsTable = table('Size', [numSpecies, numCols], 'VariableTypes', v
 
 %% Settings
 saveParsList = {'z', 'kap', 'v', 'p_M', 'E_Hb', 'E_Hp',};
-saveResultsTableEvery = 50;
+saveResultsTableEvery = 30;
 saveResultsMatFile = true;
 saveParsInitFile = true;
 
@@ -246,7 +252,7 @@ if isfolder(speciesFolder)
         numIter = numIter + itercount;
         alternateSimplexSize();
         if saveResultsMatFile
-            saveEstimationResultsFiles(estimatedPar, metaData, metaPar, txtPar, saveParsInitFile)
+            saveEstimationResultsFiles(speciesName, estimatedPar, metaData, metaPar, txtPar, saveParsInitFile)
         end
     end
     % Save estimation stats
@@ -283,7 +289,7 @@ speciesList = {allFiles(isDir).name}; % Extract names of directories
 speciesList = speciesList(~ismember(speciesList, {'.', '..'}));
 end
 
-function saveEstimationResultsFiles(par, metaData, metaPar, txtPar, saveParsInitFile)
+function saveEstimationResultsFiles(speciesName, par, metaData, metaPar, txtPar, saveParsInitFile)
     save(['results_' speciesName '.mat'], 'par', 'metaData', 'metaPar', 'txtPar')
     if saveParsInitFile
         mat2pars_init(speciesName)
