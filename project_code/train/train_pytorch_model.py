@@ -39,7 +39,6 @@ def adjust_config(config):
 
 
 def train_neural_network(config, model_class, dataset_name,
-                         n_epochs_gradient_descent=5, early_stopping_metric=None, patience=5,
                          device=None, seed=42, verbose=False, print_val_metrics_every=10,
                          report_val_scores=False, datasets_folder='data/processed'):
     torch.manual_seed(seed=seed)
@@ -86,15 +85,19 @@ def train_neural_network(config, model_class, dataset_name,
     # Create optimizer
     optimizer = optim.Adam(model.parameters(), lr=config['learning_rate'], weight_decay=1e-3)
 
-    # Train the model with batches
+    # Get training configuration from config
     max_epochs = config['max_epochs']
+    early_stopping_metric = config['early_stopping_metric']
+    patience = config['patience']
+    n_epochs_gradient_descent = config['n_epochs_gradient_descent']
+    # Initialize variables
     metric_name_list = list(METRIC_LABEL_TO_NAME.values())
     traces_df = pd.DataFrame(index=range(max_epochs), columns=['train_loss', 'val_loss'] + metric_name_list)
-
     best_model_state = copy.deepcopy(model.state_dict())
     best_epoch = 0
     epochs_no_improve = 0
 
+    # Train the model with batches
     for epoch in range(max_epochs):
         optimizer.zero_grad()
         model.train()
@@ -161,12 +164,11 @@ def train_neural_network(config, model_class, dataset_name,
                       f"Best {early_stopping_metric}: {traces_df.loc[best_epoch, early_stopping_metric]:.4f}")
                 break
 
-    # End of training - restore best model state if not already set
-    model.load_state_dict(best_model_state)
-
     if early_stopping_metric is None:
         report_epoch = max_epochs - 1
     else:
+        # End of training - restore best model state if not already set
+        model.load_state_dict(best_model_state)
         report_epoch = best_epoch
     if report_val_scores:
         report_metrics_dict = traces_df.loc[report_epoch].to_dict()
@@ -189,26 +191,30 @@ if __name__ == '__main__':
     config = {
         'scaling_type': 'log_standardize',
         'batch_size': 4,
-        'max_epochs': 300,
-        'learning_rate': 5e-5,
+        'max_epochs': 100,
+        'learning_rate': 5e-4,
         'shared_hidden_layers': 3 * [64],
         'par_hidden_layers': 2 * [32],
         'lambdas': [1, 1, 1, 1],
-        'loss_function': 'mse_infeasibility',
+        'loss_function': 'mse',
         'output_weight_strategy': '',
-        'dropout_prob': 0,
-        # 'dropout_prob': 0.1,
+        # 'dropout_prob': 0,
+        'dropout_prob': 0.1,
         'clamp_function': 'relu',
-        'use_skip_connections': False,
+        'use_skip_connections': True,
+        'n_epochs_gradient_descent': 5,
+        'patience': 10,
+        # 'early_stopping_metric': 'GEF',
+        'early_stopping_metric': None,
     }
+    print(config)
 
     model_name = 'MLP'
     model_class = DEBNetHC
     save_model = False
     save_folder = f'results/{dataset_name}'
     evaluate_on_test = True
-    # early_stopping_metric = None
-    early_stopping_metric = 'GEF'
+
     # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     device = torch.device("cpu")
 
@@ -218,9 +224,6 @@ if __name__ == '__main__':
         dataset_name=dataset_name,
         verbose=True,
         report_val_scores=False,
-        n_epochs_gradient_descent=5,
-        patience=10,
-        early_stopping_metric=early_stopping_metric,
         device=device,
     )
     formatted_metric = 'GEF'
@@ -243,6 +246,7 @@ if __name__ == '__main__':
                                                                             )
 
         # Evaluate parameter predictions in parameter scale
+        model.eval()
         evaluate_parameter_predictions_on_data(
             data=data_tensors['test'],
             col_types=col_types,

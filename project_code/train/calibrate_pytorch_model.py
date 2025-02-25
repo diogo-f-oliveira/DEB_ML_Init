@@ -18,9 +18,8 @@ from ..data.prepare_data_pytorch import prepare_data_tensors
 
 def hyperopt_calibration(model_class, search_space, dataset_name, device,
                          num_samples=100, metric='mape', mode='min', model_name=None, run_name=None,
-                         patience=10, grace_period=30,
-                         evaluate_on_test=False, save_best_model=False,
-                         save_folder='', tune_dir=None, random_state=42, datasets_folder='data/processed'):
+                         grace_period=30, evaluate_on_test=False, save_best_model=False, save_folder='', tune_dir=None,
+                         random_state=42, datasets_folder='data/processed'):
     if model_name is None:
         model_name = model_class.__name__
 
@@ -31,10 +30,13 @@ def hyperopt_calibration(model_class, search_space, dataset_name, device,
         tune_dir = os.path.abspath(f'tune')
     alg = HyperOptSearch(metric=metric, mode=mode, random_state_seed=random_state)
 
+    trainable = partial(train_neural_network,
+                        model_class=model_class, dataset_name=dataset_name,
+                        report_val_scores=True, verbose=False, seed=random_state, print_val_metrics_every=1000,
+                        datasets_folder=datasets_folder, device=device)
+
     tuner = tune.Tuner(
-        partial(train_neural_network, model_class=model_class, dataset_name=dataset_name, patience=patience,
-                report_val_scores=True, verbose=False, seed=random_state, print_val_metrics_every=1000,
-                datasets_folder=datasets_folder, device=device),
+        trainable,
 
         tune_config=tune.TuneConfig(
             search_alg=alg,
@@ -63,7 +65,7 @@ def hyperopt_calibration(model_class, search_space, dataset_name, device,
     print(f"Retraining best configuration: {best_config}")
     best_model, best_epoch_metrics_df = train_neural_network(
         config=best_config,
-        model_class=model_class, dataset_name=dataset_name, patience=patience,
+        model_class=model_class, dataset_name=dataset_name,
         report_val_scores=False, verbose=False, seed=random_state,
         print_val_metrics_every=1000,
         datasets_folder=datasets_folder, device=device,
@@ -110,20 +112,23 @@ if __name__ == '__main__':
         # Optimizer hyperparameters
         'batch_size': tune.choice([2, 4, 8, 16]),
         'learning_rate': tune.loguniform(1e-6, 1e-2),
+        'max_epochs': 500,
+        'patience': 10,
+        'n_epochs_gradient_descent': 5,
+        # 'early_stopping_metric': None,
+        'early_stopping_metric': 'GEF',
+
         # Architecture hyperparameters
+        'scaling_type': 'log_standardize',
         'n_shared_layers': tune.randint(1, 5),
         'shared_hidden_size': tune.choice([16, 32, 64, 96, 128]),
         'n_par_layers': tune.randint(1, 5),
         'par_hidden_size': tune.choice([8, 16, 32, 64]),
-        'use_skip_connections': tune.choice([True, False]),
-        # 'dropout_prob': tune.uniform(0, 0.4),
-        # Fixed options
-        'dropout_prob': 0.0,
         # 'n_par_layers': 0,
         # 'par_hidden_size': 0,
-        'scaling_type': 'log_standardize',
-        'max_epochs': 500,
-        'early_stopping_metric': 'GEF',
+        'use_skip_connections': tune.choice([True, False]),
+        # 'dropout_prob': tune.uniform(0, 0.4),
+        'dropout_prob': 0.0,
     }
     model_name = 'MLP'
 
@@ -160,8 +165,7 @@ if __name__ == '__main__':
                          evaluate_on_test=True,
                          save_folder=f'results/{dataset_name}',
                          model_name=model_name,
-                         patience=10,
-                         grace_period=50,
+                         grace_period=100,
                          device=device,
                          metric=metric,
                          )
