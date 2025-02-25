@@ -25,7 +25,7 @@ initResultsTable{:, 'data_split'} = "test";
 
 %% Settings
 % Max execution time per future
-maxTime = 15*60*60; % in seconds
+maxTime = 1*60*60; % in seconds
 maxRuns = 200;
 saveResultsTableEvery = 30;
 

@@ -11,7 +11,7 @@ allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 saveFolder = '..\..\data\estimation_runs';
 % Output file
 % outputFileName = [saveFolder '\full_estimation_from_AmP_pars_subset_test_set.csv'];
-outputFileName = [saveFolder '\run_train_val_sets_until_minimum.csv'];
+outputFileName = [saveFolder '\run_train_val_sets_until_minimum_2.csv'];
 
 %% Get list of species
 
@@ -24,7 +24,7 @@ for s=1:length(datasetSplits)
     datasetTable = readtable(datasetPath, 'Delimiter', ',', 'ReadVariableNames', true);
     speciesList = [speciesList; datasetTable.species];
 end
-% speciesList = {'Pseudunio_auricularius'};
+speciesList = {'Macropus_rufus', 'Saxicola_rubicola', 'Lepisma_saccharina', 'Daphnia_cucullata', 'Sarda_sarda', 'Eucinostomus_gula'};
 numSpecies = length(speciesList);
 
 
@@ -102,7 +102,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
             try
                 [initLoss, initParValues, finalLoss, finalParValues, estimStats, predictError] = fetchOutputs(futInfo.future);
                 executionTime = toc(futInfo.startTime);
-                fprintf('[%4d / %d | %50s] RESULT: %d %.2f \n', futInfo.i, numSpecies, futInfo.speciesName, estimStats.convergence, executionTime)
+                fprintf('[%4d / %d | %50s] RESULT: %d %d %.2f \n', futInfo.i, numSpecies, futInfo.speciesName, estimStats.convergence, estimStats.numIter, executionTime)
 
                 % Store results
                 estimationResultsTable{futInfo.speciesName, 'execution_time'} = executionTime;

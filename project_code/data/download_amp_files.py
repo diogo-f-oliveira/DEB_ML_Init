@@ -121,7 +121,7 @@ def download_amp_database(save_folder, species_list, overwrite=False, check_upda
 
 if __name__ == '__main__':
     filepaths = {}
-    with open('../../filepaths.csv', 'r') as f:
+    with open('filepaths.csv', 'r') as f:
         for line in f:
             name, path = line.rstrip('\n').split(',')
             filepaths[name] = os.path.abspath(path)

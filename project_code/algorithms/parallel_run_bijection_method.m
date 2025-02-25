@@ -1,20 +1,23 @@
 clear all
 format long
 
-%%
+%% Define folders
 scriptsFolder = pwd;
 addpath(scriptsFolder)
 
-allSpeciesFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\DEB Resources\DEBtool\AmPdata\species\';
-datasetsFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\Code\DEB Model Calibration Algorithms\DEB_ML_Bijection\data\';
-resultsFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\Code\DEB Model Calibration Algorithms\DEB_ML_Bijection\results\';
+filePathsCSVPath = '..\..\filepaths.csv';
+pathsTable = readtable(filePathsCSVPath, 'Delimiter', ',', 'ReadVariableNames', true, 'ReadRowNames', true);
+allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 
-datasetName = 'all_constraints_no_pub_age_taxonomy_ecocodes';
+datasetsFolder = '..\..\data\processed\';
+resultsFolder = '..\..\results\';
+
+datasetName = 'biologist_no_pub_age';
 modelName = 'BijectionMethod';
 
-datasetFile = [datasetsFolder 'processed\' datasetName '\' datasetName '.csv'];
-parameterTableOutputFile = [resultsFolder datasetName '\parameter_predictions\' modelName '_predictions.csv'];
-bijectionStatsOutputFile = [resultsFolder 'bijection method\bijection_stats.csv'];
+datasetFile = [datasetsFolder datasetName '\' datasetName '.csv'];
+parameterTableOutputFile = [resultsFolder '\parameter_predictions\' modelName '_predictions.csv'];
+bijectionStatsOutputFile = [resultsFolder 'bijection_method\bijection_stats.csv'];
 
 datasetTable = readtable(datasetFile, 'ReadRowNames', true);
 speciesList = datasetTable.Properties.RowNames;
@@ -38,7 +41,7 @@ bijectionStatsTable = table('Size', [numSpecies, length(statsCols)], 'VariableTy
 % Settings
 useDefaultParameterValues = true;
 % Max execution time per iteration
-maxTime = 3*60; % 3 minutes
+maxTime = 5*60; % 3 minutes
 
 
 %% Set up parallel pool
