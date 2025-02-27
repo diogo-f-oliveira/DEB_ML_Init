@@ -11,20 +11,24 @@ allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 saveFolder = '..\..\data\estimation_runs';
 % Output file
 % outputFileName = [saveFolder '\full_estimation_from_AmP_pars_subset_test_set.csv'];
-outputFileName = [saveFolder '\run_train_val_sets_until_minimum_2.csv'];
+outputFileName = [saveFolder '\run_test_set_until_minimum_20250227.csv'];
 
 %% Get list of species
 
 % speciesList = getAllSpeciesNames(allSpeciesFolder);
 speciesList = {};
-datasetSplits = {'train', 'val'};
+datasetSplits = {
+    % 'train', 
+    % 'val',
+    'test',
+    };
 for s=1:length(datasetSplits)
     sp = datasetSplits{s};
     datasetPath = ['../../data/processed/biologist_no_pub_age/' sp '.csv'];
     datasetTable = readtable(datasetPath, 'Delimiter', ',', 'ReadVariableNames', true);
     speciesList = [speciesList; datasetTable.species];
 end
-speciesList = {'Macropus_rufus', 'Saxicola_rubicola', 'Lepisma_saccharina', 'Daphnia_cucullata', 'Sarda_sarda', 'Eucinostomus_gula'};
+% speciesList = {'Trichiurus_lepturus'};
 numSpecies = length(speciesList);
 
 
@@ -71,7 +75,8 @@ parfevalOnAll(@setGlobalVars, 0);
 %% Start the processing loop
 while i <= numSpecies || ~isempty(inProgressFutures)
     % Submit new tasks if workers are available
-    while length(inProgressFutures) < numWorkers && i <= numSpecies
+    numJobsInProgress = length(inProgressFutures);
+    while numJobsInProgress < numWorkers && i <= numSpecies
         speciesName = speciesList{i};
 
         % Submit parfeval task
@@ -83,7 +88,9 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         inProgressFutures(nFutures+1).i = i;
         inProgressFutures(nFutures+1).speciesName = speciesName;
         inProgressFutures(nFutures+1).startTime = startTime;
-        fprintf('[%4d / %d | %50s] SUBMIT \n', i, numSpecies, speciesName)
+
+        numJobsInProgress = length(inProgressFutures);
+        fprintf('[%4d / %d | %50s] SUBMIT (%d/%d) \n', i, numSpecies, speciesName, numJobsInProgress, numWorkers)
         i = i + 1;
 
         % Write results to .csv file every once in a while
@@ -211,8 +218,13 @@ if isfolder(speciesFolder)
 
     % Run mydata.m
     [data, auxData, metaData, ~, weights] = feval(['mydata_' speciesName]);
-    % Run pars_init.m
-    [par, metaPar, txtPar] = feval(['pars_init_' speciesName], metaData);
+    % Get parameters from .mat file
+    resultsMatFilename = ['results_' speciesName '.mat'];
+    if exist(resultsMatFilename, 'file')
+        load(resultsMatFilename, "par", "metaPar", "txtPar")
+    else
+        [par, metaPar, txtPar] = feval(['pars_init_' speciesName], metaData);
+    end
 
     % Get initial parameter values
     for p=1:length(saveParsList)

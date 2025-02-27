@@ -1,0 +1,2 @@
+Row,init_loss,z_i,kap_i,v_i,p_M_i,E_Hb_i,E_Hp_i,final_loss,z_f,kap_f,v_f,p_M_f,E_Hb_f,E_Hp_f,convergence,n_runs,n_iter,execution_time,error,error_message
+Pseudunio_auricularius,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13.095209,1,The logical indices contain a true value outside of the array bounds.

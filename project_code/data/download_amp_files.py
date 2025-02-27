@@ -71,9 +71,10 @@ def get_file_links(url, include_dirs=True, session=None):
             continue
         if not include_dirs and href.endswith('/'):
             continue
-        # Exclude links starting with 'results'
-        if not href.startswith('results'):
-            links.append(href)
+        # Exclude links starting with 'results' except .mat files.
+        if href.startswith('results') and not href.endswith('.mat'):
+            continue
+        links.append(href)
     return links
 
 

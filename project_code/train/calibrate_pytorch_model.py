@@ -70,6 +70,7 @@ def hyperopt_calibration(model_class, search_space, dataset_name, device,
         print_val_metrics_every=1000,
         datasets_folder=datasets_folder, device=device,
     )
+    best_model.eval()
 
     formatted_score = format(best_epoch_metrics_df[metric], '.4e').replace('.', '')
     best_model_name = f'{metric}_{formatted_score}_{model_name}'
@@ -113,10 +114,11 @@ if __name__ == '__main__':
         'batch_size': tune.choice([2, 4, 8, 16]),
         'learning_rate': tune.loguniform(1e-6, 1e-2),
         'max_epochs': 500,
+        # 'max_epochs': tune.qrandint(50, 700, 50)
         'patience': 10,
         'n_epochs_gradient_descent': 5,
-        # 'early_stopping_metric': None,
-        'early_stopping_metric': 'GEF',
+        'early_stopping_metric': None,
+        # 'early_stopping_metric': 'GEF',
 
         # Architecture hyperparameters
         'scaling_type': 'log_standardize',
@@ -127,10 +129,10 @@ if __name__ == '__main__':
         # 'n_par_layers': 0,
         # 'par_hidden_size': 0,
         'use_skip_connections': tune.choice([True, False]),
-        # 'dropout_prob': tune.uniform(0, 0.4),
-        'dropout_prob': 0.0,
+        'dropout_prob': tune.uniform(0, 0.4),
+        # 'dropout_prob': 0.0,
     }
-    model_name = 'MLP'
+    model_name = 'DEBNetHC'
 
     # if model_class == DEBNet:
     #     if use_infeasibility_loss:
@@ -150,6 +152,19 @@ if __name__ == '__main__':
         search_space['loss_function'] = 'mse'
         model_class = DEBNetHC
         use_infeasibility_loss = False
+        search_space['n_par_layers'] = 0
+        search_space['par_hidden_size'] = 0
+        search_space['use_skip_connections'] = False
+    elif model_name == 'MLPSC':
+        search_space['loss_function'] = 'mse_infeasibility'
+        model_class = DEBNet
+        search_space['lambda_kap'] = tune.loguniform(1e-1, 1e1)
+        search_space['lambda_s_H'] = tune.loguniform(1e-1, 1e1)
+        search_space['lambda_s_p'] = tune.loguniform(1e-1, 1e1)
+        use_infeasibility_loss = True
+        search_space['n_par_layers'] = 0
+        search_space['par_hidden_size'] = 0
+        search_space['use_skip_connections'] = False
 
     metric = 'GEF'
 
@@ -159,7 +174,7 @@ if __name__ == '__main__':
     hyperopt_calibration(model_class=model_class,
                          search_space=search_space,
                          dataset_name=dataset_name,
-                         num_samples=300,
+                         num_samples=100,
                          datasets_folder=os.path.abspath('data/processed'),
                          save_best_model=True,
                          evaluate_on_test=True,
