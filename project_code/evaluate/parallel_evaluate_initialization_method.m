@@ -25,10 +25,10 @@ initResultsTable{:, 'data_split'} = "test";
 
 %% Settings
 % Max execution time per future
-maxTime = 1*60*60; % in seconds
+maxEstimationTime = 1*60; % in seconds
+maxExecutionTime = 1.2*maxEstimationTime; % in seconds
 maxRuns = 200;
 saveResultsTableEvery = 30;
-
 
 
 %% Set up parallel pool
@@ -55,7 +55,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         speciesParameterEstimates = parameterEstimates(speciesName, :);
 
         % Submit parfeval task
-        fut = parfeval(pool, @processSpecies, 4, speciesName, speciesParameterEstimates, allSpeciesFolder, predParNames, maxRuns);
+        fut = parfeval(pool, @processSpecies, 5, speciesName, speciesParameterEstimates, allSpeciesFolder, predParNames, maxRuns, maxEstimationTime);
         % Record the future, species name, start time
         startTime = tic;
         nFutures = length(inProgressFutures);
@@ -81,12 +81,12 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         if strcmp(futInfo.future.State, 'finished')
             % Fetch outputs
             try
-                [numRuns, converged, numIter, fval] = fetchOutputs(futInfo.future);
-                executionTime = toc(futInfo.startTime);
-                fprintf('[%4d / %d | %50s] RESULT: %d %.2f \n', futInfo.i, numSpecies, futInfo.speciesName, converged, executionTime)
+                [numRuns, converged, numIter, fval, estimationTime] = fetchOutputs(futInfo.future);
+                % executionTime = toc(futInfo.startTime);
+                fprintf('[%4d / %d | %50s] RESULT: %d %.2f \n', futInfo.i, numSpecies, futInfo.speciesName, converged, estimationTime)
 
                 % Store results
-                initResultsTable{futInfo.speciesName, 'execution_time'} = executionTime;
+                initResultsTable{futInfo.speciesName, 'execution_time'} = estimationTime;
                 initResultsTable{futInfo.speciesName, 'deb_loss'} = fval;
                 initResultsTable{futInfo.speciesName, 'convergence'} = converged;
                 initResultsTable{futInfo.speciesName, 'n_runs'} = numRuns;
@@ -104,18 +104,21 @@ while i <= numSpecies || ~isempty(inProgressFutures)
                 initResultsTable{futInfo.speciesName, 'execution_time'} = executionTime;
                 initResultsTable{futInfo.speciesName, 'convergence'} = false;
                 initResultsTable{futInfo.speciesName, 'error_message'} = string(error_message);
+                initResultsTable{futInfo.speciesName, 'error'} = true;
+
             end
             % Remove future from in-progress list
             inProgressFutures(idx) = [];
         else
             % Check for timeout
             elapsedTime = toc(futInfo.startTime);
-            if elapsedTime > maxTime
+            if elapsedTime > maxExecutionTime
                 cancel(futInfo.future);
-                fprintf('[%4d / %d | %50s] TIMEOUT: predict function took longer than %d seconds to execute. \n', futInfo.i, numSpecies, futInfo.speciesName, maxTime)
-                initResultsTable{futInfo.speciesName, 'execution_time'} = maxTime;
+                fprintf('[%4d / %d | %50s] TIMEOUT: predict function took longer than %d seconds to execute. \n', futInfo.i, numSpecies, futInfo.speciesName, maxExecutionTime)
+                initResultsTable{futInfo.speciesName, 'execution_time'} = maxExecutionTime;
                 initResultsTable{futInfo.speciesName, 'convergence'} = false;
                 initResultsTable{futInfo.speciesName, 'error_message'} = "Maximum execution time exceeded";
+                initResultsTable{futInfo.speciesName, 'error'} = true;
                 % Remove future from in-progress list
                 inProgressFutures(idx) = [];
             else
@@ -158,7 +161,7 @@ pets = {speciesName};
 end
 
 %% Function to process each species
-function [numRuns, converged, numIter, finalLoss] = processSpecies(speciesName, speciesParameterEstimates, allSpeciesFolder, predParNames, maxRuns)
+function [numRuns, converged, numIter, finalLoss, estimationTime] = processSpecies(speciesName, speciesParameterEstimates, allSpeciesFolder, predParNames, maxRuns, maxEstimationTime)
 % Set up data for the species
 speciesFolder = fullfile(allSpeciesFolder, speciesName);
 % Check if the species folder exists
@@ -199,14 +202,23 @@ if isfolder(speciesFolder)
     converged = false;
     currentLoss = 0;
     prevLoss = inf;
-    while ~converged && numRuns < maxRuns && (prevLoss - currentLoss) > tol_restart
+    startTime = tic;
+    elapsedTime = toc(startTime);
+    while ~converged ... 
+            && (prevLoss - currentLoss) > tol_restart ...
+            && numRuns < maxRuns...
+            && elapsedTime < maxEstimationTime
+
         prevLoss = currentLoss;
         [estimatedPar, converged, itercount, currentLoss] = petregr_f('predict_pets', estimatedPar, dataStruct, auxDataStruct, weightsStruct, filternm);
+        alternateSimplexSize();
         numRuns = numRuns + 1;
         numIter = numIter + itercount;
-        alternateSimplexSize();
+        elapsedTime = toc(startTime);
+
     end
     finalLoss = currentLoss;
+    estimationTime = elapsedTime;
 else
     error('Folder for species "%s" does not exist.', speciesName);
 end
