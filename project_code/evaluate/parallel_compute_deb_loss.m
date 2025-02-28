@@ -127,8 +127,16 @@ if isfolder(speciesFolder)
 
     % Run mydata.m
     [data, auxData, metaData, ~, weights] = feval(['mydata_' speciesName]);
-    % Run pars_init.m
-    [par, ~, ~] = feval(['pars_init_' speciesName], metaData);
+    % Get par struct
+    if exist(resultsMatFilePath, 'file')
+        load(resultsMatFilename, "par")
+    elseif exist(parsInitFilePath, 'file')
+        % If results.mat file does not exist load parameters from
+        % pars_init.m file. This has lower precision due to rounding errors
+        % when printing to pars_init.m
+        [par, ~, ~] = feval(['pars_init_' speciesName], metaData);
+    end
+
 
     % Replace parameters in par
     predPar = par;

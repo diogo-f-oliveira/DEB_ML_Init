@@ -73,7 +73,16 @@ function [par, metaPar, txtPar, flag] = bijection_method(data, auxData, metaData
 
 % See <../mydata_get_pars_2_9.m *mydata_get_pars_2_9*> for application of functions called by this one.
 
-[par, metaPar, txtPar] = feval(['pars_init_', metaData.species], metaData); % set pars and chem
+% Get par struct
+if exist(resultsMatFilePath, 'file')
+    load(resultsMatFilename, "par", "metaPar", "txtPar")
+elseif exist(parsInitFilePath, 'file')
+    % If results.mat file does not exist load parameters from
+    % pars_init.m file. This has lower precision due to rounding errors
+    % when printing to pars_init.m
+    [par, metaPar, txtPar] = feval(['pars_init_' speciesName], metaData);
+end
+
 % some elements of par will be overwritten below
 % T_ref is in chem, T_A in par; these are used for temp corrections
 

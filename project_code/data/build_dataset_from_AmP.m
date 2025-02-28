@@ -87,24 +87,38 @@ for i=1:numSpecies
     % Check if mydata.m and pars_init.m files exist
     mydataFilePath = [folder '/mydata_' speciesName];
     parsInitFilePath = [folder '/pars_init_' speciesName];
-    if (exist(mydataFilePath, 'file') ~= 2) || (exist(parsInitFilePath, 'file') ~= 2)
-        fprintf('Missing files for species %s\n', speciesName)
+    resultsMatFilePath = [folder '/results_' speciesName '.mat'];
+    if (exist(mydataFilePath, 'file') ~= 2) 
+        fprintf('Missing mydata.m file for species %s\n', speciesName)
         continue
     end
-
-    % Load mydata.m and pars_init.m file
+    % Run mydata.m file
     try
         [data, auxData, metaData, txtData, weights] = feval(['mydata_' speciesName]);
-        [par, metaPar, txtPar] = feval(['pars_init_' speciesName], metaData);
     catch ME
         fprintf(ME.message)
         continue
     end
+
+    % Load parameters
+    if exist(resultsMatFilePath, 'file')
+        load(resultsMatFilename, "par", "metaPar", "txtPar")
+    elseif exist(parsInitFilePath, 'file')
+        % If results.mat file does not exist load parameters from
+        % pars_init.m file. This has lower precision due to rounding errors
+        % when printing to pars_init.m
+        try
+            [par, metaPar, txtPar] = feval(['pars_init_' speciesName], metaData);
+        catch ME
+            fprintf(ME.message)
+            continue
+        end
+    else
+        fprintf('Missing results.mat and pars_init.m files for species')
+    end
+
     % Check for valid model
     modelType = metaPar.model;
-    % if ~ismember(modelType, validModelTypes)
-    %     continue
-    % end
     T{speciesName, 'model'} = string(modelType);
 
     % Fetch parameters
