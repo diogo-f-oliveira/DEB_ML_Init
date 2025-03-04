@@ -171,7 +171,6 @@ filepaths.csv
 # MATLAB autosave files
 *.asv
 
-# Ignore results for now
-results/
+
 
 

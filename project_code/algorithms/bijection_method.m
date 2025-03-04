@@ -72,10 +72,11 @@ function [par, metaPar, txtPar, flag] = bijection_method(data, auxData, metaData
 %% Example of use
 
 % See <../mydata_get_pars_2_9.m *mydata_get_pars_2_9*> for application of functions called by this one.
-
+speciesName = metaData.species;
 % Get par struct
-if exist(resultsMatFilePath, 'file')
-    load(resultsMatFilename, "par", "metaPar", "txtPar")
+resultsMatFileName = ['results_' speciesName '.mat'];
+if exist(resultsMatFileName, 'file')
+    load(resultsMatFileName, "par", "metaPar", "txtPar")
 elseif exist(parsInitFilePath, 'file')
     % If results.mat file does not exist load parameters from
     % pars_init.m file. This has lower precision due to rounding errors
