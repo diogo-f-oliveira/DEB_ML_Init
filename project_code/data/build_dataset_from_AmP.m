@@ -8,17 +8,20 @@ clear all
 format long
 
 %% Define paths to files
+filePathsCSVPath = '..\..\filepaths.csv';
+pathsTable = readtable(filePathsCSVPath, 'Delimiter', ',', 'ReadVariableNames', true, 'ReadRowNames', true);
+allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 
-AmPDataFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\DEB Resources\DEBtool\AmPdata\';
+% AmPDataFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\DEB Resources\DEBtool\AmPdata\';
 % allStatPath = [AmPDataFolder 'allStat.mat'];
-speciesFolder = [AmPDataFolder 'species\'];
-saveFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\Code\DEB Model Calibration Algorithms\DEB_ML_Bijection\data\raw';
-tableSavePath = [saveFolder '\dataset_matlab_20250128.csv'];
+% allspeciesFolder = [AmPDataFolder 'species\'];
+saveFolder = [pathsTable{'root', 'path'}{:} '\data\raw';];
+tableSavePath = [saveFolder '\dataset_matlab_20250303.csv'];
 
 %% Get list of species
 
 % Get a list of all files and folders in the specified directory
-allFiles = dir(speciesFolder);
+allFiles = dir(allSpeciesFolder);
 
 % Filter the list to include only directories
 isDir = [allFiles.isdir]; % Logical index for directories
@@ -82,12 +85,12 @@ for i=1:numSpecies
     speciesName = speciesList{i};
     waitbar(i / numSpecies, h, sprintf('Processing species %40s\n%d of %d\n', strrep(speciesName, '_', ' '), i, numSpecies));
 
-    folder = [speciesFolder speciesName];
+    folder = [allSpeciesFolder '\' speciesName];
     cd(folder);
     % Check if mydata.m and pars_init.m files exist
-    mydataFilePath = [folder '/mydata_' speciesName];
-    parsInitFilePath = [folder '/pars_init_' speciesName];
-    resultsMatFilePath = [folder '/results_' speciesName '.mat'];
+    mydataFilePath = [folder '\mydata_' speciesName];
+    parsInitFilePath = [folder '\pars_init_' speciesName];
+    resultsMatFilePath = [folder '\results_' speciesName '.mat'];
     if (exist(mydataFilePath, 'file') ~= 2) 
         fprintf('Missing mydata.m file for species %s\n', speciesName)
         continue
@@ -102,7 +105,7 @@ for i=1:numSpecies
 
     % Load parameters
     if exist(resultsMatFilePath, 'file')
-        load(resultsMatFilename, "par", "metaPar", "txtPar")
+        load(resultsMatFilePath, "par", "metaPar", "txtPar")
     elseif exist(parsInitFilePath, 'file')
         % If results.mat file does not exist load parameters from
         % pars_init.m file. This has lower precision due to rounding errors
@@ -250,6 +253,7 @@ writetable(T, tableSavePath,'WriteRowNames',true);
 fprintf('Table saved in %s\n', tableSavePath);
 delete(h)
 
+%% Functions
 
 function [matchingFields, exactMatchIndex] = getMatchingFields(dataFields, datasetName)
 matchingFields = dataFields(startsWith(dataFields, datasetName) & ~contains(dataFields, '_m') & ~strcmp(dataFields, [datasetName 'm']));

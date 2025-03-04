@@ -158,9 +158,14 @@ if isfolder(speciesFolder)
 
     % Run mydata.m
     [~, ~, metaData, ~, ~] = feval(['mydata_' speciesName]);
-    % Run pars_init.m
-    [par, metaPar, ~] = feval(['pars_init_' speciesName], metaData);
-    
+    % Get parameters from .mat file
+    resultsMatFilename = ['results_' speciesName '.mat'];
+    if exist(resultsMatFilename, 'file')
+        load(resultsMatFilename, "par", "metaPar")
+    else
+        [par, metaPar, ~] = feval(['pars_init_' speciesName], metaData);
+    end
+    % Check that DEB model is abj
     if ~strcmp(metaPar.model, 'abj')
         return
     end
