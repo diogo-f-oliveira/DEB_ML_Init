@@ -25,7 +25,7 @@ end
 numWorkers = pool.NumWorkers;
 
 % Max execution time per future
-maxTime = 10*60; % in seconds
+maxTime = 5*60; % in seconds
 
 % Initialize variables
 i = 1; % Index of species to submit
@@ -115,11 +115,14 @@ speciesFolder = fullfile(allSpeciesFolder, speciesName);
 if isfolder(speciesFolder)
     % Change directory to the species folder
     cd(speciesFolder);
-
+    
     % Get par struct
-    if exist(resultsMatFilePath, 'file')
-        load(resultsMatFilename, "par", "metaPar")
-    elseif exist(parsInitFilePath, 'file')
+    resultsMatFileName = ['results_' speciesName '.mat'];
+    parsInitFileName = ['pars_init_' speciesName '.m'];
+    % Get par struct
+    if exist(resultsMatFileName, 'file')
+        load(resultsMatFileName, "par", "metaPar")
+    elseif exist(parsInitFileName, 'file')
         % If results.mat file does not exist load parameters from
         % pars_init.m file. This has lower precision due to rounding errors
         % when printing to pars_init.m

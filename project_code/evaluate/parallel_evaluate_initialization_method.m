@@ -25,7 +25,7 @@ initResultsTable{:, 'data_split'} = "test";
 
 %% Settings
 % Max execution time per future
-maxEstimationTime = 1*60; % in seconds
+maxEstimationTime = 1*60*60; % in seconds
 maxExecutionTime = 1.2*maxEstimationTime; % in seconds
 maxRuns = 200;
 saveResultsTableEvery = 30;
@@ -83,7 +83,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
             try
                 [numRuns, converged, numIter, fval, estimationTime] = fetchOutputs(futInfo.future);
                 % executionTime = toc(futInfo.startTime);
-                fprintf('[%4d / %d | %50s] RESULT: %d %.2f \n', futInfo.i, numSpecies, futInfo.speciesName, converged, estimationTime)
+                fprintf('[%4d / %d | %50s] RESULT: %d %d %.2f \n', futInfo.i, numSpecies, futInfo.speciesName, converged, numIter, estimationTime)
 
                 % Store results
                 initResultsTable{futInfo.speciesName, 'execution_time'} = estimationTime;
@@ -172,9 +172,11 @@ if isfolder(speciesFolder)
     % Run mydata.m
     [data, auxData, metaData, ~, weights] = feval(['mydata_' speciesName]);
     % Get par struct
-    if exist(resultsMatFilePath, 'file')
-        load(resultsMatFilename, "par", "metaPar")
-    elseif exist(parsInitFilePath, 'file')
+    resultsMatFileName = ['results_' speciesName '.mat'];
+    parsInitFileName = ['pars_init_' speciesName '.m'];
+    if exist(resultsMatFileName, 'file')
+        load(resultsMatFileName, "par", "metaPar")
+    elseif exist(parsInitFileName, 'file')
         % If results.mat file does not exist load parameters from
         % pars_init.m file. This has lower precision due to rounding errors
         % when printing to pars_init.m

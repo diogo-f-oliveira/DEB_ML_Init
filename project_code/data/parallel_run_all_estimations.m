@@ -11,7 +11,7 @@ allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 saveFolder = '..\..\data\estimation_runs';
 % Output file
 % outputFileName = [saveFolder '\full_estimation_from_AmP_pars_subset_test_set.csv'];
-outputFileName = [saveFolder '\run_test_set_until_minimum_20250227.csv'];
+outputFileName = [saveFolder '\run_new_species_20250303_2_larger_simplex_size.csv'];
 
 %% Get list of species
 
@@ -20,7 +20,7 @@ speciesList = {};
 datasetSplits = {
     % 'train', 
     % 'val',
-    'test',
+    % 'test',
     };
 for s=1:length(datasetSplits)
     sp = datasetSplits{s};
@@ -28,7 +28,7 @@ for s=1:length(datasetSplits)
     datasetTable = readtable(datasetPath, 'Delimiter', ',', 'ReadVariableNames', true);
     speciesList = [speciesList; datasetTable.species];
 end
-% speciesList = {'Trichiurus_lepturus'};
+speciesList = {'Cheilopogon_cyanopterus', 'Perna_viridis'};
 numSpecies = length(speciesList);
 
 
@@ -67,6 +67,7 @@ numWorkers = pool.NumWorkers;
 
 % Initialize variables
 i = 1; % Index of species to submit
+numCompleted = 0;
 inProgressFutures = struct('future', {}, 'i', {}, 'speciesName', {}, 'startTime', {});
 
 % Set global variables used in estimation function
@@ -90,7 +91,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         inProgressFutures(nFutures+1).startTime = startTime;
 
         numJobsInProgress = length(inProgressFutures);
-        fprintf('[%4d / %d | %50s] SUBMIT (%d/%d) \n', i, numSpecies, speciesName, numJobsInProgress, numWorkers)
+        fprintf('[%4d / %d | %50s] SUBMIT (%2d/%d) \n', i, numSpecies, speciesName, numJobsInProgress, numWorkers)
         i = i + 1;
 
         % Write results to .csv file every once in a while
@@ -109,7 +110,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
             try
                 [initLoss, initParValues, finalLoss, finalParValues, estimStats, predictError] = fetchOutputs(futInfo.future);
                 executionTime = toc(futInfo.startTime);
-                fprintf('[%4d / %d | %50s] RESULT: %d %d %.2f \n', futInfo.i, numSpecies, futInfo.speciesName, estimStats.convergence, estimStats.numIter, executionTime)
+                fprintf('[%4d / %d | %50s] RESULT: %d %d %.2f PROGRESS (%4d/%d) \n', futInfo.i, numSpecies, futInfo.speciesName, estimStats.convergence, estimStats.numIter, executionTime, numCompleted+1, numSpecies)
 
                 % Store results
                 estimationResultsTable{futInfo.speciesName, 'execution_time'} = executionTime;
@@ -139,7 +140,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
                     error_message = futInfo.future.Error.message;
                 end
                 executionTime = toc(futInfo.startTime);
-                fprintf('[%4d / %d | %50s] ERROR: %s %.2f \n', futInfo.i, numSpecies, futInfo.speciesName, error_message, executionTime)
+                fprintf('[%4d / %d | %50s] ERROR: %s %.2f PROGRESS (%4d/%d)\n', futInfo.i, numSpecies, futInfo.speciesName, error_message, executionTime, numCompleted+1, numSpecies)
                 estimationResultsTable{futInfo.speciesName, 'execution_time'} = executionTime;
                 estimationResultsTable{futInfo.speciesName, 'convergence'} = false;
                 estimationResultsTable{futInfo.speciesName, 'error'} = true;
@@ -147,18 +148,20 @@ while i <= numSpecies || ~isempty(inProgressFutures)
             end
             % Remove future from in-progress list
             inProgressFutures(idx) = [];
+            numCompleted = numCompleted + 1;
         else
             % Check for timeout
             elapsedTime = toc(futInfo.startTime);
             if elapsedTime > maxTime
                 cancel(futInfo.future);
-                fprintf('[%4d / %d | %50s] TIMEOUT: predict function took longer than %d seconds to execute. \n', futInfo.i, numSpecies, futInfo.speciesName, maxTime)
+                fprintf('[%4d / %d | %50s] TIMEOUT: predict function took longer than %d seconds to execute. PROGRESS (%4d/%d)\n', futInfo.i, numSpecies, futInfo.speciesName, maxTime, numCompleted+1, numSpecies)
                 estimationResultsTable{futInfo.speciesName, 'execution_time'} = maxTime;
                 estimationResultsTable{futInfo.speciesName, 'convergence'} = false;
                 estimationResultsTable{futInfo.speciesName, 'error'} = false;
                 estimationResultsTable{futInfo.speciesName, 'error_message'} = "Maximum execution time exceeded";
                 % Remove future from in-progress list
                 inProgressFutures(idx) = [];
+                numCompleted = numCompleted + 1;
             else
                 idx = idx + 1;
             end
@@ -182,7 +185,7 @@ max_step_number = 5e2;
 max_fun_evals = 5e3;
 tol_simplex = 1e-4;
 tol_fun = 1e-4;
-simplex_size = 0.02;
+simplex_size = 0.05;
 covRules = 0;
 tol_restart = 1e-4;
 end

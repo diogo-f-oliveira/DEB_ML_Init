@@ -29,7 +29,7 @@ end
 numWorkers = pool.NumWorkers;
 
 % Max execution time per future
-maxTime = 10*60; % in seconds
+maxTime = 5*60; % in seconds
 includePseudoData = true;
 
 % Initialize variables
@@ -128,9 +128,11 @@ if isfolder(speciesFolder)
     % Run mydata.m
     [data, auxData, metaData, ~, weights] = feval(['mydata_' speciesName]);
     % Get par struct
-    if exist(resultsMatFilePath, 'file')
-        load(resultsMatFilename, "par")
-    elseif exist(parsInitFilePath, 'file')
+    resultsMatFileName = ['results_' speciesName '.mat'];
+    parsInitFileName = ['pars_init_' speciesName '.m'];
+    if exist(resultsMatFileName, 'file')
+        load(resultsMatFileName, "par")
+    elseif exist(parsInitFileName, 'file')
         % If results.mat file does not exist load parameters from
         % pars_init.m file. This has lower precision due to rounding errors
         % when printing to pars_init.m

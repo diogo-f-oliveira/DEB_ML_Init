@@ -10,11 +10,13 @@ resultsFolder = '..\..\results';
 
 %% Define model
 modelNamesCell = {
-    'AmP',
+    % 'AmP',
     'BijectionMethod',
     'SRTaxo1NN',
+    'Taxo1NN',
     % 'RandomForestRegressor',
-    % 'MultiTaskElasticNet',
+    'MultiTaskElasticNet',
+    'MLP',
     % 'DEBNetHC',
     % 'DEBNetSC',
     % 'DEBNet',

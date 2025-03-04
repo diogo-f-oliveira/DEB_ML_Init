@@ -75,9 +75,10 @@ function [par, metaPar, txtPar, flag] = bijection_method(data, auxData, metaData
 speciesName = metaData.species;
 % Get par struct
 resultsMatFileName = ['results_' speciesName '.mat'];
+parsInitFileName = ['pars_init_' speciesName '.m'];
 if exist(resultsMatFileName, 'file')
     load(resultsMatFileName, "par", "metaPar", "txtPar")
-elseif exist(parsInitFilePath, 'file')
+elseif exist(parsInitFileName, 'file')
     % If results.mat file does not exist load parameters from
     % pars_init.m file. This has lower precision due to rounding errors
     % when printing to pars_init.m
