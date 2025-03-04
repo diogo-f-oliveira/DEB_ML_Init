@@ -17,7 +17,7 @@ DEFAULT_VALUES = {
 UPPER_BOUNDS = {
     'kap': 1,
     '1-kap': 1,
-    's_p_M': 0.8 ** 3,
+    's_p_M': 1 ** 3,
     's_H': 1,
     's_Hb_bj': 1,
     's_Hbj_p': 1,
