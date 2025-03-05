@@ -205,11 +205,11 @@ if isfolder(speciesFolder)
 
      % Run estimation
     global tol_restart
-    estimatedPar = par;
+    estimatedPar = predPar;
     numRuns = 0;
     numIter = 0;
     converged = false;
-    currentLoss = 0;
+    currentLoss = 1e16;
     prevLoss = inf;
     startTime = tic;
     elapsedTime = toc(startTime);
