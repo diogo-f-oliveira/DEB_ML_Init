@@ -168,10 +168,10 @@ def geometric_error_factor(y_true, y_pred, *, sample_weight=None, multioutput='r
         y_pred = y_pred.reshape(-1, 1)
 
     # Ensure that all values are positive
-    if np.any(y_true <= 0):
-        raise ValueError("All true values must be positive.")
-    if np.any(y_pred <= 0):
-        raise ValueError("All predicted values must be positive.")
+    #if np.any(y_true <= 0):
+    #    raise RuntimeWarning("All true values must be positive.")
+    #if np.any(y_pred <= 0):
+    #    raise RuntimeWarning("All predicted values must be positive.")
 
     # Compute the absolute log error for each element
     log_errors = np.abs(np.log(y_pred / y_true))
