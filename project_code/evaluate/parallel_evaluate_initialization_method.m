@@ -114,7 +114,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
             elapsedTime = toc(futInfo.startTime);
             if elapsedTime > maxExecutionTime
                 cancel(futInfo.future);
-                fprintf('[%4d / %d | %50s] TIMEOUT: predict function took longer than %d seconds to execute. \n', futInfo.i, numSpecies, futInfo.speciesName, maxExecutionTime)
+                fprintf('[%4d / %d | %50s] TIMEOUT: parameter estimation took longer than %d seconds to execute. \n', futInfo.i, numSpecies, futInfo.speciesName, maxExecutionTime)
                 initResultsTable{futInfo.speciesName, 'execution_time'} = maxExecutionTime;
                 initResultsTable{futInfo.speciesName, 'convergence'} = false;
                 initResultsTable{futInfo.speciesName, 'error_message'} = "Maximum execution time exceeded";
