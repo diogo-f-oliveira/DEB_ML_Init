@@ -4,6 +4,8 @@ import json
 
 from sklearn.model_selection import train_test_split
 
+SAVE_FLOAT_FORMAT = '%.10e'
+
 
 def encode_taxonomy(df: pd.DataFrame, categories: dict, include_other_col: dict):
     """"""
@@ -115,10 +117,10 @@ def split_and_save_dataset(df, dataset_name, types_of_col, train_percentage=0.70
     dataset_folder = os.path.join(save_folder, dataset_name)
     if not os.path.exists(dataset_folder):
         os.makedirs(dataset_folder)
-    df.to_csv(os.path.join(dataset_folder, f'{dataset_name}.csv'), index=True, float_format='%.6e')
-    train_df.to_csv(os.path.join(dataset_folder, f'train.csv'), index=True, float_format='%.6e')
-    val_df.to_csv(os.path.join(dataset_folder, f'val.csv'), index=True, float_format='%.6e')
-    test_df.to_csv(os.path.join(dataset_folder, f'test.csv'), index=True, float_format='%.6e')
+    df.to_csv(os.path.join(dataset_folder, f'{dataset_name}.csv'), index=True, float_format=SAVE_FLOAT_FORMAT)
+    train_df.to_csv(os.path.join(dataset_folder, f'train.csv'), index=True, float_format=SAVE_FLOAT_FORMAT)
+    val_df.to_csv(os.path.join(dataset_folder, f'val.csv'), index=True, float_format=SAVE_FLOAT_FORMAT)
+    test_df.to_csv(os.path.join(dataset_folder, f'test.csv'), index=True, float_format=SAVE_FLOAT_FORMAT)
 
     # Check if all keys in col_types are in df.columns
     missing_cols_in_df = [col for col in types_of_col if col not in df.columns]
