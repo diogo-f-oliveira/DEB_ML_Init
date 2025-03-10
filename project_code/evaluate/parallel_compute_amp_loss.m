@@ -32,8 +32,8 @@ parameterTable = table('Size', [numSpecies, length(parameterTableCols)], 'Variab
 parameterTable{:, 'data_split'} = datasetTable{:, 'data_split'};
 
 % DEB Loss table
-lossTableCols = {'data_split', 'deb_loss', 'success', 'error_type', 'error_message'};
-varTypesLossTable = {'string', 'double', 'logical', 'string', 'string'};
+lossTableCols = {'data_split', 'deb_loss', 'weight_sum', 'success', 'error_type', 'error_message'};
+varTypesLossTable = {'string', 'double', 'double', 'logical', 'string', 'string'};
 lossTable = table('Size', [numSpecies, length(lossTableCols)], 'VariableTypes', varTypesLossTable, 'VariableNames', lossTableCols, 'RowNames', speciesList);
 % debLossTable{:, 'data_split'} = parameterEstimates{:, 'data_split'};
 lossTable{:, 'data_split'} = "test";
@@ -60,7 +60,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         speciesName = speciesList{i};
 
         % Submit parfeval task
-        fut = parfeval(pool, @processSpecies, 4, speciesName, allSpeciesFolder, includePseudoData);
+        fut = parfeval(pool, @processSpecies, 5, speciesName, allSpeciesFolder, includePseudoData);
         % Record the future, species name, start time
         startTime = tic;
         nFutures = length(inProgressFutures);
@@ -82,11 +82,12 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         if strcmp(futInfo.future.State, 'finished')
             % Fetch outputs
             try
-                [par, debLoss, success, error_type] = fetchOutputs(futInfo.future);
+                [par, debLoss, weightSum, success, error_type] = fetchOutputs(futInfo.future);
                 fprintf('[%4d / %d | %50s] RESULT: %d %s \n', futInfo.i, numSpecies, futInfo.speciesName, success, error_type)
 
                 % Store results
                 lossTable{futInfo.speciesName, 'deb_loss'} = debLoss;
+                lossTable{futInfo.speciesName, 'weight_sum'} = weightSum;
                 lossTable{futInfo.speciesName, 'success'} = success;
                 lossTable{futInfo.speciesName, 'error_type'} = error_type;
 
@@ -142,7 +143,7 @@ fprintf('Parameter table saved in %s\n', parameterTableOutputFile);
 
 
 %% Function to process each species
-function [par, debLoss, success, errorType] = processSpecies(speciesName, allSpeciesFolder, includePseudoData)
+function [par, debLoss, weightSum, success, errorType] = processSpecies(speciesName, allSpeciesFolder, includePseudoData)
 % Set up data for the species
 speciesFolder = fullfile(allSpeciesFolder, speciesName);
 % Check if the species folder exists
@@ -174,6 +175,7 @@ if isfolder(speciesFolder)
     else
         % Compute loss
         debLoss = deb_lossfun(data, prdData, weights, par, includePseudoData);
+        weightSum = getLossWeightsSum(weights);
         success = true;
         errorType = "";
     end
@@ -182,5 +184,18 @@ else
     error('Folder for species "%s" does not exist.', speciesName);
 end
 end
+
+function [weightSum] = getLossWeightsSum(weightsStruct)
+% structRef has the same structure as struct, but some values can be NaN's; the values themselves are not used
+% struct2vector is called for data (which might have NaN's), but also for predictions, which do not have NaN's
+fieldNames = fieldnmnst_st(weightsStruct);
+weightSum = 0;
+for i = 1:size(fieldNames, 1)
+    fieldsInCells = textscan(fieldNames{i},'%s','Delimiter','.');
+    datasetWeights = getfield(weightsStruct, fieldsInCells{1}{:}); datasetWeights = datasetWeights(:);
+    weightSum  = weightSum + sum(datasetWeights, "all", "omitnan");
+end
+end
+
 
 % end
