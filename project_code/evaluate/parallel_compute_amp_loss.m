@@ -36,7 +36,7 @@ lossTableCols = {'data_split', 'deb_loss', 'weight_sum', 'success', 'error_type'
 varTypesLossTable = {'string', 'double', 'double', 'logical', 'string', 'string'};
 lossTable = table('Size', [numSpecies, length(lossTableCols)], 'VariableTypes', varTypesLossTable, 'VariableNames', lossTableCols, 'RowNames', speciesList);
 % debLossTable{:, 'data_split'} = parameterEstimates{:, 'data_split'};
-lossTable{:, 'data_split'} = "test";
+lossTable{:, 'data_split'} = datasetTable{:, 'data_split'};
 
 %% Set up parallel pool
 pool = gcp('nocreate');

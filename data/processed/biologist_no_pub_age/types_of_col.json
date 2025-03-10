@@ -3,6 +3,9 @@
         "input",
         "log"
     ],
+    "d_V": [
+        "input"
+    ],
     "genus": [
         "input",
         "category"
@@ -39,13 +42,7 @@
     "p_M": [
         "output"
     ],
-    "E_G": [
-        "output"
-    ],
     "E_Hb": [
-        "output"
-    ],
-    "E_Hx": [
         "output"
     ],
     "E_Hj": [
