@@ -3,11 +3,15 @@ import json
 
 
 def load_data(dataset_name, datasets_folder='data/processed', data_split='train_val_test'):
+    col_types = load_col_types(dataset_name=dataset_name, datasets_folder=datasets_folder)
     data = {
         'train': pd.read_csv(f"{datasets_folder}/{dataset_name}/train.csv", index_col=0),
         'val': pd.read_csv(f"{datasets_folder}/{dataset_name}/val.csv", index_col=0),
         'test': pd.read_csv(f"{datasets_folder}/{dataset_name}/test.csv", index_col=0)
     }
+    ordered_cols = col_types['input']['all'] + col_types['output']['all']
+    for split, df in data.items():
+        data[split] = df[ordered_cols]
     if data_split == 'train_test':
         data = {
             'train': pd.concat([data['train'], data['val']], axis=0),

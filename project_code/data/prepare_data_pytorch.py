@@ -6,6 +6,19 @@ from ..inference.parameters import impute_predictions_for_DEB_model_dependent_ou
 DEFAULT_TORCH_DTYPE = torch.float32
 
 
+def get_output_mask(X, y, col_types):
+    output_mask = torch.ones_like(y, dtype=DEFAULT_TORCH_DTYPE)
+    metamorphosis_idx = col_types['input']['all'].index('metamorphosis')
+    no_metamorphosis_mask = X[:, metamorphosis_idx] == 0
+
+    for col in ['s_M', '1/s_M', 's_Hb_bj', 'E_Hj']:
+        if col in col_types['output']['all']:
+            col_idx = col_types['output']['all'].index(col)
+            output_mask[no_metamorphosis_mask, col_idx] = 0
+
+    return output_mask
+
+
 class LogScaleTensorTransformer:
     def __init__(self, all_cols, log_cols=None, scale_cols=None):
         self.all_col_names = all_cols
@@ -63,18 +76,15 @@ def log_standardize_data(data, col_types):
     data_tensors = {}
     for split, df in data.items():
         data_tensors[split] = {
-            'input': torch.tensor(df[input_cols].astype('float').values, dtype=torch.float32),
-            'output': torch.tensor(df[output_cols].astype('float').values, dtype=torch.float32),
+            'input': torch.tensor(df[input_cols].astype('float').values, dtype=DEFAULT_TORCH_DTYPE),
+            'output': torch.tensor(df[output_cols].astype('float').values, dtype=DEFAULT_TORCH_DTYPE),
         }
 
-        # Compute weights from ´metamorphosis´ column
-        split_mask = torch.zeros_like(data_tensors[split]['output'], dtype=torch.float32)
-        # Sets predictions to 1 for outputs that should not be predicted
-        split_mask = impute_predictions_for_DEB_model_dependent_outputs(
-            y=split_mask, X=data_tensors[split]['input'], col_types=col_types,
+        data_tensors[split]['mask'] = get_output_mask(
+            X=data_tensors[split]['input'],
+            y=data_tensors[split]['output'],
+            col_types=col_types
         )
-        # Complement to have weight of 0 for outputs that should not be predicted
-        data_tensors[split]['mask'] = 1 - split_mask
 
     # Scale the data
     scalers = {}
