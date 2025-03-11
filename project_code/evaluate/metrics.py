@@ -1,19 +1,6 @@
 import numpy as np
 
 
-#
-# def mean_deb_loss(y_true, y_pred, sample_weight=None, multioutput='raw_values'):
-#     if sample_weight is None:
-#         sample_weight = np.ones_like(y_true)
-#     y_true = np.array(y_true)
-#     y_pred = np.array(y_pred)
-#     raw_values = sample_weight * (np.power(y_true - y_pred, 2)) / (np.power(y_true, 2) + np.power(y_pred, 2))
-#     if multioutput == 'raw_values':
-#         return np.mean(raw_values, axis=0)
-#     elif multioutput == 'uniform_average':
-#         return np.mean(raw_values)
-
-
 def mean_deb_loss(y_true, y_pred, *, sample_weight=None, multioutput="raw_values"):
     """
     Compute the mean DEB loss between true and predicted values.

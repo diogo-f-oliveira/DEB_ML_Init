@@ -5,6 +5,7 @@ import torch
 from ..algorithms.theoretical import predict_E_G_from_theory
 
 PARAMETER_COLS = ['p_Am', 'kap', 'v', 'p_M', 'E_Hb', 'E_Hj', 'E_Hp', 'k_J', 's_M']
+MODEL_DEPENDENT_PARAMETER_COLS = ['E_Hj', 's_M']
 AmP_CORE_DEB_PARS = ['z', 'p_M', 'kap', 'v', 'E_G', 'E_Hb', 'E_Hx', 'E_Hj', 'E_Hp', 'k_J']
 DEFAULT_VALUES = {
     'h_a': 3.0e-9,
@@ -57,14 +58,11 @@ def convert_output_to_parameter_predictions(y, X, col_types):
     y_imputed = impute_predictions_for_DEB_model_dependent_outputs(y=y, X=X, col_types=col_types)
     pars_df = pd.DataFrame(y_imputed, columns=col_types['output']['all'])
 
-    # If the model did not predict 'k_J', set it to default value
-    if 'k_J' not in pars_df.columns:
-        pars_df['k_J'] = DEFAULT_VALUES['k_J']
-
     # If the model did not predict 's_M', set it to default value
     if 's_M' not in pars_df.columns:
         if '1/s_M' in pars_df.columns:
             pars_df['s_M'] = 1 / pars_df['1/s_M']
+            pars_df.drop(columns=['1/s_M'], inplace=True)
         else:
             pars_df['s_M'] = DEFAULT_VALUES['s_M']
 
@@ -77,6 +75,7 @@ def convert_output_to_parameter_predictions(y, X, col_types):
     if 'E_Hj' not in pars_df.columns:
         if {'s_Hbj_p', 'E_Hp'}.issubset(pars_df.columns):
             pars_df['E_Hj'] = pars_df['s_Hbj_p'] * pars_df['E_Hp']
+            pars_df.drop(columns=['s_Hbj_p'], inplace=True)
         # set it to 1.05x 'E_Hb'
         elif 'E_Hb' in pars_df.columns:
             pars_df['E_Hj'] = 1.05 * pars_df['E_Hb']
@@ -89,17 +88,45 @@ def convert_output_to_parameter_predictions(y, X, col_types):
         # If the model predicts 's_Hb_bj' instead of 'E_Hb', compute 'E_Hb'
         elif {'s_Hb_bj', 'E_Hj'}.issubset(pars_df.columns):
             pars_df['E_Hb'] = pars_df['s_Hb_bj'] * pars_df['E_Hj']
+            pars_df.drop(columns=['s_Hb_bj'], inplace=True)
 
     # If the model predicts 's_p' instead of 'p_M', compute 'p_M'
     if 'p_M' not in pars_df.columns:
         if {'s_p', 'kap', 'E_Hp', 'p_Am', 'k_J'}.issubset(pars_df.columns):
-            pars_df['p_M'] = np.sqrt(np.power(pars_df['s_p'] * pars_df['kap'], 2) * (1 - pars_df['kap']) *
-                                     np.power(pars_df['p_Am'], 3) / pars_df['k_J'] / pars_df['E_Hp'])
+            pars_df['p_M'] = np.sqrt(
+                pars_df['s_p'] * np.power(pars_df['kap'], 2) * (1 - pars_df['kap']) * np.power(pars_df['p_Am'], 3)
+                /
+                pars_df['k_J'] / pars_df['E_Hp']
+            )
             pars_df.drop(columns=['s_p'], inplace=True)
-        if {'s_p_M', 'kap', 'E_Hp', 'p_Am', 'k_J', 's_M'}.issubset(pars_df.columns):
-            pars_df['p_M'] = np.sqrt(np.power(pars_df['s_p_M'] * pars_df['kap'], 2) * (1 - pars_df['kap']) *
-                                     np.power(pars_df['p_Am'], 3) / pars_df['k_J'] / pars_df['E_Hp'])
+        elif {'s_p_M', 's_M', 'kap', 'E_Hp', 'p_Am', 'k_J', 's_M'}.issubset(pars_df.columns):
+            pars_df['p_M'] = np.sqrt(
+                pars_df['s_p_M'] * np.power(pars_df['s_M'], 3) * np.power(pars_df['p_Am'], 3) *
+                np.power(pars_df['kap'], 2) * (1 - pars_df['kap'])
+                /
+                pars_df['k_J'] / pars_df['E_Hp']
+            )
             pars_df.drop(columns=['s_p_M'], inplace=True)
+
+    # If the model did not predict 'k_J', set it to default value
+    if 'k_J' not in pars_df.columns:
+        if {'s_p', 'kap', 'p_Am', 'p_M', 'E_Hp'}.issubset(pars_df.columns):
+            pars_df['k_J'] = (
+                    pars_df['s_p'] * np.power(pars_df['kap'], 2) * (1 - pars_df['kap']) * np.power(pars_df['p_Am'], 3)
+                    /
+                    np.power(pars_df['p_M'], 2) / pars_df['E_Hp']
+            )
+            pars_df.drop(columns=['s_p'], inplace=True)
+        elif {'s_p_M', 's_M', 'p_Am', 'kap', 'p_M', 'E_Hp'}.issubset(pars_df.columns):
+            pars_df['k_J'] = (
+                    pars_df['s_p_M'] * np.power(pars_df['s_M'], 3) * np.power(pars_df['p_Am'], 3)
+                    * np.power(pars_df['kap'], 2) * (1 - pars_df['kap'])
+                    /
+                    np.power(pars_df['p_M'], 2) / pars_df['E_Hp']
+            )
+            pars_df.drop(columns=['s_p_M'], inplace=True)
+        else:
+            pars_df['k_J'] = DEFAULT_VALUES['k_J']
 
     pars_df = pars_df[PARAMETER_COLS].copy()
 

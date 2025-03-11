@@ -1,8 +1,4 @@
-import numpy as np
 from sklearn.base import BaseEstimator, RegressorMixin, clone
-from sklearn.multioutput import MultiOutputRegressor
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import FunctionTransformer
 
 from ..data.prepare_data_sklearn import LogScaleClipTransformer
 
