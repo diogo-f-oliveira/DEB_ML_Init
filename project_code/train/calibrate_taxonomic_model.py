@@ -33,33 +33,37 @@ if __name__ == '__main__':
 
     base_model = TaxonomicKNNRegressor
     search_space = {
-        'weight_factor': tune.loguniform(1e-6, 1e2),
+        'weight_factor': tune.qloguniform(1e-3, 1e2, 1e-3),
 
         # Fixed params
         'n_neighbors': 1,
         'col_types': col_types,
         'output_scaler_type': 'none',
         'taxonomy_encoder': taxonomy_encoder,
-        'use_scaling_relationships': False,
+        'use_scaling_relationships': True,
     }
+    for model_name in ['Taxo1NN', 'SRTaxo1NN']:
+    #model_name = 'SRTaxo1NN' if search_space['use_scaling_relationships'] else 'Taxo1NN'
+        if 'SR' in model_name:
+            search_space['use_scaling_relationships'] = True
+        else:
+            search_space['use_scaling_relationships'] = False
 
-    model_name = 'SRTaxo1NN' if search_space['use_scaling_relationships'] else 'Taxo1NN'
-
-    os.environ['RAY_AIR_NEW_OUTPUT'] = '0'
-    hyperopt_calibration(
-        base_model=base_model,
-        search_space=search_space,
-        data=data,
-        col_types=col_types,
-        metric='GEF',
-        mode='min',
-        num_samples=100,
-        max_concurrent_trials=12,
-        evaluate_on_test=True,
-        save_best_model=True,
-        save_folder=f'results/{dataset_name}',
-        model_name=model_name,
-        run_name=f'{model_name}',
-        n_splits=10,
-        stratify=col_types['input']['all'].index('metamorphosis'),
-    )
+        os.environ['RAY_AIR_NEW_OUTPUT'] = '0'
+        hyperopt_calibration(
+            base_model=base_model,
+            search_space=search_space,
+            data=data,
+            col_types=col_types,
+            metric='GEF',
+            mode='min',
+            num_samples=50,
+            #max_concurrent_trials=None,
+            evaluate_on_test=True,
+            save_best_model=True,
+            save_folder=f'results/{dataset_name}',
+            model_name=model_name,
+            run_name=f'{model_name}',
+            n_splits=10,
+            stratify=col_types['input']['all'].index('metamorphosis'),
+        )
