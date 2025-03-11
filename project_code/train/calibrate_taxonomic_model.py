@@ -61,4 +61,5 @@ if __name__ == '__main__':
         model_name=model_name,
         run_name=f'{model_name}',
         n_splits=10,
+        stratify=col_types['input']['all'].index('metamorphosis'),
     )

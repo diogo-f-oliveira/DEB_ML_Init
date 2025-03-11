@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     base_model = TaxonomicKNNRegressor
     config = {
-        'weight_factor': 0.1,
+        'weight_factor': 0.688,
         'n_neighbors': 1,
         'col_types': col_types,
         'output_scaler_type': 'none',
@@ -51,7 +51,9 @@ if __name__ == '__main__':
                                     col_types=col_types,
                                     data=data['train'],
                                     report_metrics=False,
-                                    stratify=col_types['input']['all'].index('metamorphosis'),
+                                    # stratify=col_types['input']['all'].index('metamorphosis'),
+                                    stratify=None,
+                                    n_splits=10,
                                     )
 
     cv_gef = cv_metrics_df['GEF'].mean()
