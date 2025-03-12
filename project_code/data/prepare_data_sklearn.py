@@ -5,6 +5,8 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, Qu
     FunctionTransformer
 import numpy as np
 
+from project_code.inference.parameters import DEFAULT_VALUES
+
 
 class LogScaleClipTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, all_col_names, log_col_names=None, clip_col_names=None, scale_col_names=None,
@@ -132,6 +134,8 @@ class LogScaleClipTransformer(BaseEstimator, TransformerMixin):
 
 def get_output_mask(y, X, col_types):
     output_mask = np.ones_like(y, dtype='float')
+
+    # Columns only for metamorphosis
     metamorphosis_idx = col_types['input']['all'].index('metamorphosis')
     no_metamorphosis_mask = X[:, metamorphosis_idx] == 0
 
@@ -139,6 +143,12 @@ def get_output_mask(y, X, col_types):
         if col in col_types['output']['all']:
             col_idx = col_types['output']['all'].index(col)
             output_mask[no_metamorphosis_mask, col_idx] = 0
+
+        # Non-estimated k_J
+    if 'k_J' in col_types['output']['all']:
+        k_J_idx = col_types['output']['all'].index('k_J')
+        default_k_J_mask = y[:, k_J_idx] == DEFAULT_VALUES['k_J']
+        output_mask[default_k_J_mask, k_J_idx] = 0
 
     return output_mask
 
