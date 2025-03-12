@@ -5,7 +5,7 @@ import torch
 from tabulate import tabulate
 
 from .metrics import mean_deb_loss, geometric_error_factor, symmetric_mean_absolute_percentage_error
-from ..inference.parameters import convert_output_to_parameter_predictions, PARAMETER_COLS, \
+from ..inference.parameters import convert_output_to_parameter_predictions, PARAMETER_COLS, DEFAULT_VALUES, \
     MODEL_DEPENDENT_PARAMETER_COLS, impute_predictions_for_DEB_model_dependent_outputs
 
 METRIC_LABEL_TO_NAME = {'mean_absolute_percentage_error': 'MAPE',
@@ -22,6 +22,10 @@ def get_output_mask_for_parameter_predictions(y, X, *, metamorphosis_idx):
         if col in MODEL_DEPENDENT_PARAMETER_COLS:
             output_mask[no_metamorphosis_mask, i] = 0
 
+    k_J_idx = PARAMETER_COLS.index('k_J')
+    default_k_J_mask = y[:, k_J_idx] == DEFAULT_VALUES['k_J']
+    output_mask[default_k_J_mask, k_J_idx] = 0
+
     return output_mask
 
 
@@ -31,8 +35,8 @@ def evaluate_parameter_predictions_on_data(data, col_types, model, print_score=F
     y_true = data['output'].reshape(-1, n_outputs)
     y_pred = model.predict(data['input']).reshape(-1, n_outputs)
     # Convert predictions to parameters
-    target_df = convert_output_to_parameter_predictions(y_true, data['input'], col_types)
-    pred_df = convert_output_to_parameter_predictions(y_pred, data['input'], col_types)
+    target_df = convert_output_to_parameter_predictions(y=y_true, X=data['input'], y_true=y_true, col_types=col_types)
+    pred_df = convert_output_to_parameter_predictions(y=y_pred, X=data['input'], y_true=y_true, col_types=col_types)
     mask = get_output_mask_for_parameter_predictions(y_true, data['input'],
                                                      metamorphosis_idx=col_types['input']['all'].index('metamorphosis'))
 
@@ -90,11 +94,25 @@ def compute_metrics(y_true, y_pred, mask=None, metrics=None, output_col_names=No
 
 
 def evaluate_pytorch_model(dataloader, model, criterion, col_types):
-    eval_loss = 0
+    # Set model to evaluation state
     model.eval()
+    eval_loss = 0
+
+    # Get default k_J value scaled
+    k_J_idx = col_types['output']['all'].index('k_J')
+    dummy_input = torch.ones((1, len(col_types['output']['all'])))
+    dummy_input[:, k_J_idx] = DEFAULT_VALUES['k_J']
+    default_k_J = model.output_transformer.transform(dummy_input)[0, k_J_idx]
+
+    # Compute loss
     with torch.no_grad():
         for X_batch, y_batch, mask in dataloader:
+            # Get model output
             outputs = model(X_batch)
-            outputs = impute_predictions_for_DEB_model_dependent_outputs(y=outputs, X=X_batch, col_types=col_types)
+            # Impute predictions for non-estimated DEB parameter outputs
+            outputs = impute_predictions_for_DEB_model_dependent_outputs(
+                y=outputs, X=X_batch, y_true=y_batch, col_types=col_types, default_k_J=default_k_J,
+            )
+            # Add loss
             eval_loss += criterion(outputs, y_batch, mask).item()
         return eval_loss / len(dataloader)

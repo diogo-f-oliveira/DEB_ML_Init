@@ -26,7 +26,7 @@ UPPER_BOUNDS = {
 }
 
 
-def impute_predictions_for_DEB_model_dependent_outputs(y, X, col_types):
+def impute_predictions_for_DEB_model_dependent_outputs(y, X, y_true, col_types, default_k_J=DEFAULT_VALUES['k_J']):
     if torch.is_tensor(y):
         y = y.clone()
     else:
@@ -37,25 +37,30 @@ def impute_predictions_for_DEB_model_dependent_outputs(y, X, col_types):
     # Impute values for s_M
     if 's_M' in col_types['output']['all']:
         s_M_idx = col_types['output']['all'].index('s_M')
-        y[no_metamorphosis_mask, s_M_idx] = 1
+        y[no_metamorphosis_mask, s_M_idx] = y_true[no_metamorphosis_mask, s_M_idx]
     elif '1/s_M' in col_types['output']['all']:
         s_M_idx = col_types['output']['all'].index('1/s_M')
-        y[no_metamorphosis_mask, s_M_idx] = 1
+        y[no_metamorphosis_mask, s_M_idx] = y_true[no_metamorphosis_mask, s_M_idx]
 
     # Impute values for s_Hb_bj or E_Hj
     if 's_Hb_bj' in col_types['output']['all']:
         s_Hb_bj_idx = col_types['output']['all'].index('s_Hb_bj')
-        y[no_metamorphosis_mask, s_Hb_bj_idx] = 1
+        y[no_metamorphosis_mask, s_Hb_bj_idx] = y_true[no_metamorphosis_mask, s_Hb_bj_idx]
     elif 'E_Hj' in col_types['output']['all'] and 'E_Hb' in col_types['output']['all']:
         E_Hb_idx = col_types['output']['all'].index('E_Hb')
         E_Hj_idx = col_types['output']['all'].index('E_Hj')
-        y[no_metamorphosis_mask, E_Hj_idx] = y[no_metamorphosis_mask, E_Hb_idx]
+        y[no_metamorphosis_mask, E_Hj_idx] = y_true[no_metamorphosis_mask, E_Hb_idx]
+
+    if 'k_J' in col_types['output']['all']:
+        k_J_idx = col_types['output']['all'].index('k_J')
+        default_k_J_mask = y_true[:, k_J_idx] == default_k_J
+        y[default_k_J_mask, k_J_idx] = y_true[default_k_J_mask, k_J_idx]
 
     return y
 
 
-def convert_output_to_parameter_predictions(y, X, col_types):
-    y_imputed = impute_predictions_for_DEB_model_dependent_outputs(y=y, X=X, col_types=col_types)
+def convert_output_to_parameter_predictions(y, X, y_true, col_types):
+    y_imputed = impute_predictions_for_DEB_model_dependent_outputs(y=y, X=X, y_true=y_true, col_types=col_types)
     pars_df = pd.DataFrame(y_imputed, columns=col_types['output']['all'])
 
     # If the model did not predict 's_M', set it to default value
@@ -137,7 +142,8 @@ def get_core_parameter_predictions(dfs, pred_df, col_types):
     pred_df.index.name = 'species'
     X = pd.concat([dfs[ds][col_types['input']['all']] for ds in pred_df['data_split'].unique()]).values
     y = pred_df.drop(columns=['data_split']).values
-    converted_output_df = convert_output_to_parameter_predictions(y=y, X=X, col_types=col_types)
+    y_true = pd.concat([dfs[ds][col_types['output']['all']] for ds in pred_df['data_split'].unique()]).values
+    converted_output_df = convert_output_to_parameter_predictions(y=y, X=X, y_true=y_true, col_types=col_types)
     pars_df = pd.DataFrame(converted_output_df.values,
                            columns=list(converted_output_df.columns),
                            index=pred_df.index)

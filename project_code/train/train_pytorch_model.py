@@ -185,6 +185,7 @@ if __name__ == '__main__':
     # dataset_name = 'kappa_complement_no_pub_age'
     # dataset_name = 'all_constraints_no_pub_age'
     dataset_name = 'final'
+    # dataset_name += 'no_k_J'
     dataset_name += '_taxonomy'
     dataset_name += '_ecocodes'
 

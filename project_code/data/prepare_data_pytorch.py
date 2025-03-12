@@ -1,12 +1,15 @@
 import torch
 from sklearn.preprocessing import QuantileTransformer
 from torch.utils.data import TensorDataset, DataLoader
+from ..inference.parameters import DEFAULT_VALUES
 
 DEFAULT_TORCH_DTYPE = torch.float32
 
 
 def get_output_mask(X, y, col_types):
     output_mask = torch.ones_like(y, dtype=DEFAULT_TORCH_DTYPE)
+
+    # Columns only for metamorphosis
     metamorphosis_idx = col_types['input']['all'].index('metamorphosis')
     no_metamorphosis_mask = X[:, metamorphosis_idx] == 0
 
@@ -14,6 +17,12 @@ def get_output_mask(X, y, col_types):
         if col in col_types['output']['all']:
             col_idx = col_types['output']['all'].index(col)
             output_mask[no_metamorphosis_mask, col_idx] = 0
+
+    # Non-estimated k_J
+    if 'k_J' in col_types['output']['all']:
+        k_J_idx = col_types['output']['all'].index('k_J')
+        default_k_J_mask = y[:, k_J_idx] == DEFAULT_VALUES['k_J']
+        output_mask[default_k_J_mask, k_J_idx] = 0
 
     return output_mask
 
