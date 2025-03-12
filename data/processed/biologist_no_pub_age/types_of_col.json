@@ -1,60 +1,127 @@
 {
-    "Wwi": [
-        "input",
-        "log"
-    ],
-    "d_V": [
-        "input"
-    ],
-    "genus": [
-        "input",
-        "category"
-    ],
-    "family": [
-        "input",
-        "category"
-    ],
-    "order": [
-        "input",
-        "category"
-    ],
-    "class": [
-        "input",
-        "category"
-    ],
-    "phylum": [
-        "input",
-        "category"
-    ],
-    "metamorphosis": [
-        "input",
-        "boolean"
-    ],
-    "p_Am": [
-        "output"
-    ],
-    "kap": [
-        "output"
-    ],
-    "v": [
-        "output"
-    ],
-    "p_M": [
-        "output"
-    ],
-    "E_Hb": [
-        "output"
-    ],
-    "E_Hj": [
-        "output"
-    ],
-    "E_Hp": [
-        "output"
-    ],
-    "k_J": [
-        "output"
-    ],
-    "s_M": [
-        "output"
-    ]
+    "Wwi": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "log"
+        ]
+    },
+    "d_V": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": []
+    },
+    "genus": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "category"
+        ]
+    },
+    "family": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "category"
+        ]
+    },
+    "order": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "category"
+        ]
+    },
+    "class": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "category"
+        ]
+    },
+    "phylum": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "category"
+        ]
+    },
+    "p_Am": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": []
+    },
+    "kap": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": []
+    },
+    "v": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": []
+    },
+    "p_M": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": []
+    },
+    "E_Hb": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": []
+    },
+    "E_Hj": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": []
+    },
+    "E_Hp": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": []
+    },
+    "k_J": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": []
+    },
+    "s_M": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": []
+    },
+    "metamorphosis": {
+        "classes": [
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "estim_k_J": {
+        "classes": [
+            "input",
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    }
 }

@@ -1,209 +1,389 @@
 {
-    "ab": [
-        "input",
-        "log",
-        "scale",
-        "quantile"
-    ],
-    "am": [
-        "input",
-        "log",
-        "scale",
-        "quantile"
-    ],
-    "d_V": [
-        "input"
-    ],
-    "Wwb": [
-        "input",
-        "log",
-        "scale",
-        "quantile"
-    ],
-    "Wwp": [
-        "input",
-        "log",
-        "scale",
-        "quantile"
-    ],
-    "Wwi": [
-        "input",
-        "log",
-        "scale",
-        "quantile"
-    ],
-    "Ri": [
-        "input",
-        "log",
-        "scale",
-        "quantile"
-    ],
-    "T_typical": [
-        "input",
-        "scale",
-        "quantile"
-    ],
-    "metamorphosis": [
-        "input",
-        "boolean"
-    ],
-    "p_Am": [
-        "output",
-        "log",
-        "scale",
-        "quantile"
-    ],
-    "1-kap": [
-        "output",
-        "log",
-        "scale",
-        "bounded01",
-        "quantile"
-    ],
-    "v": [
-        "output",
-        "log",
-        "scale",
-        "quantile"
-    ],
-    "p_M": [
-        "output",
-        "log",
-        "scale",
-        "quantile"
-    ],
-    "s_Hb_bj": [
-        "output",
-        "log",
-        "scale",
-        "bounded01",
-        "quantile"
-    ],
-    "s_Hbj_p": [
-        "output",
-        "log",
-        "scale",
-        "bounded01",
-        "quantile"
-    ],
-    "E_Hp": [
-        "output",
-        "log",
-        "scale",
-        "quantile"
-    ],
-    "s_p_M": [
-        "output",
-        "log",
-        "scale",
-        "bounded01",
-        "quantile"
-    ],
-    "1/s_M": [
-        "output",
-        "log",
-        "scale",
-        "bounded01",
-        "quantile"
-    ],
-    "class_other": [
-        "input",
-        "boolean"
-    ],
-    "class_Aves": [
-        "input",
-        "boolean"
-    ],
-    "class_Actinopterygii": [
-        "input",
-        "boolean"
-    ],
-    "class_Reptilia": [
-        "input",
-        "boolean"
-    ],
-    "class_Chondrichthyes": [
-        "input",
-        "boolean"
-    ],
-    "class_Amphibia": [
-        "input",
-        "boolean"
-    ],
-    "class_Mammalia": [
-        "input",
-        "boolean"
-    ],
-    "class_Bivalvia": [
-        "input",
-        "boolean"
-    ],
-    "class_Branchiopoda": [
-        "input",
-        "boolean"
-    ],
-    "class_Malacostraca": [
-        "input",
-        "boolean"
-    ],
-    "climate_A": [
-        "input",
-        "boolean"
-    ],
-    "climate_B": [
-        "input",
-        "boolean"
-    ],
-    "climate_C": [
-        "input",
-        "boolean"
-    ],
-    "climate_D": [
-        "input",
-        "boolean"
-    ],
-    "climate_E": [
-        "input",
-        "boolean"
-    ],
-    "habitat_T": [
-        "input",
-        "boolean"
-    ],
-    "habitat_F": [
-        "input",
-        "boolean"
-    ],
-    "habitat_S": [
-        "input",
-        "boolean"
-    ],
-    "habitat_M": [
-        "input",
-        "boolean"
-    ],
-    "migrate_T": [
-        "input",
-        "boolean"
-    ],
-    "food_other": [
-        "input",
-        "boolean"
-    ],
-    "food_P": [
-        "input",
-        "boolean"
-    ],
-    "food_O": [
-        "input",
-        "boolean"
-    ],
-    "food_H": [
-        "input",
-        "boolean"
-    ],
-    "food_C": [
-        "input",
-        "boolean"
-    ]
+    "ab": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "quantile"
+        ]
+    },
+    "am": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "quantile"
+        ]
+    },
+    "d_V": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": []
+    },
+    "Wwb": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "quantile"
+        ]
+    },
+    "Wwp": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "quantile"
+        ]
+    },
+    "Wwi": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "quantile"
+        ]
+    },
+    "Ri": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "quantile"
+        ]
+    },
+    "T_typical": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "scale",
+            "quantile"
+        ]
+    },
+    "p_Am": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "quantile"
+        ]
+    },
+    "1-kap": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "bounded01",
+            "quantile"
+        ]
+    },
+    "v": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "quantile"
+        ]
+    },
+    "p_M": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "quantile"
+        ]
+    },
+    "s_Hb_bj": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "bounded01",
+            "quantile"
+        ]
+    },
+    "s_Hbj_p": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "bounded01",
+            "quantile"
+        ]
+    },
+    "E_Hp": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "quantile"
+        ]
+    },
+    "s_p_M": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "bounded01",
+            "quantile"
+        ]
+    },
+    "1/s_M": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "bounded01",
+            "quantile"
+        ]
+    },
+    "metamorphosis": {
+        "classes": [
+            "input",
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "estim_k_J": {
+        "classes": [
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "class_other": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "class_Aves": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "class_Actinopterygii": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "class_Reptilia": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "class_Chondrichthyes": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "class_Amphibia": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "class_Mammalia": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "class_Bivalvia": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "class_Branchiopoda": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "class_Malacostraca": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "climate_A": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "climate_B": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "climate_C": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "climate_D": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "climate_E": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "habitat_T": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "habitat_F": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "habitat_S": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "habitat_M": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "migrate_T": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "food_other": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "food_P": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "food_O": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "food_H": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "food_C": {
+        "classes": [
+            "input"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    }
 }
