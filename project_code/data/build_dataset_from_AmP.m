@@ -16,7 +16,7 @@ allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 % allStatPath = [AmPDataFolder 'allStat.mat'];
 % allspeciesFolder = [AmPDataFolder 'species\'];
 saveFolder = [pathsTable{'root', 'path'}{:} '\data\raw';];
-tableSavePath = [saveFolder '\dataset_matlab_20250303.csv'];
+tableSavePath = [saveFolder '\dataset_matlab_20250312.csv'];
 
 %% Get list of species
 
@@ -42,7 +42,7 @@ timeSinceBirthDataCols = {'tg', 'tb', 'tj', 'tx', 'tp'};
 weightDataCols = {'Wwb', 'Wwj', 'Wwx', 'Wwp', 'Wwi'};
 lengthDataCols = {'Lb', 'Lj', 'Lx', 'Lp', 'Li'};
 reproductionDataCols = {'Ri', 'Ni', 'GSI', 'NR'};
-otherCols = {'d_V', 'T_typical', 'f', 't_0', 'model', 'completeness'};
+otherCols = {'d_V', 'T_typical', 'f', 't_0', 'model', 'completeness', 'estim_k_J'};
 columnNames = [parameterCols taxonomyCols ecoCodeCols ageDataCols timeSinceBirthDataCols weightDataCols lengthDataCols reproductionDataCols otherCols];
 numCols = length(columnNames);
 validModelTypes = {'std', 'stf', 'stx', 'abj'};
@@ -62,7 +62,7 @@ varTypes = {
     'double', 'double', 'double', 'double', 'double', ... % weightDataCols
     'double', 'double', 'double', 'double', 'double', ... % lengthDataCols
     'double', 'double', 'double', 'double', ... % reproductionCols
-    'double', 'double', 'double', 'double', 'string', 'double',... % otherCols
+    'double', 'double', 'double', 'double', 'string', 'double', 'logical',... % otherCols
     };
 
 % Initialize the table with missing values
@@ -132,6 +132,10 @@ for i=1:numSpecies
         end
     end
     T{speciesName, 'p_Am'} = par.z * par.p_M / par.kap;
+
+    if isfield(par, 'k_J')
+        T{speciesName, 'estim_k_J'} = par.free.k_J;
+    end
 
     % Fetch taxonomy
     for n=1:length(taxonomyCols)
