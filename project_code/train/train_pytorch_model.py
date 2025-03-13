@@ -10,7 +10,7 @@ import inspect
 
 from ..algorithms.loss_functions import MaskedMSELoss, MSEInfeasibilityLoss
 from ..algorithms.neural_networks import DEBNet, DEBNetHC
-from ..data.load_data import load_data, load_col_types
+from ..data.load_data import load_dataframes, load_col_types
 from ..data.prepare_data_pytorch import prepare_data_tensors
 from ..evaluate.prediction_error import evaluate_parameter_predictions_on_data, evaluate_pytorch_model, \
     METRIC_LABEL_TO_NAME
@@ -48,8 +48,8 @@ def train_neural_network(config, model_class, dataset_name,
         device = torch.device(device if torch.cuda.is_available() else 'cpu')
 
     # Load and preprocess data
-    data = load_data(dataset_name=dataset_name, data_split='train_val_test', datasets_folder=datasets_folder)
-    col_types = load_col_types(dataset_name=dataset_name, datasets_folder=datasets_folder)
+    data, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_val_test', datasets_folder=datasets_folder)
+    # col_types = load_col_types(dataset_name=dataset_name, datasets_folder=datasets_folder)
     create_results_directories_for_dataset(dataset_name)
 
     data_tensors, dataloaders, datasets, scalers = prepare_data_tensors(data=data, col_types=col_types,
@@ -238,8 +238,7 @@ if __name__ == '__main__':
 
     if evaluate_on_test:
         # Load and preprocess data
-        data = load_data(dataset_name=dataset_name, data_split='train_val_test')
-        col_types = load_col_types(dataset_name=dataset_name)
+        data, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_val_test')
         data_tensors, dataloaders, datasets, scalers = prepare_data_tensors(data=data, col_types=col_types,
                                                                             batch_size=config['batch_size'],
                                                                             scaling_type=config['scaling_type'],

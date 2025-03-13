@@ -116,7 +116,7 @@
             "quantile"
         ]
     },
-    "s_Hb_bj": {
+    "s_Hb_p": {
         "classes": [
             "output"
         ],
@@ -127,7 +127,18 @@
             "quantile"
         ]
     },
-    "s_Hbj_p": {
+    "s_Hb_j": {
+        "classes": [
+            "output"
+        ],
+        "qualifiers": [
+            "log",
+            "scale",
+            "bounded01",
+            "quantile"
+        ]
+    },
+    "s_Hj_p": {
         "classes": [
             "output"
         ],

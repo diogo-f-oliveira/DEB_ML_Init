@@ -3,6 +3,7 @@ import pandas as pd
 import torch
 
 from ..algorithms.theoretical import predict_E_G_from_theory
+from ..data.prepare_data_sklearn import get_output_mask
 
 PARAMETER_COLS = ['p_Am', 'kap', 'v', 'p_M', 'E_Hb', 'E_Hj', 'E_Hp', 'k_J', 's_M']
 MODEL_DEPENDENT_PARAMETER_COLS = ['E_Hj', 's_M']
@@ -22,11 +23,14 @@ UPPER_BOUNDS = {
     's_H': 1,
     's_Hb_bj': 1,
     's_Hbj_p': 1,
+    's_Hb_p': 1,
+    's_Hb_j': 1,
+    's_Hj_p': 1,
     '1/s_M': 1,
 }
 
 
-def impute_predictions_for_DEB_model_dependent_outputs(y, X, y_true, col_types, default_k_J=DEFAULT_VALUES['k_J']):
+def impute_predictions_old(y, X, y_true, col_types, default_k_J=DEFAULT_VALUES['k_J']):
     if torch.is_tensor(y):
         y = y.clone()
     else:
@@ -59,8 +63,19 @@ def impute_predictions_for_DEB_model_dependent_outputs(y, X, y_true, col_types, 
     return y
 
 
-def convert_output_to_parameter_predictions(y, X, y_true, col_types):
-    y_imputed = impute_predictions_for_DEB_model_dependent_outputs(y=y, X=X, y_true=y_true, col_types=col_types)
+def impute_predictions(y, y_true, mask):
+    if torch.is_tensor(y):
+        y_imputed = y.clone()
+    else:
+        y_imputed = y.copy()
+    imputation_mask = mask == 0
+    y_imputed[imputation_mask] = y_true[imputation_mask]
+
+    return y_imputed
+
+
+def convert_output_to_parameter_predictions(y, y_true, mask, col_types):
+    y_imputed = impute_predictions(y=y, y_true=y_true, mask=mask)
     pars_df = pd.DataFrame(y_imputed, columns=col_types['output']['all'])
 
     # If the model did not predict 's_M', set it to default value
@@ -75,6 +90,21 @@ def convert_output_to_parameter_predictions(y, X, y_true, col_types):
     if 'kap' not in pars_df.columns and '1-kap' in pars_df.columns:
         pars_df['kap'] = 1 - pars_df['1-kap']
         pars_df.drop(columns=['1-kap'], inplace=True)
+
+    if 'E_Hj' not in pars_df.columns and 'E_Hb' not in pars_df.columns:
+        pars_df['E_Hb'] = np.nan
+        pars_df['E_Hj'] = np.nan
+        if {'s_Hb_p', 'E_Hp'}.issubset(pars_df.columns):
+            s_Hb_p_mask = np.asarray(mask[:, col_types['output']['all'].index('s_Hb_p')]) == 1
+            pars_df.loc[s_Hb_p_mask, 'E_Hb'] = pars_df.loc[s_Hb_p_mask, 'E_Hp'] * pars_df.loc[s_Hb_p_mask, 's_Hb_p']
+            pars_df.loc[s_Hb_p_mask, 'E_Hj'] = pars_df.loc[s_Hb_p_mask, 'E_Hp'] * pars_df.loc[s_Hb_p_mask, 's_Hb_p']
+            pars_df.drop(columns=['s_Hb_p'], inplace=True)
+        if {'s_Hb_j', 's_Hj_p', 'E_Hp'}.issubset(pars_df.columns):
+            s_Hb_j_mask = np.asarray(mask[:, col_types['output']['all'].index('s_Hb_j')]) == 1
+            s_Hj_p_mask = np.asarray(mask[:, col_types['output']['all'].index('s_Hj_p')]) == 1
+            pars_df.loc[s_Hj_p_mask, 'E_Hj'] = pars_df.loc[s_Hj_p_mask, 'E_Hp'] * pars_df.loc[s_Hj_p_mask, 's_Hj_p']
+            pars_df.loc[s_Hj_p_mask, 'E_Hb'] = pars_df.loc[s_Hb_j_mask, 'E_Hj'] * pars_df.loc[s_Hj_p_mask, 's_Hb_j']
+            pars_df.drop(columns=['s_Hb_j', 's_Hj_p'], inplace=True)
 
     # If the model did not predict 'E_Hj',
     if 'E_Hj' not in pars_df.columns:
@@ -140,10 +170,12 @@ def convert_output_to_parameter_predictions(y, X, y_true, col_types):
 
 def get_core_parameter_predictions(dfs, pred_df, col_types):
     pred_df.index.name = 'species'
-    X = pd.concat([dfs[ds][col_types['input']['all']] for ds in pred_df['data_split'].unique()]).values
+    # X = pd.concat([dfs[ds][col_types['input']['all']] for ds in pred_df['data_split'].unique()]).values
     y = pred_df.drop(columns=['data_split']).values
     y_true = pd.concat([dfs[ds][col_types['output']['all']] for ds in pred_df['data_split'].unique()]).values
-    converted_output_df = convert_output_to_parameter_predictions(y=y, X=X, y_true=y_true, col_types=col_types)
+    mask = pd.concat([get_output_mask(df=dfs[ds], col_types=col_types) for ds in pred_df['data_split'].unique()]).values
+
+    converted_output_df = convert_output_to_parameter_predictions(y=y, y_true=y_true, mask=mask, col_types=col_types)
     pars_df = pd.DataFrame(converted_output_df.values,
                            columns=list(converted_output_df.columns),
                            index=pred_df.index)
@@ -180,11 +212,10 @@ def get_core_parameter_predictions(dfs, pred_df, col_types):
 
 
 if __name__ == '__main__':
-    from ..data.load_data import load_data, load_col_types
+    from ..data.load_data import load_dataframes, load_col_types
 
     dataset_name = 'biologist_no_pub_age'
-    dfs = load_data(dataset_name=dataset_name, data_split='train_test')
-    col_types = load_col_types(dataset_name=dataset_name)
+    dfs, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_test')
     gt_df = pd.concat({ds: dfs[ds][col_types['output']['all']] for ds in ('train', 'test')})
     gt_df.reset_index(level=0, names='data_split', inplace=True)
     gt_pars_df = get_core_parameter_predictions(dfs, pred_df=gt_df, col_types=col_types)

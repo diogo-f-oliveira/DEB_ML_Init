@@ -12,7 +12,7 @@ from project_code.evaluate.prediction_error import evaluate_parameter_prediction
 from project_code.utils.models import save_pytorch_model
 from ..algorithms.neural_networks import DEBNet, DEBNetHC
 from .train_pytorch_model import train_neural_network
-from ..data.load_data import load_data, load_col_types
+from ..data.load_data import load_dataframes, load_col_types
 from ..data.prepare_data_pytorch import prepare_data_tensors
 
 
@@ -82,8 +82,7 @@ def hyperopt_calibration(model_class, search_space, dataset_name, device,
 
     if evaluate_on_test:
         # Load and preprocess data
-        data = load_data(dataset_name=dataset_name, data_split='train_val_test')
-        col_types = load_col_types(dataset_name=dataset_name)
+        data, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_val_test')
         data_tensors, dataloaders, datasets, scalers = prepare_data_tensors(data=data, col_types=col_types,
                                                                             batch_size=best_config['batch_size'],
                                                                             scaling_type=best_config['scaling_type'],

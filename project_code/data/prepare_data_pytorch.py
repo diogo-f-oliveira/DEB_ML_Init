@@ -1,28 +1,31 @@
 import torch
 from sklearn.preprocessing import QuantileTransformer
 from torch.utils.data import TensorDataset, DataLoader
-from ..inference.parameters import DEFAULT_VALUES
 
 DEFAULT_TORCH_DTYPE = torch.float32
 
 
-def get_output_mask(X, y, col_types):
-    output_mask = torch.ones_like(y, dtype=DEFAULT_TORCH_DTYPE)
+def get_output_mask(df, col_types):
+    output_cols = col_types['output']['all']
+    mask_cols = col_types['mask']['all']
+    output_mask = torch.ones((df.shape[0], len(output_cols)), dtype=DEFAULT_TORCH_DTYPE)
 
-    # Columns only for metamorphosis
-    metamorphosis_idx = col_types['input']['all'].index('metamorphosis')
-    no_metamorphosis_mask = X[:, metamorphosis_idx] == 0
-
-    for col in ['s_M', '1/s_M', 's_Hb_bj', 'E_Hj']:
-        if col in col_types['output']['all']:
-            col_idx = col_types['output']['all'].index(col)
-            output_mask[no_metamorphosis_mask, col_idx] = 0
+    # Columns only for `abj` species
+    if 'metamorphosis' in mask_cols:
+        no_metamorphosis_mask = torch.tensor(~df['metamorphosis'].values, dtype=torch.bool)
+        for col in ['s_M', '1/s_M', 's_Hb_bj', 'E_Hj', 's_Hb_j', 's_Hj_p']:
+            if col in output_cols:
+                col_idx = output_cols.index(col)
+                output_mask[no_metamorphosis_mask, col_idx] = 0
+        if {'s_Hb_p', 's_Hb_j', 's_Hj_p'}.issubset(output_cols):
+            s_Hb_p_idx = output_cols.index('s_Hb_p')
+            output_mask[~no_metamorphosis_mask, s_Hb_p_idx] = 0
 
     # Non-estimated k_J
-    if 'k_J' in col_types['output']['all']:
-        k_J_idx = col_types['output']['all'].index('k_J')
-        default_k_J_mask = y[:, k_J_idx] == DEFAULT_VALUES['k_J']
-        output_mask[default_k_J_mask, k_J_idx] = 0
+    if 'estim_k_J' in mask_cols and 'k_J' in output_cols:
+        no_estim_k_J_mask = torch.tensor(~df['estim_k_J'].values, dtype=torch.bool)
+        k_J_idx = output_cols.index('k_J')
+        output_mask[no_estim_k_J_mask, k_J_idx] = 0
 
     return output_mask
 
@@ -86,13 +89,8 @@ def log_standardize_data(data, col_types):
         data_tensors[split] = {
             'input': torch.tensor(df[input_cols].astype('float').values, dtype=DEFAULT_TORCH_DTYPE),
             'output': torch.tensor(df[output_cols].astype('float').values, dtype=DEFAULT_TORCH_DTYPE),
+            'mask': get_output_mask(df=df, col_types=col_types)
         }
-
-        data_tensors[split]['mask'] = get_output_mask(
-            X=data_tensors[split]['input'],
-            y=data_tensors[split]['output'],
-            col_types=col_types
-        )
 
     # Scale the data
     scalers = {}
