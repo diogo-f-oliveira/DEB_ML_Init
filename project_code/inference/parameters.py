@@ -173,7 +173,8 @@ def get_core_parameter_predictions(dfs, pred_df, col_types):
     # X = pd.concat([dfs[ds][col_types['input']['all']] for ds in pred_df['data_split'].unique()]).values
     y = pred_df.drop(columns=['data_split']).values
     y_true = pd.concat([dfs[ds][col_types['output']['all']] for ds in pred_df['data_split'].unique()]).values
-    mask = pd.concat([get_output_mask(df=dfs[ds], col_types=col_types) for ds in pred_df['data_split'].unique()]).values
+    mask = np.concatenate([get_output_mask(df=dfs[ds], col_types=col_types) for ds in pred_df['data_split'].unique()],
+                          axis=0)
 
     converted_output_df = convert_output_to_parameter_predictions(y=y, y_true=y_true, mask=mask, col_types=col_types)
     pars_df = pd.DataFrame(converted_output_df.values,
