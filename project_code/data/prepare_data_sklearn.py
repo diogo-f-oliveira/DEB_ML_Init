@@ -5,8 +5,6 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, Qu
     FunctionTransformer
 import numpy as np
 
-from project_code.inference.parameters import DEFAULT_VALUES
-
 
 class LogScaleClipTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, all_col_names, log_col_names=None, clip_col_names=None, scale_col_names=None,
@@ -132,23 +130,27 @@ class LogScaleClipTransformer(BaseEstimator, TransformerMixin):
         return X_unflatten, flattened
 
 
-def get_output_mask(y, X, col_types):
-    output_mask = np.ones_like(y, dtype='float')
+def get_output_mask(df, col_types):
+    output_cols = col_types['output']['all']
+    mask_cols = col_types['mask']['all']
+    output_mask = np.ones((df.shape[0], len(output_cols)))
 
-    # Columns only for metamorphosis
-    metamorphosis_idx = col_types['input']['all'].index('metamorphosis')
-    no_metamorphosis_mask = X[:, metamorphosis_idx] == 0
+    # Columns only for `abj` species
+    if 'metamorphosis' in mask_cols:
+        no_metamorphosis_mask = ~df['metamorphosis'].values
+        for col in ['s_M', '1/s_M', 's_Hb_bj', 'E_Hj', 's_Hb_j', 's_Hj_p']:
+            if col in output_cols:
+                col_idx = output_cols.index(col)
+                output_mask[no_metamorphosis_mask, col_idx] = 0
+        if {'s_Hb_p', 's_Hb_j', 's_Hj_p'}.issubset(output_cols):
+            s_Hb_p_idx = output_cols.index('s_Hb_p')
+            output_mask[~no_metamorphosis_mask, s_Hb_p_idx] = 0
 
-    for col in ['s_M', '1/s_M', 's_Hb_bj', 'E_Hj']:
-        if col in col_types['output']['all']:
-            col_idx = col_types['output']['all'].index(col)
-            output_mask[no_metamorphosis_mask, col_idx] = 0
-
-        # Non-estimated k_J
-    if 'k_J' in col_types['output']['all']:
-        k_J_idx = col_types['output']['all'].index('k_J')
-        default_k_J_mask = y[:, k_J_idx] == DEFAULT_VALUES['k_J']
-        output_mask[default_k_J_mask, k_J_idx] = 0
+    # Non-estimated k_J
+    if 'estim_k_J' in mask_cols and 'k_J' in output_cols:
+        no_estim_k_J_mask = ~df['estim_k_J'].values
+        k_J_idx = output_cols.index('k_J')
+        output_mask[no_estim_k_J_mask, k_J_idx] = 0
 
     return output_mask
 
@@ -165,7 +167,7 @@ def get_features_targets(data, col_types):
         if output_values.shape[1] == 1:
             output_values = output_values.ravel()
         # Compute output mask
-        mask = get_output_mask(output_values, input_values, col_types)
+        mask = get_output_mask(df, col_types)
         # Pack data
         features_targets[split] = {
             'input': input_values,

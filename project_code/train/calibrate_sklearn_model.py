@@ -20,7 +20,7 @@ from ..utils.models import save_sklearn_model
 from ..train.train_sklearn_model import train_sklearn_model
 from ..utils.results import create_results_directories_for_dataset
 from ..algorithms.build_sklearn_model import build_sklearn_model
-from ..data.load_data import load_data, load_col_types
+from ..data.load_data import load_dataframes, load_col_types
 from ..data.prepare_data_sklearn import get_features_targets, get_single_output_col_types
 from ..evaluate.prediction_error import evaluate_parameter_predictions_on_data, METRIC_LABEL_TO_NAME
 
@@ -225,7 +225,7 @@ def calibrate_independent_output_models(base_model, search_space, dataset_name, 
                                         dfs=None, col_types=None, save_folder=None,
                                         **calibration_function_kwargs):
     if dfs is None:
-        dfs = load_data(dataset_name=dataset_name, data_split='train_test')
+        dfs = load_dataframes(dataset_name=dataset_name, data_split='train_test')
     if col_types is None:
         col_types = load_col_types(dataset_name=dataset_name)
 
@@ -263,8 +263,7 @@ if __name__ == '__main__':
     dataset_name += '_ecocodes'
 
     # Load the data
-    dfs = load_data(dataset_name=dataset_name, data_split='train_test')
-    col_types = load_col_types(dataset_name=dataset_name)
+    dfs, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_test')
     data = get_features_targets(dfs, col_types)
 
     os.environ['RAY_AIR_NEW_OUTPUT'] = '0'
