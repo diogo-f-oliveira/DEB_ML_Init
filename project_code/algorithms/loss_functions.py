@@ -34,9 +34,9 @@ class MSEInfeasibilityLoss(nn.Module):
         self.output_transformer = output_transformer
 
         # Compute upper bounds in model scale
-        upper_bounds = torch.zeros(4, dtype=DEFAULT_TORCH_DTYPE)
-        bounded_col_idx = torch.zeros(4, dtype=torch.long)
-        for i, col in enumerate(['1-kap', 's_p_M', 's_Hb_bj', 's_Hbj_p']):
+        upper_bounds = torch.zeros(5, dtype=DEFAULT_TORCH_DTYPE)
+        bounded_col_idx = torch.zeros(5, dtype=torch.long)
+        for i, col in enumerate(['1-kap', 's_p_M', 's_Hb_j', 's_Hj_p', 's_Hb_p']):
             idx = col_types['output']['all'].index(col)
             bounded_col_idx[i] = idx
             upper_bound_par_scale = UPPER_BOUNDS[col_types['output']['all'][idx]]
@@ -79,16 +79,21 @@ class MSEInfeasibilityLoss(nn.Module):
 
     def maturity_levels_loss(self, outputs, mask):
         # Penalty for E_Hj > E_Hb
-        idx_s_Hb_bj = self.bounded_col_idx[2]
-        ub_s_Hb_bj = self.upper_bounds[2]
-        penalty_s_Hb_bj = mask[:, idx_s_Hb_bj] * torch.square(torch.relu(outputs[:, idx_s_Hb_bj] - ub_s_Hb_bj))
+        idx_s_Hb_j = self.bounded_col_idx[2]
+        ub_s_Hb_j = self.upper_bounds[2]
+        penalty_s_Hb_j = mask[:, idx_s_Hb_j] * torch.square(torch.relu(outputs[:, idx_s_Hb_j] - ub_s_Hb_j))
 
         # Penalty for E_Hj > E_Hb
-        idx_s_Hbj_p = self.bounded_col_idx[3]
-        ub_s_Hbj_p = self.upper_bounds[3]
-        penalty_s_Hbj_p = torch.square(torch.relu(outputs[:, idx_s_Hbj_p] - ub_s_Hbj_p))
+        idx_s_Hj_p = self.bounded_col_idx[3]
+        ub_s_Hj_p = self.upper_bounds[3]
+        penalty_s_Hj_p = torch.square(torch.relu(outputs[:, idx_s_Hj_p] - ub_s_Hj_p))
 
-        return torch.mean(penalty_s_Hb_bj + penalty_s_Hbj_p)
+        # Penalty for E_Hp > E_Hb
+        idx_s_Hb_p = self.bounded_col_idx[4]
+        ub_s_Hb_p = self.upper_bounds[4]
+        penalty_s_Hb_p = torch.square(torch.relu(outputs[:, idx_s_Hb_p] - ub_s_Hb_p))
+
+        return torch.mean(penalty_s_Hb_j + penalty_s_Hj_p + penalty_s_Hb_p)
 
 
 class MSEInfeasibiltyLossParameterScale(nn.Module):
