@@ -193,7 +193,9 @@ if isfolder(speciesFolder)
                 continue
             end
         end
-        predPar.(parName) = speciesParameterEstimates{1, parName};
+        if par.free.(parName)
+            predPar.(parName) = speciesParameterEstimates{1, parName};
+        end
     end
 
     % Format arguments for 'petregr_f'

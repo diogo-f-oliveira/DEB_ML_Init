@@ -1,4 +1,4 @@
-clear all
+clear
 format long
 
 %% Define folders and files
@@ -9,7 +9,7 @@ allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 datasetsFolder = '..\..\data\processed\';
 resultsFolder = '..\..\results\';
 datasetName = 'biologist_no_pub_age';
-modelName = 'AmP';
+modelName = 'AmP_minimum';
 
 datasetFile = [datasetsFolder datasetName '\' datasetName '.csv'];
 parameterTableOutputFile = [resultsFolder 'parameter_predictions\' modelName '_predictions.csv'];
