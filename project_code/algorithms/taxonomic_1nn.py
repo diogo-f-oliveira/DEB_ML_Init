@@ -70,8 +70,10 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
     """
     LINEAR_SCALING_COLS = ['p_Am', 'h_a']
     CUBE_SCALING_COLS = ['E_Hb', 'E_Hj', 'E_Hx', 'E_Hp']
+    PENALTY_NO_ESTIM_k_J = 10000
 
-    def __init__(self, col_types, taxonomy_encoder, n_neighbors=1, use_scaling_relationships=True, weight_factor=0.01):
+    def __init__(self, col_types, taxonomy_encoder, n_neighbors=1, use_scaling_relationships=True,
+                 ultimate_weight_factor=0.01, deb_model_factor=0):
         self.n_neighbors = n_neighbors
         self.col_types = col_types
         self.output_col_idx_dict = {col: i for i, col in enumerate(col_types['output']['all'])}
@@ -84,7 +86,17 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
         if 'Wwi' not in col_types['input']['all']:
             raise Exception("Missing maximum weight column 'Wwi' in dataset.")
         self.wi_col = col_types['input']['all'].index('Wwi')
-        self.weight_factor = weight_factor
+        self.ultimate_weight_factor = ultimate_weight_factor
+
+        if 'estim_k_J' not in col_types['input']['all']:
+            raise Exception("Missing column 'estim_k_J' that says whether k_J is to be estimated")
+        self.estim_k_J = col_types['input']['all'].index('estim_k_J')
+        self.k_J_col = col_types['input']['all'].index('k_J')
+
+        if 'metamorphosis' not in col_types['input']['all']:
+            raise Exception("Missing column 'metamorphosis' to differentiate DEB models of species")
+        self.abj_col = col_types['input']['all'].index('metamorphosis')
+        self.deb_model_factor = deb_model_factor
 
         self.use_scaling_relationships = use_scaling_relationships
 
@@ -106,28 +118,34 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
                 distance += 1
         return distance
 
-    def _compute_distance_matrix(self, data_a, data_b, data_split='test'):
+    def _compute_distance_matrix(self, data_queries, data_indexed, data_split='test'):
         # Compute pairwise distances between all elements in data_a and data_b
-        n_a, n_b = data_a.shape[0], data_b.shape[0]
-        distance_matrix = np.zeros((n_a, n_b))
+        n_queries, n_indexed = data_queries.shape[0], data_indexed.shape[0]
+        distance_matrix = np.zeros((n_queries, n_indexed))
 
-        for i in range(n_a):
-            for j in range(n_b):
+        for q in range(n_queries):
+            for i in range(n_indexed):
                 # Get taxonomy distance
                 taxonomy_distance = self._taxonomy_distance(
-                    tax1=data_a[i, self.taxonomy_cols],
-                    tax2=data_b[j, self.taxonomy_cols]
+                    tax1=data_queries[q, self.taxonomy_cols],
+                    tax2=data_indexed[i, self.taxonomy_cols]
                 )
                 # Get weight distance
-                weight_distance = abs(data_a[i, self.wi_col] - data_b[j, self.wi_col])
-                # Add distance between weights to break ties with a small factor
-                distance = (taxonomy_distance + weight_distance * self.weight_factor)
+                weight_distance = abs(data_queries[q, self.wi_col] - data_indexed[i, self.wi_col])
+                # Add distance between ultimate weights
+                distance = (taxonomy_distance + weight_distance * self.ultimate_weight_factor)
+                # Add distance if DEB models are not the same
+                distance += self.deb_model_factor * (data_queries[q, self.abj_col] + data_indexed[i, self.abj_col])
+                # Add penalty if k_J is not to be estimated for query but was estimated for indexed species
+                incompatible_estim_k_J = (not data_queries[q, self.estim_k_J]) and bool(data_indexed[i, self.estim_k_J])
+                k_J_distance = abs(data_queries[q, self.k_J_col] - data_indexed[i, self.k_J_col])
+                distance += self.PENALTY_NO_ESTIM_k_J * incompatible_estim_k_J * k_J_distance
 
                 # In case distance is zero for multiple species during training, add small factor to ensure the nearest
                 # neighbor is itself
-                if distance == 0 and data_split == 'train' and i != j:
+                if distance == 0 and data_split == 'train' and q != i:
                     distance += 1e-10
-                distance_matrix[i, j] = distance
+                distance_matrix[q, i] = distance
 
         return distance_matrix
 
