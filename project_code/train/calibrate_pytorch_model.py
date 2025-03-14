@@ -12,7 +12,7 @@ from project_code.evaluate.prediction_error import evaluate_parameter_prediction
 from project_code.utils.models import save_pytorch_model
 from ..algorithms.neural_networks import DEBNet, DEBNetHC
 from .train_pytorch_model import train_neural_network
-from ..data.load_data import load_dataframes, load_col_types
+from ..data.load_data import load_dataframes
 from ..data.prepare_data_pytorch import prepare_data_tensors
 
 
@@ -49,7 +49,7 @@ def hyperopt_calibration(model_class, search_space, dataset_name, device,
             verbose=1,
             progress_reporter=CLIReporter(
                 metric=metric, mode=mode,
-                metric_columns=list(METRIC_LABEL_TO_NAME.values()) + ['val_loss', 'epoch'],
+                metric_columns=list(METRIC_LABEL_TO_NAME.values())[1:3] + ['val_loss', 'epoch'],
                 parameter_columns=[p for p, s in search_space.items() if isinstance(s, tune.search.sample.Domain)],
                 sort_by_metric=True,
                 max_report_frequency=60,
@@ -105,17 +105,18 @@ if __name__ == '__main__':
     device = torch.device('cpu')
 
     dataset_name = 'final'
+    # dataset_name += '_no_k_J'
     dataset_name += '_taxonomy'
     dataset_name += '_ecocodes'
 
     search_space = {
         # Optimizer hyperparameters
-        'batch_size': tune.choice([2, 4, 8, 16]),
-        'learning_rate': tune.loguniform(1e-6, 1e-2),
-        'max_epochs': 500,
-        # 'max_epochs': tune.qrandint(50, 700, 50)
+        'batch_size': tune.choice([1, 2, 4, 8, 16]),
+        'learning_rate': tune.qloguniform(1e-5, 1e-2, 1e-5),
+        #'max_epochs': 500,
+        'max_epochs': tune.qrandint(50, 700, 25),
         'patience': 10,
-        'n_epochs_gradient_descent': 5,
+        'n_epochs_gradient_descent': 0,
         'early_stopping_metric': None,
         # 'early_stopping_metric': 'GEF',
 
@@ -124,15 +125,17 @@ if __name__ == '__main__':
         'n_shared_layers': tune.randint(1, 5),
         'shared_hidden_size': tune.choice([16, 32, 64, 96, 128]),
         'n_par_layers': tune.randint(1, 5),
-        'par_hidden_size': tune.choice([8, 16, 32, 64]),
+        'par_hidden_size': tune.choice([8, 16, 32, 64, 96]),
         # 'n_par_layers': 0,
         # 'par_hidden_size': 0,
         'use_skip_connections': tune.choice([True, False]),
-        'dropout_prob': tune.uniform(0, 0.4),
+        'dropout_prob': tune.quniform(0, 0.4, 0.02),
         # 'dropout_prob': 0.0,
     }
-    model_name = 'DEBNetHC'
-
+    # model_name = 'DEBNetHC'
+    # for model_name in ['DEBNetHC', 'DEBNetSC','MLP', 'MLPSC']:
+    #for model_name in ['MLP', 'MLPSC']:
+    for model_name in ['MLPSC']:
     # if model_class == DEBNet:
     #     if use_infeasibility_loss:
     #         search_space['loss_function'] = 'mse_infeasibility'
@@ -143,43 +146,53 @@ if __name__ == '__main__':
     #     else:
     #         search_space['loss_function'] = 'mse'
     #         model_name = 'DEBNet'
-    if model_name == 'DEBNetHC':
-        search_space['loss_function'] = 'mse'
-        model_class = DEBNetHC
-        use_infeasibility_loss = False
-    elif model_name == 'MLP':
-        search_space['loss_function'] = 'mse'
-        model_class = DEBNetHC
-        use_infeasibility_loss = False
-        search_space['n_par_layers'] = 0
-        search_space['par_hidden_size'] = 0
-        search_space['use_skip_connections'] = False
-    elif model_name == 'MLPSC':
-        search_space['loss_function'] = 'mse_infeasibility'
-        model_class = DEBNet
-        search_space['lambda_kap'] = tune.loguniform(1e-1, 1e1)
-        search_space['lambda_s_H'] = tune.loguniform(1e-1, 1e1)
-        search_space['lambda_s_p'] = tune.loguniform(1e-1, 1e1)
-        use_infeasibility_loss = True
-        search_space['n_par_layers'] = 0
-        search_space['par_hidden_size'] = 0
-        search_space['use_skip_connections'] = False
+        if model_name == 'DEBNetHC':
+            search_space['loss_function'] = 'mse'
+            model_class = DEBNetHC
+            use_infeasibility_loss = False
+        elif model_name == 'DEBNetSC':
+            search_space['loss_function'] = 'mse_infeasibility'
+            model_class = DEBNet
+            search_space['lambda_kap'] = tune.qloguniform(1e-1, 1e1, 1e-1)
+            search_space['lambda_s_H'] = tune.qloguniform(1e-1, 1e1, 1e-1)
+            search_space['lambda_s_p'] = tune.qloguniform(1e-1, 1e1, 1e-1)
+            use_infeasibility_loss = True
+        elif model_name == 'MLP':
+            search_space['loss_function'] = 'mse'
+            model_class = DEBNetHC
+            use_infeasibility_loss = False
+            search_space['n_par_layers'] = 0
+            search_space['par_hidden_size'] = 0
+            search_space['use_skip_connections'] = False
+        elif model_name == 'MLPSC':
+            search_space['loss_function'] = 'mse_infeasibility'
+            model_class = DEBNet
+            search_space['lambda_kap'] = tune.qloguniform(1e-1, 1e1, 1e-1)
+            search_space['lambda_s_H'] = tune.qloguniform(1e-1, 1e1, 1e-1)
+            search_space['lambda_s_p'] = tune.qloguniform(1e-1, 1e1, 1e-1)
+            use_infeasibility_loss = True
+            search_space['n_par_layers'] = 0
+            search_space['par_hidden_size'] = 0
+            search_space['use_skip_connections'] = False
 
-    metric = 'GEF'
+        metric = 'GEF'
 
-    print(f"Tuning hyperparameters for {model_name} ({model_class.__name__}) with "
-          f"{'infeasibility loss' if use_infeasibility_loss else 'MSE loss'} and metric {metric}")
+        if 'no_k_J' in dataset_name:
+            model_name += 'nokJ'        
 
-    hyperopt_calibration(model_class=model_class,
-                         search_space=search_space,
-                         dataset_name=dataset_name,
-                         num_samples=100,
-                         datasets_folder=os.path.abspath('data/processed'),
-                         save_best_model=True,
-                         evaluate_on_test=True,
-                         save_folder=f'results/{dataset_name}',
-                         model_name=model_name,
-                         grace_period=100,
-                         device=device,
-                         metric=metric,
-                         )
+        print(f"Tuning hyperparameters for {model_name} ({model_class.__name__}) with "
+            f"{'infeasibility loss' if use_infeasibility_loss else 'MSE loss'} and metric {metric}")
+
+        hyperopt_calibration(model_class=model_class,
+                            search_space=search_space,
+                            dataset_name=dataset_name,
+                            num_samples=150,
+                            datasets_folder=os.path.abspath('data/processed'),
+                            save_best_model=True,
+                            evaluate_on_test=True,
+                            save_folder=f'results/{dataset_name}',
+                            model_name=model_name,
+                            grace_period=250,
+                            device=device,
+                            metric=metric,
+                            )

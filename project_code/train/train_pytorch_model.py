@@ -173,7 +173,7 @@ def train_neural_network(config, model_class, dataset_name,
     if report_val_scores:
         report_metrics_dict = traces_df.loc[report_epoch].to_dict()
         report_metrics_dict.pop('train_loss')
-        report_metrics_dict['epoch'] = best_epoch
+        report_metrics_dict['epoch'] = report_epoch
         return report_metrics_dict
     else:
         return model, traces_df.loc[report_epoch]

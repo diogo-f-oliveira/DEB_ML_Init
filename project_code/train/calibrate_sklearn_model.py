@@ -305,14 +305,19 @@ if __name__ == '__main__':
 
     # Train multioutput models
     multi_output_models_to_train = [
-        'MultiTaskElasticNet',
-        # 'RandomForestRegressor',
+        #'MultiTaskElasticNet',
+        'RandomForestRegressor',
     ]
+    model_names = {
+        #'RandomForestRegressor': 'RandomForest',
+        'MultiTaskElasticNet': 'ElasticNet',
+    }
 
-    for model_name in multi_output_models_to_train:
+    for model_type in multi_output_models_to_train:
+        model_name = model_names[model_type]
         print(f"Training model {model_name} on dataset {dataset_name}")
-        base_model = base_models[model_name]
-        search_space = search_spaces[model_name]
+        base_model = base_models[model_type]
+        search_space = search_spaces[model_type]
         hyperopt_calibration(
             base_model=base_model,
             search_space=search_space,
@@ -321,9 +326,10 @@ if __name__ == '__main__':
             evaluate_on_test=True,
             save_best_model=True,
             save_folder=f'results/{dataset_name}',
-            metric='sMAPE',
+            metric='GEF',
             mode='min',
-            num_samples=50,
-            max_concurrent_trials=12,
+            num_samples=150,
+            max_concurrent_trials=24,
             stratify=col_types['input']['all'].index('metamorphosis'),
+            model_name=model_name,
         )

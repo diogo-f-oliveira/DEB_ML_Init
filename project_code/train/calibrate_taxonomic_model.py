@@ -33,7 +33,6 @@ if __name__ == '__main__':
     base_model = TaxonomicKNNRegressor
     search_space = {
         'ultimate_weight_factor': tune.qloguniform(1e-3, 1e2, 1e-3),
-        'deb_model_factor': tune.qloguniform(1e-3, 1e2, 1e-3),
 
         # Fixed params
         'n_neighbors': 1,
@@ -41,6 +40,7 @@ if __name__ == '__main__':
         'output_scaler_type': 'none',
         'taxonomy_encoder': taxonomy_encoder,
         'use_scaling_relationships': True,
+        'deb_model_factor': 0,                        
     }
     for model_name in ['Taxo1NN', 'SRTaxo1NN']:
     #model_name = 'SRTaxo1NN' if search_space['use_scaling_relationships'] else 'Taxo1NN'
