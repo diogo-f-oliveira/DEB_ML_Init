@@ -87,7 +87,7 @@ def grid_search_calibration(base_model, search_space, data, col_types, scorer=No
 
 
 def evaluate_config(config, base_model, col_types, data, random_state=42, n_splits=5, stratify=None,
-                    report_metrics=False):
+                    report_metrics=False, verbose=False):
     X_train = data['input']
     y_train = data['output']
     mask_train = data['mask']
@@ -134,6 +134,8 @@ def evaluate_config(config, base_model, col_types, data, random_state=42, n_spli
         # Report metrics
         if report_metrics:
             train.report({m: cv_metrics_df[m].mean() for m in METRIC_LABEL_TO_NAME.values()})
+        elif verbose:
+            print(cv_metrics_df.loc[i])
 
     # Report the CV R2 score to Ray Tune
     if report_metrics:

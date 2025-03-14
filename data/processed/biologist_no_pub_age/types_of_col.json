@@ -71,7 +71,7 @@
         ],
         "qualifiers": []
     },
-    "p_M": {
+    "s_p_M": {
         "classes": [
             "output"
         ],
@@ -97,6 +97,7 @@
     },
     "k_J": {
         "classes": [
+            "input",
             "output"
         ],
         "qualifiers": []
@@ -109,6 +110,7 @@
     },
     "metamorphosis": {
         "classes": [
+            "input",
             "mask"
         ],
         "qualifiers": [

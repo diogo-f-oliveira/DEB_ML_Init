@@ -6,7 +6,7 @@ from ..evaluate.prediction_error import evaluate_parameter_predictions_on_data
 from ..train.calibrate_sklearn_model import evaluate_config
 from ..train.train_sklearn_model import train_sklearn_model
 from ..utils.results import create_results_directories_for_dataset
-from ..data.load_data import load_data, load_col_types
+from ..data.load_data import load_dataframes
 from ..algorithms.taxonomic_1nn import TaxonomicKNNRegressor, TaxonomicLabelEncoder
 
 if __name__ == '__main__':
@@ -14,8 +14,7 @@ if __name__ == '__main__':
     dataset_name = 'biologist_' + base_dataset_name
 
     # Load the data
-    dfs = load_data(dataset_name=dataset_name, data_split='train_test')
-    col_types = load_col_types(dataset_name=dataset_name)
+    dfs, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_test')
 
     # Variables to save results
     results_folder = f'results/{dataset_name}'
@@ -35,7 +34,8 @@ if __name__ == '__main__':
 
     base_model = TaxonomicKNNRegressor
     config = {
-        'weight_factor': 0.688,
+        'ultimate_weight_factor': 0.688,
+        'deb_model_factor': 4,
         'n_neighbors': 1,
         'col_types': col_types,
         'output_scaler_type': 'none',
@@ -43,7 +43,7 @@ if __name__ == '__main__':
         'use_scaling_relationships': True,
     }
 
-    save_trained_model = True
+    save_trained_model = False
     evaluate_on_test = True
 
     cv_metrics_df = evaluate_config(config=config,
@@ -54,6 +54,7 @@ if __name__ == '__main__':
                                     # stratify=col_types['input']['all'].index('metamorphosis'),
                                     stratify=None,
                                     n_splits=10,
+                                    verbose=True,
                                     )
 
     cv_gef = cv_metrics_df['GEF'].mean()
