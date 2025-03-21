@@ -83,7 +83,8 @@ def train_neural_network(config, model_class, dataset_name,
     criterion.to(device)
 
     # Create optimizer
-    optimizer = optim.Adam(model.parameters(), lr=config['learning_rate'], weight_decay=1e-3)
+    optimizer = optim.AdamW(model.parameters(), lr=config['learning_rate'], weight_decay=config['weight_decay'])
+
 
     # Get training configuration from config
     max_epochs = config['max_epochs']
@@ -193,16 +194,17 @@ if __name__ == '__main__':
         'scaling_type': 'log_standardize',
         'batch_size': 4,
         'max_epochs': 100,
-        'learning_rate': 5e-4,
+        'learning_rate': 5e-5,
+        'weight_decay': 1e-3,
         'shared_hidden_layers': 3 * [64],
-        'par_hidden_layers': 0 * [32],
+        'par_hidden_layers': 2 * [32],
         'lambdas': [1, 1, 1, 1],
         'loss_function': 'mse',
         'output_weight_strategy': '',
         # 'dropout_prob': 0,
         'dropout_prob': 0.1,
-        'clamp_function': 'relu',
-        'use_skip_connections': True,
+        'clamp_function': 'logsigmoid',
+        'use_skip_connections': False,
         'n_epochs_gradient_descent': 0,
         'patience': 10,
         # 'early_stopping_metric': 'GEF',
@@ -238,8 +240,8 @@ if __name__ == '__main__':
 
     if evaluate_on_test:
         # Load and preprocess data
-        data, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_val_test')
-        data_tensors, dataloaders, datasets, scalers = prepare_data_tensors(data=data, col_types=col_types,
+        dfs, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_val_test')
+        data_tensors, dataloaders, datasets, scalers = prepare_data_tensors(data=dfs, col_types=col_types,
                                                                             batch_size=config['batch_size'],
                                                                             scaling_type=config['scaling_type'],
                                                                             device=device,

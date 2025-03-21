@@ -7,6 +7,8 @@ from ..inference.parameters import UPPER_BOUNDS
 
 
 class DEBNet(nn.Module):
+    BIAS_INITIAL_VALUE = 0.1
+
     def __init__(self, col_types, shared_hidden_layers, par_hidden_layers, dropout_prob, output_transformer,
                  input_transformer, use_skip_connection=True):
         super(DEBNet, self).__init__()
@@ -22,6 +24,7 @@ class DEBNet(nn.Module):
             # Create and initialize layer
             hidden_layer = nn.Linear(prev_dim, hidden_dim)
             nn.init.kaiming_normal_(tensor=hidden_layer.weight, nonlinearity='relu')
+            nn.init.constant_(tensor=hidden_layer.bias, val=self.BIAS_INITIAL_VALUE)
             # Append layer with ReLu activation and dropout
             layers.append(hidden_layer)
             layers.append(nn.ReLU())
@@ -39,6 +42,7 @@ class DEBNet(nn.Module):
             for hidden_dim in par_hidden_layers:
                 hidden_layer = nn.Linear(prev_dim, hidden_dim)
                 nn.init.kaiming_normal_(tensor=hidden_layer.weight, nonlinearity='relu')
+                nn.init.constant_(tensor=hidden_layer.bias, val=self.BIAS_INITIAL_VALUE)
                 layers.append(hidden_layer)
                 layers.append(nn.ReLU())
                 layers.append(nn.Dropout(p=dropout_prob))
@@ -46,6 +50,7 @@ class DEBNet(nn.Module):
             # Create the output parameter layer
             par_output_layer = nn.Linear(prev_dim, 1)
             nn.init.xavier_normal_(par_output_layer.weight)
+            nn.init.constant_(tensor=par_output_layer.bias, val=self.BIAS_INITIAL_VALUE)
             layers.append(par_output_layer)
             self.par_hidden_layers.append(nn.Sequential(*layers))
 

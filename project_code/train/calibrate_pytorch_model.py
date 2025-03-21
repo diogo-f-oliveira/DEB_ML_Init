@@ -113,6 +113,7 @@ if __name__ == '__main__':
         # Optimizer hyperparameters
         'batch_size': tune.choice([1, 2, 4, 8, 16]),
         'learning_rate': tune.qloguniform(1e-5, 1e-2, 1e-5),
+        'weight_decay': tune.qloguniform(1e-5, 1e-1, 1e-5),
         #'max_epochs': 500,
         'max_epochs': tune.qrandint(50, 700, 25),
         'patience': 10,
@@ -134,18 +135,7 @@ if __name__ == '__main__':
     }
     # model_name = 'DEBNetHC'
     # for model_name in ['DEBNetHC', 'DEBNetSC','MLP', 'MLPSC']:
-    #for model_name in ['MLP', 'MLPSC']:
-    for model_name in ['MLPSC']:
-    # if model_class == DEBNet:
-    #     if use_infeasibility_loss:
-    #         search_space['loss_function'] = 'mse_infeasibility'
-    #         model_name = 'DEBNetSC'
-    #         search_space['lambda_kap'] = tune.loguniform(1e-1, 1e1)
-    #         search_space['lambda_s_H'] = tune.loguniform(1e-1, 1e1)
-    #         search_space['lambda_s_p'] = tune.loguniform(1e-1, 1e1)
-    #     else:
-    #         search_space['loss_function'] = 'mse'
-    #         model_name = 'DEBNet'
+    for model_name in ['MLP', 'MLPSC']:
         if model_name == 'DEBNetHC':
             search_space['loss_function'] = 'mse'
             model_class = DEBNetHC
