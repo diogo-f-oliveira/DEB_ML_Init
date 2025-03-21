@@ -96,14 +96,14 @@ def convert_output_to_parameter_predictions(y, y_true, mask, col_types):
         pars_df['E_Hj'] = np.nan
         if {'s_Hb_p', 'E_Hp'}.issubset(pars_df.columns):
             s_Hb_p_mask = np.asarray(mask[:, col_types['output']['all'].index('s_Hb_p')]) == 1
-            pars_df.loc[s_Hb_p_mask, 'E_Hb'] = pars_df.loc[s_Hb_p_mask, 'E_Hp'] * pars_df.loc[s_Hb_p_mask, 's_Hb_p']
-            pars_df.loc[s_Hb_p_mask, 'E_Hj'] = pars_df.loc[s_Hb_p_mask, 'E_Hp'] * pars_df.loc[s_Hb_p_mask, 's_Hb_p']
+            pars_df.loc[s_Hb_p_mask, 'E_Hb'] = pars_df.loc[s_Hb_p_mask, 'E_Hp'] * pars_df.loc[s_Hb_p_mask, 's_Hb_p'] * (1-1e-10)
+            pars_df.loc[s_Hb_p_mask, 'E_Hj'] = pars_df.loc[s_Hb_p_mask, 'E_Hp'] * pars_df.loc[s_Hb_p_mask, 's_Hb_p'] * (1-1e-10)
             pars_df.drop(columns=['s_Hb_p'], inplace=True)
         if {'s_Hb_j', 's_Hj_p', 'E_Hp'}.issubset(pars_df.columns):
             s_Hb_j_mask = np.asarray(mask[:, col_types['output']['all'].index('s_Hb_j')]) == 1
             s_Hj_p_mask = np.asarray(mask[:, col_types['output']['all'].index('s_Hj_p')]) == 1
-            pars_df.loc[s_Hj_p_mask, 'E_Hj'] = pars_df.loc[s_Hj_p_mask, 'E_Hp'] * pars_df.loc[s_Hj_p_mask, 's_Hj_p']
-            pars_df.loc[s_Hj_p_mask, 'E_Hb'] = pars_df.loc[s_Hb_j_mask, 'E_Hj'] * pars_df.loc[s_Hj_p_mask, 's_Hb_j']
+            pars_df.loc[s_Hj_p_mask, 'E_Hj'] = pars_df.loc[s_Hj_p_mask, 'E_Hp'] * pars_df.loc[s_Hj_p_mask, 's_Hj_p'] * (1-1e-10)
+            pars_df.loc[s_Hj_p_mask, 'E_Hb'] = pars_df.loc[s_Hb_j_mask, 'E_Hj'] * pars_df.loc[s_Hj_p_mask, 's_Hb_j'] * (1-1e-10)
             pars_df.drop(columns=['s_Hb_j', 's_Hj_p'], inplace=True)
 
     # If the model did not predict 'E_Hj',
@@ -220,4 +220,4 @@ if __name__ == '__main__':
     gt_df = pd.concat({ds: dfs[ds][col_types['output']['all']] for ds in ('train', 'test')})
     gt_df.reset_index(level=0, names='data_split', inplace=True)
     gt_pars_df = get_core_parameter_predictions(dfs, pred_df=gt_df, col_types=col_types)
-    gt_pars_df.to_csv(f'results/parameter_predictions/AmP_predictions.csv', float_format='%.6e')
+    gt_pars_df.to_csv(f'results/parameter_predictions/AmP_predictions.csv', float_format='%.10e')
