@@ -204,6 +204,10 @@ def get_core_parameter_predictions(dfs, pred_df, col_types):
                 mu_V=DEFAULT_VALUES['mu_V'],
                 w_V=DEFAULT_VALUES['w_V'],
             )
+    
+    # Slightly increase 'E_Hj' to avoid 'E_Hj' == 'E_Hb' after file is saved
+    if 'E_Hj' in pars_df.columns:
+        pars_df['E_Hj'] = pars_df['E_Hj'] * (1 + 1e-10)
 
     # Convert to float
     pars_df[AmP_CORE_DEB_PARS] = pars_df[AmP_CORE_DEB_PARS].astype('float')
