@@ -137,9 +137,8 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
                 # Add distance if DEB models are not the same
                 distance += self.deb_model_factor * (data_queries[q, self.abj_col] + data_indexed[i, self.abj_col])
                 # Add penalty if k_J is not to be estimated for query but was estimated for indexed species
-                incompatible_estim_k_J = (not data_queries[q, self.estim_k_J]) and bool(data_indexed[i, self.estim_k_J])
                 k_J_distance = abs(data_queries[q, self.k_J_col] - data_indexed[i, self.k_J_col])
-                distance += self.PENALTY_NO_ESTIM_k_J * incompatible_estim_k_J * k_J_distance
+                distance += self.PENALTY_NO_ESTIM_k_J * (not data_queries[q, self.estim_k_J]) * k_J_distance
 
                 # In case distance is zero for multiple species during training, add small factor to ensure the nearest
                 # neighbor is itself

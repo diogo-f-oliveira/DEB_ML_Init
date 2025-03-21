@@ -35,7 +35,7 @@ if __name__ == '__main__':
     base_model = TaxonomicKNNRegressor
     config = {
         'ultimate_weight_factor': 0.688,
-        'deb_model_factor': 4,
+        'deb_model_factor': 0.4,
         'n_neighbors': 1,
         'col_types': col_types,
         'output_scaler_type': 'none',
