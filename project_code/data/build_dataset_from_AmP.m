@@ -16,7 +16,7 @@ allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 % allStatPath = [AmPDataFolder 'allStat.mat'];
 % allspeciesFolder = [AmPDataFolder 'species\'];
 saveFolder = [pathsTable{'root', 'path'}{:} '\data\raw';];
-tableSavePath = [saveFolder '\dataset_matlab_20250312.csv'];
+tableSavePath = [saveFolder '\dataset_matlab_20250324.csv'];
 
 %% Get list of species
 
@@ -42,8 +42,9 @@ timeSinceBirthDataCols = {'tg', 'tb', 'tj', 'tx', 'tp'};
 weightDataCols = {'Wwb', 'Wwj', 'Wwx', 'Wwp', 'Wwi'};
 lengthDataCols = {'Lb', 'Lj', 'Lx', 'Lp', 'Li'};
 reproductionDataCols = {'Ri', 'Ni', 'GSI', 'NR'};
-otherCols = {'d_V', 'T_typical', 'f', 't_0', 'model', 'completeness', 'estim_k_J'};
-columnNames = [parameterCols taxonomyCols ecoCodeCols ageDataCols timeSinceBirthDataCols weightDataCols lengthDataCols reproductionDataCols otherCols];
+estimParCols = {'estim_kap', 'estim_p_M', 'estim_k_J'};
+otherCols = {'d_V', 'T_typical', 'f', 't_0', 'model', 'completeness'};
+columnNames = [parameterCols taxonomyCols ecoCodeCols ageDataCols timeSinceBirthDataCols weightDataCols lengthDataCols reproductionDataCols estimParCols otherCols];
 numCols = length(columnNames);
 validModelTypes = {'std', 'stf', 'stx', 'abj'};
 
@@ -62,7 +63,8 @@ varTypes = {
     'double', 'double', 'double', 'double', 'double', ... % weightDataCols
     'double', 'double', 'double', 'double', 'double', ... % lengthDataCols
     'double', 'double', 'double', 'double', ... % reproductionCols
-    'double', 'double', 'double', 'double', 'string', 'double', 'logical',... % otherCols
+    'logical', 'logical', 'logical', ... % estimParCols
+    'double', 'double', 'double', 'double', 'string', 'double', ... % otherCols
     };
 
 % Initialize the table with missing values
@@ -132,9 +134,12 @@ for i=1:numSpecies
         end
     end
     T{speciesName, 'p_Am'} = par.z * par.p_M / par.kap;
-
-    if isfield(par, 'k_J')
-        T{speciesName, 'estim_k_J'} = par.free.k_J;
+    % Save if parameter is estimated
+    for p=1:length(estimParCols)
+        parName = estimParCols{p}(7:end);
+        if isfield(par, parName)
+            T{speciesName, ['estim_' parName]} = par.free.(parName);
+        end
     end
 
     % Fetch taxonomy
