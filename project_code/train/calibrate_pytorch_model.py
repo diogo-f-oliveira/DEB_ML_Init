@@ -113,7 +113,7 @@ if __name__ == '__main__':
         # Optimizer hyperparameters
         'batch_size': tune.choice([1, 2, 4, 8, 16]),
         'learning_rate': tune.qloguniform(1e-5, 1e-2, 1e-5),
-        'weight_decay': tune.qloguniform(1e-5, 1e-1, 1e-5),
+        'weight_decay': tune.qloguniform(1e-4, 1e-1, 1e-4),
         #'max_epochs': 500,
         'max_epochs': tune.qrandint(50, 700, 25),
         'patience': 10,
