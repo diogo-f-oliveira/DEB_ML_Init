@@ -42,7 +42,7 @@ timeSinceBirthDataCols = {'tg', 'tb', 'tj', 'tx', 'tp'};
 weightDataCols = {'Wwb', 'Wwj', 'Wwx', 'Wwp', 'Wwi'};
 lengthDataCols = {'Lb', 'Lj', 'Lx', 'Lp', 'Li'};
 reproductionDataCols = {'Ri', 'Ni', 'GSI', 'NR'};
-estimParCols = {'estim_z', 'estim_kap', 'estim_p_M', 'estim_k_J', 'estim_E_Hb', 'estim_E_Hj', 'estim_E_Hp'};
+estimParCols = {'estim_z', 'estim_kap', 'estim_v', 'estim_p_M', 'estim_k_J', 'estim_E_Hb', 'estim_E_Hj', 'estim_E_Hp'};
 otherCols = {'d_V', 'T_typical', 'f', 't_0', 'model', 'completeness'};
 columnNames = [parameterCols taxonomyCols ecoCodeCols ageDataCols timeSinceBirthDataCols weightDataCols lengthDataCols reproductionDataCols estimParCols otherCols];
 numCols = length(columnNames);
@@ -63,7 +63,7 @@ varTypes = {
     'double', 'double', 'double', 'double', 'double', ... % weightDataCols
     'double', 'double', 'double', 'double', 'double', ... % lengthDataCols
     'double', 'double', 'double', 'double', ... % reproductionCols
-    'logical', 'logical', 'logical', 'logical', 'logical', 'logical', 'logical', ... % estimParCols
+    'logical', 'logical', 'logical', 'logical', 'logical', 'logical', 'logical', 'logical', ... % estimParCols
     'double', 'double', 'double', 'double', 'string', 'double', ... % otherCols
     };
 
