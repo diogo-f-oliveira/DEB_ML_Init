@@ -1,6 +1,7 @@
 import torch
 from sklearn.preprocessing import QuantileTransformer
 from torch.utils.data import TensorDataset, DataLoader
+from ..inference.parameters import get_parameter_mask
 
 DEFAULT_TORCH_DTYPE = torch.float32
 
@@ -10,22 +11,12 @@ def get_output_mask(df, col_types):
     mask_cols = col_types['mask']['all']
     output_mask = torch.ones((df.shape[0], len(output_cols)), dtype=DEFAULT_TORCH_DTYPE)
 
-    # Columns only for `abj` species
-    if 'metamorphosis' in mask_cols:
-        no_metamorphosis_mask = torch.tensor(~df['metamorphosis'].values, dtype=torch.bool)
-        for col in ['s_M', '1/s_M', 's_Hb_bj', 'E_Hj', 's_Hb_j', 's_Hj_p']:
-            if col in output_cols:
-                col_idx = output_cols.index(col)
-                output_mask[no_metamorphosis_mask, col_idx] = 0
-        if {'s_Hb_p', 's_Hb_j', 's_Hj_p'}.issubset(output_cols):
-            s_Hb_p_idx = output_cols.index('s_Hb_p')
-            output_mask[~no_metamorphosis_mask, s_Hb_p_idx] = 0
-
-    # Non-estimated k_J
-    if 'estim_k_J' in mask_cols and 'k_J' in output_cols:
-        no_estim_k_J_mask = torch.tensor(~df['estim_k_J'].values, dtype=torch.bool)
-        k_J_idx = output_cols.index('k_J')
-        output_mask[no_estim_k_J_mask, k_J_idx] = 0
+    for idx, col in enumerate(output_cols):
+        mask_col = f'estim_{col}'
+        if mask_col not in df.columns or mask_col not in mask_cols:
+            raise Warning(f"Mask column for output {col} is missing, assuming no mask is needed.")
+        no_estim_mask = torch.tensor(~df[mask_col].values, dtype=torch.bool)
+        output_mask[no_estim_mask, idx] = 0
 
     return output_mask
 
@@ -89,7 +80,8 @@ def log_standardize_data(data, col_types):
         data_tensors[split] = {
             'input': torch.tensor(df[input_cols].astype('float').values, dtype=DEFAULT_TORCH_DTYPE),
             'output': torch.tensor(df[output_cols].astype('float').values, dtype=DEFAULT_TORCH_DTYPE),
-            'mask': get_output_mask(df=df, col_types=col_types)
+            'mask': get_output_mask(df=df, col_types=col_types),
+            'param_mask': get_parameter_mask(df=df, col_types=col_types),
         }
 
     # Scale the data
