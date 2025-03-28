@@ -124,19 +124,10 @@ def convert_output_to_parameter_predictions(y, y_true, mask, col_types):
     return pars_df
 
 
-def get_core_parameter_predictions(dfs, pred_df, col_types):
+def get_core_parameter_predictions(dfs, pred_df):
     pred_df.index.name = 'species'
-    # X = pd.concat([dfs[ds][col_types['input']['all']] for ds in pred_df['data_split'].unique()]).values
-    y = pred_df.drop(columns=['data_split']).values
-    y_true = pd.concat([dfs[ds][col_types['output']['all']] for ds in pred_df['data_split'].unique()]).values
-    mask = np.concatenate(
-        [get_parameter_mask(df=dfs[ds], col_types=col_types) for ds in pred_df['data_split'].unique()],
-        axis=0)
+    pars_df = pred_df.copy()
 
-    converted_output_df = convert_output_to_parameter_predictions(y=y, y_true=y_true, mask=mask, col_types=col_types)
-    pars_df = pd.DataFrame(converted_output_df.values,
-                           columns=list(converted_output_df.columns),
-                           index=pred_df.index)
     pars_df['data_split'] = pred_df['data_split']
     for col in pred_df.columns:
         if col in AmP_CORE_DEB_PARS and col not in pars_df.columns:

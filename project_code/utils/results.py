@@ -78,7 +78,7 @@ def fetch_best_results_per_model(results_folder, save=False):
 def get_best_model_file(results_folder, model_type=None, metric='MAPE'):
     model_files = os.listdir(os.path.join(results_folder, 'models'))
     best_model_file = None
-    if metric in ['MAPE', 'MSE', 'GEF', 'sMAPE']:
+    if metric in ['MAPE', 'MSE', 'logQ', 'sMAPE']:
         best_score = float('inf')
         method = min
     elif metric in ['R2', 'D2']:
