@@ -113,9 +113,9 @@ def convert_output_to_parameter_predictions(y, y_true, mask, col_types):
     if 'p_Am' not in pars_df.columns:
         if {'s_p_M', 's_M', 'kap', 'E_Hp', 'p_M', 'k_J', 's_M'}.issubset(pars_df.columns):
             pars_df['p_Am'] = np.cbrt(
-                pars_df['k_J'] * pars_df['E_Hp'] * np.power(pars_df['p_M'], 2)
+                (pars_df['k_J'] * pars_df['E_Hp'] * np.power(pars_df['p_M'], 2))
                 /
-                pars_df['s_p_M'] * np.power(pars_df['s_M'], 3) * np.power(pars_df['kap'], 2) * (1 - pars_df['kap'])
+                (pars_df['s_p_M'] * np.power(pars_df['s_M'], 3) * np.power(pars_df['kap'], 2) * (1 - pars_df['kap']))
             )
             pars_df.drop(columns=['s_p_M'], inplace=True)
 
