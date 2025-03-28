@@ -3,7 +3,6 @@ import pandas as pd
 import torch
 
 from ..algorithms.theoretical import predict_E_G_from_theory
-from ..data.prepare_data_sklearn import get_output_mask
 
 PARAMETER_COLS = ['p_Am', 'kap', 'v', 'p_M', 'E_Hb', 'E_Hj', 'E_Hp', 'k_J', 's_M']
 MODEL_DEPENDENT_PARAMETER_COLS = ['E_Hj', 's_M']
@@ -30,37 +29,18 @@ UPPER_BOUNDS = {
 }
 
 
-def impute_predictions_old(y, X, y_true, col_types, default_k_J=DEFAULT_VALUES['k_J']):
-    if torch.is_tensor(y):
-        y = y.clone()
-    else:
-        y = y.copy()
+def get_parameter_mask(df, col_types):
+    mask_cols = col_types['mask']['all']
+    param_mask = np.ones((df.shape[0], len(PARAMETER_COLS)))
 
-    metamorphosis_idx = col_types['input']['all'].index('metamorphosis')
-    no_metamorphosis_mask = X[:, metamorphosis_idx] == 0.0
-    # Impute values for s_M
-    if 's_M' in col_types['output']['all']:
-        s_M_idx = col_types['output']['all'].index('s_M')
-        y[no_metamorphosis_mask, s_M_idx] = y_true[no_metamorphosis_mask, s_M_idx]
-    elif '1/s_M' in col_types['output']['all']:
-        s_M_idx = col_types['output']['all'].index('1/s_M')
-        y[no_metamorphosis_mask, s_M_idx] = y_true[no_metamorphosis_mask, s_M_idx]
+    for idx, par in enumerate(PARAMETER_COLS):
+        mask_col = f'estim_{par}'
+        if mask_col not in df.columns or mask_col not in mask_cols:
+            raise Warning(f"Mask column for parameter {par} is missing, assuming no mask is needed.")
+        no_estim_mask = torch.tensor(~df[mask_col].values, dtype=torch.bool)
+        param_mask[no_estim_mask, idx] = 0
 
-    # Impute values for s_Hb_bj or E_Hj
-    if 's_Hb_bj' in col_types['output']['all']:
-        s_Hb_bj_idx = col_types['output']['all'].index('s_Hb_bj')
-        y[no_metamorphosis_mask, s_Hb_bj_idx] = y_true[no_metamorphosis_mask, s_Hb_bj_idx]
-    elif 'E_Hj' in col_types['output']['all'] and 'E_Hb' in col_types['output']['all']:
-        E_Hb_idx = col_types['output']['all'].index('E_Hb')
-        E_Hj_idx = col_types['output']['all'].index('E_Hj')
-        y[no_metamorphosis_mask, E_Hj_idx] = y_true[no_metamorphosis_mask, E_Hb_idx]
-
-    if 'k_J' in col_types['output']['all']:
-        k_J_idx = col_types['output']['all'].index('k_J')
-        default_k_J_mask = y_true[:, k_J_idx] == default_k_J
-        y[default_k_J_mask, k_J_idx] = y_true[default_k_J_mask, k_J_idx]
-
-    return y
+    return param_mask
 
 
 def impute_predictions(y, y_true, mask):
@@ -96,14 +76,18 @@ def convert_output_to_parameter_predictions(y, y_true, mask, col_types):
         pars_df['E_Hj'] = np.nan
         if {'s_Hb_p', 'E_Hp'}.issubset(pars_df.columns):
             s_Hb_p_mask = np.asarray(mask[:, col_types['output']['all'].index('s_Hb_p')]) == 1
-            pars_df.loc[s_Hb_p_mask, 'E_Hb'] = pars_df.loc[s_Hb_p_mask, 'E_Hp'] * pars_df.loc[s_Hb_p_mask, 's_Hb_p'] * (1-1e-10)
-            pars_df.loc[s_Hb_p_mask, 'E_Hj'] = pars_df.loc[s_Hb_p_mask, 'E_Hp'] * pars_df.loc[s_Hb_p_mask, 's_Hb_p'] * (1-1e-10)
+            pars_df.loc[s_Hb_p_mask, 'E_Hb'] = pars_df.loc[s_Hb_p_mask, 'E_Hp'] * pars_df.loc[s_Hb_p_mask, 's_Hb_p'] * (
+                    1 - 1e-10)
+            pars_df.loc[s_Hb_p_mask, 'E_Hj'] = pars_df.loc[s_Hb_p_mask, 'E_Hp'] * pars_df.loc[s_Hb_p_mask, 's_Hb_p'] * (
+                    1 - 1e-10)
             pars_df.drop(columns=['s_Hb_p'], inplace=True)
         if {'s_Hb_j', 's_Hj_p', 'E_Hp'}.issubset(pars_df.columns):
             s_Hb_j_mask = np.asarray(mask[:, col_types['output']['all'].index('s_Hb_j')]) == 1
             s_Hj_p_mask = np.asarray(mask[:, col_types['output']['all'].index('s_Hj_p')]) == 1
-            pars_df.loc[s_Hj_p_mask, 'E_Hj'] = pars_df.loc[s_Hj_p_mask, 'E_Hp'] * pars_df.loc[s_Hj_p_mask, 's_Hj_p'] * (1-1e-10)
-            pars_df.loc[s_Hj_p_mask, 'E_Hb'] = pars_df.loc[s_Hb_j_mask, 'E_Hj'] * pars_df.loc[s_Hj_p_mask, 's_Hb_j'] * (1-1e-10)
+            pars_df.loc[s_Hj_p_mask, 'E_Hj'] = pars_df.loc[s_Hj_p_mask, 'E_Hp'] * pars_df.loc[s_Hj_p_mask, 's_Hj_p'] * (
+                    1 - 1e-10)
+            pars_df.loc[s_Hj_p_mask, 'E_Hb'] = pars_df.loc[s_Hb_j_mask, 'E_Hj'] * pars_df.loc[s_Hj_p_mask, 's_Hb_j'] * (
+                    1 - 1e-10)
             pars_df.drop(columns=['s_Hb_j', 's_Hj_p'], inplace=True)
 
     # If the model did not predict 'E_Hj',
@@ -125,43 +109,15 @@ def convert_output_to_parameter_predictions(y, y_true, mask, col_types):
             pars_df['E_Hb'] = pars_df['s_Hb_bj'] * pars_df['E_Hj']
             pars_df.drop(columns=['s_Hb_bj'], inplace=True)
 
-    # If the model predicts 's_p' instead of 'p_M', compute 'p_M'
-    if 'p_M' not in pars_df.columns:
-        if {'s_p', 'kap', 'E_Hp', 'p_Am', 'k_J'}.issubset(pars_df.columns):
-            pars_df['p_M'] = np.sqrt(
-                pars_df['s_p'] * np.power(pars_df['kap'], 2) * (1 - pars_df['kap']) * np.power(pars_df['p_Am'], 3)
+    # If the model predicts 's_p_M' instead of 'p_Am'
+    if 'p_Am' not in pars_df.columns:
+        if {'s_p_M', 's_M', 'kap', 'E_Hp', 'p_M', 'k_J', 's_M'}.issubset(pars_df.columns):
+            pars_df['p_Am'] = np.cbrt(
+                pars_df['k_J'] * pars_df['E_Hp'] * np.power(pars_df['p_M'], 2)
                 /
-                pars_df['k_J'] / pars_df['E_Hp']
-            )
-            pars_df.drop(columns=['s_p'], inplace=True)
-        elif {'s_p_M', 's_M', 'kap', 'E_Hp', 'p_Am', 'k_J', 's_M'}.issubset(pars_df.columns):
-            pars_df['p_M'] = np.sqrt(
-                pars_df['s_p_M'] * np.power(pars_df['s_M'], 3) * np.power(pars_df['p_Am'], 3) *
-                np.power(pars_df['kap'], 2) * (1 - pars_df['kap'])
-                /
-                pars_df['k_J'] / pars_df['E_Hp']
+                pars_df['s_p_M'] * np.power(pars_df['s_M'], 3) * np.power(pars_df['kap'], 2) * (1 - pars_df['kap'])
             )
             pars_df.drop(columns=['s_p_M'], inplace=True)
-
-    # If the model did not predict 'k_J', set it to default value
-    if 'k_J' not in pars_df.columns:
-        if {'s_p', 'kap', 'p_Am', 'p_M', 'E_Hp'}.issubset(pars_df.columns):
-            pars_df['k_J'] = (
-                    pars_df['s_p'] * np.power(pars_df['kap'], 2) * (1 - pars_df['kap']) * np.power(pars_df['p_Am'], 3)
-                    /
-                    np.power(pars_df['p_M'], 2) / pars_df['E_Hp']
-            )
-            pars_df.drop(columns=['s_p'], inplace=True)
-        elif {'s_p_M', 's_M', 'p_Am', 'kap', 'p_M', 'E_Hp'}.issubset(pars_df.columns):
-            pars_df['k_J'] = (
-                    pars_df['s_p_M'] * np.power(pars_df['s_M'], 3) * np.power(pars_df['p_Am'], 3)
-                    * np.power(pars_df['kap'], 2) * (1 - pars_df['kap'])
-                    /
-                    np.power(pars_df['p_M'], 2) / pars_df['E_Hp']
-            )
-            pars_df.drop(columns=['s_p_M'], inplace=True)
-        else:
-            pars_df['k_J'] = DEFAULT_VALUES['k_J']
 
     pars_df = pars_df[PARAMETER_COLS].copy()
 
@@ -173,8 +129,9 @@ def get_core_parameter_predictions(dfs, pred_df, col_types):
     # X = pd.concat([dfs[ds][col_types['input']['all']] for ds in pred_df['data_split'].unique()]).values
     y = pred_df.drop(columns=['data_split']).values
     y_true = pd.concat([dfs[ds][col_types['output']['all']] for ds in pred_df['data_split'].unique()]).values
-    mask = np.concatenate([get_output_mask(df=dfs[ds], col_types=col_types) for ds in pred_df['data_split'].unique()],
-                          axis=0)
+    mask = np.concatenate(
+        [get_parameter_mask(df=dfs[ds], col_types=col_types) for ds in pred_df['data_split'].unique()],
+        axis=0)
 
     converted_output_df = convert_output_to_parameter_predictions(y=y, y_true=y_true, mask=mask, col_types=col_types)
     pars_df = pd.DataFrame(converted_output_df.values,
@@ -204,7 +161,7 @@ def get_core_parameter_predictions(dfs, pred_df, col_types):
                 mu_V=DEFAULT_VALUES['mu_V'],
                 w_V=DEFAULT_VALUES['w_V'],
             )
-    
+
     # Slightly increase 'E_Hj' to avoid 'E_Hj' == 'E_Hb' after file is saved
     if 'E_Hj' in pars_df.columns:
         pars_df['E_Hj'] = pars_df['E_Hj'] * (1 + 1e-10)
@@ -217,7 +174,7 @@ def get_core_parameter_predictions(dfs, pred_df, col_types):
 
 
 if __name__ == '__main__':
-    from ..data.load_data import load_dataframes, load_col_types
+    from ..data.load_data import load_dataframes
 
     dataset_name = 'biologist_no_pub_age'
     dfs, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_test')
