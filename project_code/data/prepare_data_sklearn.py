@@ -5,6 +5,8 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler, RobustScaler, Qu
     FunctionTransformer
 import numpy as np
 
+from ..inference.parameters import get_parameter_mask
+
 
 class LogScaleClipTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, all_col_names, log_col_names=None, clip_col_names=None, scale_col_names=None,
@@ -135,6 +137,21 @@ def get_output_mask(df, col_types):
     mask_cols = col_types['mask']['all']
     output_mask = np.ones((df.shape[0], len(output_cols)))
 
+    for idx, col in enumerate(output_cols):
+        mask_col = f'estim_{col}'
+        if mask_col not in df.columns or mask_col not in mask_cols:
+            raise Warning(f"Mask column for output {col} is missing, assuming no mask is needed.")
+        no_estim_mask = ~df[mask_col].values
+        output_mask[no_estim_mask, idx] = 0
+
+    return output_mask
+
+
+def get_output_mask_old(df, col_types):
+    output_cols = col_types['output']['all']
+    mask_cols = col_types['mask']['all']
+    output_mask = np.ones((df.shape[0], len(output_cols)))
+
     # Columns only for `abj` species
     if 'metamorphosis' in mask_cols:
         no_metamorphosis_mask = ~df['metamorphosis'].values
@@ -167,12 +184,14 @@ def get_features_targets(data, col_types):
         if output_values.shape[1] == 1:
             output_values = output_values.ravel()
         # Compute output mask
-        mask = get_output_mask(df, col_types)
+        mask = get_output_mask(df=df, col_types=col_types)
+        param_mask = get_parameter_mask(df=df, col_types=col_types)
         # Pack data
         features_targets[split] = {
             'input': input_values,
             'output': output_values,
-            'mask': mask
+            'mask': mask,
+            'param_mask': param_mask
         }
     return features_targets
 

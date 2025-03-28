@@ -70,7 +70,7 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
     """
     LINEAR_SCALING_COLS = ['p_Am', 'h_a']
     CUBE_SCALING_COLS = ['E_Hb', 'E_Hj', 'E_Hx', 'E_Hp']
-    PENALTY_NO_ESTIM_k_J = 10000
+    PENALTY_NO_ESTIM = 100
 
     def __init__(self, col_types, taxonomy_encoder, n_neighbors=1, use_scaling_relationships=True,
                  ultimate_weight_factor=0.01, deb_model_factor=0):
@@ -88,10 +88,17 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
         self.wi_col = col_types['input']['all'].index('Wwi')
         self.ultimate_weight_factor = ultimate_weight_factor
 
-        if 'estim_k_J' not in col_types['input']['all']:
-            raise Exception("Missing column 'estim_k_J' that says whether k_J is to be estimated")
-        self.estim_k_J = col_types['input']['all'].index('estim_k_J')
-        self.k_J_col = col_types['input']['all'].index('k_J')
+        self.input_col_idx_dict = {}
+        self.estim_col_idx_dict = {}
+        for col in self.output_col_idx_dict:
+            self.input_col_idx_dict[col] = col_types['input']['all'].index(col)
+            if col not in col_types['input']['all']:
+                raise Exception(f"Missing {col} column in inputs. Unable to compute fixed parameter distance.")
+
+            estim_col = f"estim_{col}"
+            if estim_col not in col_types['input']['all']:
+                raise Exception(f"Missing column 'estim_{col}' that says whether {col} is to be estimated")
+            self.estim_col_idx_dict[col] = col_types['input']['all'].index(estim_col)
 
         if 'metamorphosis' not in col_types['input']['all']:
             raise Exception("Missing column 'metamorphosis' to differentiate DEB models of species")
@@ -118,6 +125,20 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
                 distance += 1
         return distance
 
+    @staticmethod
+    def _ultimate_weight_distance(wi_q, wi_i):
+        return abs(wi_q - wi_i)
+
+    def _fixed_par_distance(self, data_q, data_i):
+        distance = 0
+        for col, col_idx in self.input_col_idx_dict.items():
+            estim_col_idx = self.estim_col_idx_dict[col]
+            no_estim = (not data_q[estim_col_idx])
+            if no_estim:
+                par_distance = abs(np.log(data_q[col_idx]) - np.log(data_i[col_idx]))
+                distance += par_distance
+        return distance
+
     def _compute_distance_matrix(self, data_queries, data_indexed, data_split='test'):
         # Compute pairwise distances between all elements in data_a and data_b
         n_queries, n_indexed = data_queries.shape[0], data_indexed.shape[0]
@@ -131,14 +152,22 @@ class TaxonomicKNNRegressor(BaseEstimator, RegressorMixin):
                     tax2=data_indexed[i, self.taxonomy_cols]
                 )
                 # Get weight distance
-                weight_distance = abs(data_queries[q, self.wi_col] - data_indexed[i, self.wi_col])
+                weight_distance = self._ultimate_weight_distance(
+                    wi_q=data_queries[q, self.wi_col],
+                    wi_i=data_indexed[i, self.wi_col]
+                )
+                # Get fixed par distance
+                fixed_par_distance = self._fixed_par_distance(
+                    data_q=data_queries[q],
+                    data_i=data_indexed[i],
+                )
                 # Add distance between ultimate weights
-                distance = (taxonomy_distance + weight_distance * self.ultimate_weight_factor)
+                distance = (taxonomy_distance +
+                            self.ultimate_weight_factor * weight_distance +
+                            self.PENALTY_NO_ESTIM * fixed_par_distance)
+
                 # Add distance if DEB models are not the same
                 distance += self.deb_model_factor * (data_queries[q, self.abj_col] + data_indexed[i, self.abj_col])
-                # Add penalty if k_J is not to be estimated for query but was estimated for indexed species
-                k_J_distance = abs(data_queries[q, self.k_J_col] - data_indexed[i, self.k_J_col])
-                distance += self.PENALTY_NO_ESTIM_k_J * (not data_queries[q, self.estim_k_J]) * k_J_distance
 
                 # In case distance is zero for multiple species during training, add small factor to ensure the nearest
                 # neighbor is itself

@@ -89,9 +89,6 @@ def grid_search_calibration(base_model, search_space, data, col_types, scorer=No
 def evaluate_config(config, base_model, col_types, data, random_state=42, n_splits=5, stratify=None,
                     report_metrics=False, verbose=False):
     X_train = data['input']
-    y_train = data['output']
-    mask_train = data['mask']
-    # Set random state
     if random_state in inspect.signature(base_model.__init__).parameters:
         config['random_state'] = random_state
 
@@ -110,11 +107,7 @@ def evaluate_config(config, base_model, col_types, data, random_state=42, n_spli
     cv_metrics_df = pd.DataFrame(columns=list(METRIC_LABEL_TO_NAME.values()))
     for i, (train_index, val_index) in enumerate(cv.split(X_train, stratify_col)):
         # Get fold training data
-        fold_train_data = {
-            'input': X_train[train_index],
-            'output': y_train[train_index],
-            'mask': mask_train[train_index],
-        }
+        fold_train_data = {sp: d[train_index] for sp, d in data.items()}
         # Train model
         model = train_sklearn_model(
             base_model=base_model,
@@ -124,7 +117,8 @@ def evaluate_config(config, base_model, col_types, data, random_state=42, n_spli
             random_state=random_state
         )
         # Evaluate on fold validation data
-        fold_val_data = {'input': X_train[val_index], 'output': y_train[val_index], 'mask': mask_train[val_index]}
+        fold_val_data = {sp: d[val_index] for sp, d in data.items()}
+
         fold_metrics_df = evaluate_parameter_predictions_on_data(
             data=fold_val_data,
             col_types=col_types,
@@ -305,11 +299,11 @@ if __name__ == '__main__':
 
     # Train multioutput models
     multi_output_models_to_train = [
-        #'MultiTaskElasticNet',
+        # 'MultiTaskElasticNet',
         'RandomForestRegressor',
     ]
     model_names = {
-        #'RandomForestRegressor': 'RandomForest',
+        # 'RandomForestRegressor': 'RandomForest',
         'MultiTaskElasticNet': 'ElasticNet',
     }
 
