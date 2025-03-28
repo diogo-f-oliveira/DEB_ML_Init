@@ -37,7 +37,7 @@ def evaluate_parameter_predictions_on_data(data, col_types, model, print_score=F
         ]
     )
     if print_score:
-        print(f"GEF: {metrics_df['log_accuracy_ratio'].mean():.4f}")
+        print(f"logQ: {metrics_df['log_accuracy_ratio'].mean():.4f}")
         print(tabulate(metrics_df, headers='keys', tablefmt='simple'))
 
     if save_score:

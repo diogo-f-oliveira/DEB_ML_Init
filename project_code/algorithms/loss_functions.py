@@ -57,9 +57,9 @@ class MSEInfeasibilityLoss(nn.Module):
         mse_loss = self.criterion(outputs, targets, mask)
 
         # kap must be smaller than 1
-        kappa_loss = self.kappa_loss(outputs)
+        kappa_loss = self.kappa_loss(outputs, mask)
         # Must reach puberty
-        reach_pub_loss = self.reach_puberty_loss(outputs)
+        reach_pub_loss = self.reach_puberty_loss(outputs, mask)
         # Maturity levels must increase
         mat_levels_loss = self.maturity_levels_loss(outputs, mask)
 
@@ -67,15 +67,15 @@ class MSEInfeasibilityLoss(nn.Module):
 
         return torch.dot(self.loss_values, self.lambdas)
 
-    def kappa_loss(self, outputs):
-        kap_idx = self.bounded_col_idx[0]
+    def kappa_loss(self, outputs, mask):
+        idx_kap = self.bounded_col_idx[0]
         upper_bound = self.upper_bounds[0]
-        return torch.mean(torch.square(torch.relu(outputs[:, kap_idx] - upper_bound)))
+        return torch.mean(mask[:, idx_kap] * torch.square(torch.relu(outputs[:, idx_kap] - upper_bound)))
 
-    def reach_puberty_loss(self, outputs):
-        s_p_idx = self.bounded_col_idx[1]
+    def reach_puberty_loss(self, outputs, mask):
+        idx_s_p_M = self.bounded_col_idx[1]
         upper_bound = self.upper_bounds[1]
-        return torch.mean(torch.square(torch.relu(outputs[:, s_p_idx] - upper_bound)))
+        return torch.mean(mask[:, idx_s_p_M] * torch.square(torch.relu(outputs[:, idx_s_p_M] - upper_bound)))
 
     def maturity_levels_loss(self, outputs, mask):
         # Penalty for E_Hj > E_Hb
@@ -86,12 +86,12 @@ class MSEInfeasibilityLoss(nn.Module):
         # Penalty for E_Hj > E_Hb
         idx_s_Hj_p = self.bounded_col_idx[3]
         ub_s_Hj_p = self.upper_bounds[3]
-        penalty_s_Hj_p = torch.square(torch.relu(outputs[:, idx_s_Hj_p] - ub_s_Hj_p))
+        penalty_s_Hj_p = mask[:, idx_s_Hj_p] * torch.square(torch.relu(outputs[:, idx_s_Hj_p] - ub_s_Hj_p))
 
         # Penalty for E_Hp > E_Hb
         idx_s_Hb_p = self.bounded_col_idx[4]
         ub_s_Hb_p = self.upper_bounds[4]
-        penalty_s_Hb_p = torch.square(torch.relu(outputs[:, idx_s_Hb_p] - ub_s_Hb_p))
+        penalty_s_Hb_p = mask[:, idx_s_Hb_p] * torch.square(torch.relu(outputs[:, idx_s_Hb_p] - ub_s_Hb_p))
 
         return torch.mean(penalty_s_Hb_j + penalty_s_Hj_p + penalty_s_Hb_p)
 
