@@ -53,44 +53,51 @@
             "category"
         ]
     },
-    "p_Am": {
+    "p_M": {
         "classes": [
+            "input",
             "output"
         ],
         "qualifiers": []
     },
     "kap": {
         "classes": [
+            "input",
             "output"
         ],
         "qualifiers": []
     },
     "v": {
         "classes": [
+            "input",
             "output"
         ],
         "qualifiers": []
     },
     "s_p_M": {
         "classes": [
+            "input",
             "output"
         ],
         "qualifiers": []
     },
     "E_Hb": {
         "classes": [
+            "input",
             "output"
         ],
         "qualifiers": []
     },
     "E_Hj": {
         "classes": [
+            "input",
             "output"
         ],
         "qualifiers": []
     },
     "E_Hp": {
         "classes": [
+            "input",
             "output"
         ],
         "qualifiers": []
@@ -104,6 +111,7 @@
     },
     "s_M": {
         "classes": [
+            "input",
             "output"
         ],
         "qualifiers": []
@@ -117,9 +125,89 @@
             "boolean"
         ]
     },
+    "estim_p_M": {
+        "classes": [
+            "input",
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "estim_v": {
+        "classes": [
+            "input",
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "estim_kap": {
+        "classes": [
+            "input",
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
     "estim_k_J": {
         "classes": [
             "input",
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "estim_E_Hb": {
+        "classes": [
+            "input",
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "estim_E_Hj": {
+        "classes": [
+            "input",
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "estim_E_Hp": {
+        "classes": [
+            "input",
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "estim_s_M": {
+        "classes": [
+            "input",
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "estim_s_p_M": {
+        "classes": [
+            "input",
+            "mask"
+        ],
+        "qualifiers": [
+            "boolean"
+        ]
+    },
+    "estim_p_Am": {
+        "classes": [
             "mask"
         ],
         "qualifiers": [
