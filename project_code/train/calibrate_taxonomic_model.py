@@ -55,7 +55,7 @@ if __name__ == '__main__':
             search_space=search_space,
             data=data,
             col_types=col_types,
-            metric='GEF',
+            metric='logQ',
             mode='min',
             num_samples=50,
             #max_concurrent_trials=None,

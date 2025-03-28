@@ -1,9 +1,5 @@
 import inspect
 
-import numpy as np
-from tabulate import tabulate
-import pandas as pd
-
 from ..algorithms.build_sklearn_model import build_sklearn_model
 
 

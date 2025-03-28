@@ -145,7 +145,7 @@ def evaluate_config(config, base_model, col_types, data, random_state=42, n_spli
 
 
 def hyperopt_calibration(base_model, search_space, data, col_types,
-                         num_samples=100, metric='GEF', mode='min', current_best_params=None,
+                         num_samples=100, metric='logQ', mode='min', current_best_params=None,
                          run_name=None, model_name=None, tune_dir=None, max_concurrent_trials=None,
                          evaluate_on_test=False, save_best_model=False,
                          save_folder='', random_state=42,
@@ -326,7 +326,7 @@ if __name__ == '__main__':
             evaluate_on_test=True,
             save_best_model=True,
             save_folder=f'results/{dataset_name}',
-            metric='GEF',
+            metric='logQ',
             mode='min',
             num_samples=150,
             max_concurrent_trials=24,

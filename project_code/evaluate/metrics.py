@@ -100,12 +100,12 @@ def mean_deb_loss(y_true, y_pred, *, sample_weight=None, multioutput="raw_values
         raise ValueError("multioutput must be 'raw_values', 'uniform_average', or array-like of weights.")
 
 
-def geometric_error_factor(y_true, y_pred, *, sample_weight=None, multioutput='raw_values'):
+def log_accuracy_ratio(y_true, y_pred, *, sample_weight=None, exponentiate=False, multioutput='raw_values'):
     """
-    Compute the geometric error factor between true and predicted values.
+    Compute the logarithm of the accuracy ratio.
 
     The geometric error factor is defined as:
-        GEF = exp( mean( | ln( y_pred / y_true ) | ) )
+        log Q = mean( | ln( y_pred / y_true ) | )
     For multioutput data, the metric is computed per output (i.e. along axis 0) and then
     aggregated according to the `multioutput` parameter.
 
@@ -116,6 +116,12 @@ def geometric_error_factor(y_true, y_pred, *, sample_weight=None, multioutput='r
 
     y_pred : array-like of shape (n_samples,) or (n_samples, n_outputs)
         Predicted values. All elements must be positive.
+
+    sample_weight: array_like of shape (n_samples,)
+        Sample weights.
+
+    exponentiate: boolean, default False
+        If true, returns exp(log Q).
 
     multioutput : {"raw_values", "uniform_average"} or array-like of shape (n_outputs,), default="uniform_average"
         Defines aggregating of multiple output errors:
@@ -140,10 +146,10 @@ def geometric_error_factor(y_true, y_pred, *, sample_weight=None, multioutput='r
     >>> y_true = np.array([[10, 100], [20, 200], [30, 300]])
     >>> y_pred = np.array([[11, 95], [19, 210], [29, 310]])
     >>> # Return a weighted average (default uniform average)
-    >>> geometric_error_factor(y_true, y_pred)
+    >>> log_accuracy_ratio(y_true, y_pred)
     1.055...
     >>> # Return raw error per output
-    >>> geometric_error_factor(y_true, y_pred, multioutput="raw_values")
+    >>> log_accuracy_ratio(y_true, y_pred, multioutput="raw_values")
     array([1.052..., 1.058...])
     """
     y_true = np.asarray(y_true)
@@ -173,18 +179,21 @@ def geometric_error_factor(y_true, y_pred, *, sample_weight=None, multioutput='r
         mean_log_error = np.mean(log_errors, axis=0)
 
     # Exponentiate the mean log error to get the geometric error factor per output
-    gef = np.exp(mean_log_error)
+    if exponentiate:
+        log_acc_ratio = np.exp(mean_log_error)
+    else:
+        log_acc_ratio = mean_log_error
 
     # Aggregate results according to multioutput parameter
     if multioutput == "raw_values":
-        return gef
+        return log_acc_ratio
     elif multioutput == "uniform_average":
-        return np.mean(gef)
+        return np.mean(log_acc_ratio)
     elif isinstance(multioutput, (list, np.ndarray)):
         weights = np.asarray(multioutput)
-        if weights.shape[0] != gef.shape[0]:
+        if weights.shape[0] != log_acc_ratio.shape[0]:
             raise ValueError("Weights must have the same length as the number of outputs.")
-        return np.average(gef, weights=weights)
+        return np.average(log_acc_ratio, weights=weights)
     else:
         raise ValueError("multioutput must be 'raw_values', 'uniform_average', or array-like of weights.")
 

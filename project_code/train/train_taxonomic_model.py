@@ -57,9 +57,9 @@ if __name__ == '__main__':
                                     verbose=True,
                                     )
 
-    cv_gef = cv_metrics_df['GEF'].mean()
+    cv_logQ = cv_metrics_df['logQ'].mean()
     print(cv_metrics_df)
-    print(f"CV GEF:  {cv_gef:.4f} \n")
+    print(f"CV logQ:  {cv_logQ:.4f} \n")
 
     taxo1nn = train_sklearn_model(
         base_model=base_model,
@@ -69,8 +69,8 @@ if __name__ == '__main__':
     )
 
     model_name = 'SRTaxo1NN' if config['use_scaling_relationships'] else 'Taxo1NN'
-    formatted_score = format(cv_gef, '.4e').replace('.', '')
-    best_model_name = f'GEF_{formatted_score}_{model_name}'
+    formatted_score = format(cv_logQ, '.4e').replace('.', '')
+    best_model_name = f'logQ_{formatted_score}_{model_name}'
 
     save_folder = f'results/{dataset_name}'
     test_performance_save_folder = os.path.join(save_folder, 'test_performance')

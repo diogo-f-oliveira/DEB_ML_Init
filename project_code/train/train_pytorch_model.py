@@ -48,11 +48,12 @@ def train_neural_network(config, model_class, dataset_name,
         device = torch.device(device if torch.cuda.is_available() else 'cpu')
 
     # Load and preprocess data
-    data, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_val_test', datasets_folder=datasets_folder)
+    dataframes, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_val_test',
+                                            datasets_folder=datasets_folder)
     # col_types = load_col_types(dataset_name=dataset_name, datasets_folder=datasets_folder)
     create_results_directories_for_dataset(dataset_name)
 
-    data_tensors, dataloaders, datasets, scalers = prepare_data_tensors(data=data, col_types=col_types,
+    data_tensors, dataloaders, datasets, scalers = prepare_data_tensors(data=dataframes, col_types=col_types,
                                                                         batch_size=config['batch_size'],
                                                                         scaling_type=config['scaling_type'],
                                                                         device=device)
@@ -84,7 +85,6 @@ def train_neural_network(config, model_class, dataset_name,
 
     # Create optimizer
     optimizer = optim.AdamW(model.parameters(), lr=config['learning_rate'], weight_decay=config['weight_decay'])
-
 
     # Get training configuration from config
     max_epochs = config['max_epochs']
@@ -135,14 +135,14 @@ def train_neural_network(config, model_class, dataset_name,
         )
         traces_df.loc[epoch, metric_name_list] = epoch_metrics_df.mean().rename(METRIC_LABEL_TO_NAME)
 
+        print(f"\nEpoch [{epoch + 1}/{max_epochs}], "
+              f"Loss: {traces_df.loc[epoch, 'train_loss']:.4f}, "
+              f"Val Loss: {traces_df.loc[epoch, 'val_loss']:.4f}, "
+              f"Val logQ: {traces_df.loc[epoch, 'logQ']:.4f}, "
+              f"Val sMAPE: {traces_df.loc[epoch, 'sMAPE']:.4f}, "
+              f"Val MAPE: {traces_df.loc[epoch, 'MAPE']:.4f}, "
+              f"{epochs_no_improve}")
         if verbose:
-            print(f"\nEpoch [{epoch + 1}/{max_epochs}], "
-                  f"Loss: {traces_df.loc[epoch, 'train_loss']:.4f}, "
-                  f"Val Loss: {traces_df.loc[epoch, 'val_loss']:.4f}, "
-                  f"Val MAPE: {traces_df.loc[epoch, 'MAPE']:.4f}, "
-                  f"Val sMAPE: {traces_df.loc[epoch, 'sMAPE']:.4f}, "
-                  f"Val GEF: {traces_df.loc[epoch, 'GEF']:.4f}, "
-                  f"{epochs_no_improve}")
             if config['loss_function'] == 'mse_infeasibility':
                 print(criterion.loss_values)
 
@@ -207,7 +207,7 @@ if __name__ == '__main__':
         'use_skip_connections': False,
         'n_epochs_gradient_descent': 0,
         'patience': 10,
-        # 'early_stopping_metric': 'GEF',
+        # 'early_stopping_metric': 'logQ',
         'early_stopping_metric': None,
     }
     print(config)
@@ -229,7 +229,7 @@ if __name__ == '__main__':
         report_val_scores=False,
         device=device,
     )
-    formatted_metric = 'GEF'
+    formatted_metric = 'logQ'
     formatted_score = format(best_epoch_metrics_df[formatted_metric], '.4e').replace('.', '')
     best_model_name = f'{formatted_metric}_{formatted_score}_{model_name}'
     test_performance_save_folder = os.path.join(save_folder, 'test_performance')

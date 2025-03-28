@@ -119,7 +119,7 @@ if __name__ == '__main__':
         'patience': 10,
         'n_epochs_gradient_descent': 0,
         'early_stopping_metric': None,
-        # 'early_stopping_metric': 'GEF',
+        # 'early_stopping_metric': 'logQ',
 
         # Architecture hyperparameters
         'scaling_type': 'log_standardize',
@@ -165,7 +165,7 @@ if __name__ == '__main__':
             search_space['par_hidden_size'] = 0
             search_space['use_skip_connections'] = False
 
-        metric = 'GEF'
+        metric = 'logQ'
 
         if 'no_k_J' in dataset_name:
             model_name += 'nokJ'        
