@@ -134,15 +134,15 @@ def train_neural_network(config, model_class, dataset_name,
             print_score=verbose and (epoch + 1) % print_val_metrics_every == 0,
         )
         traces_df.loc[epoch, metric_name_list] = epoch_metrics_df.mean().rename(METRIC_LABEL_TO_NAME)
-
-        print(f"\nEpoch [{epoch + 1}/{max_epochs}], "
-              f"Loss: {traces_df.loc[epoch, 'train_loss']:.4f}, "
-              f"Val Loss: {traces_df.loc[epoch, 'val_loss']:.4f}, "
-              f"Val logQ: {traces_df.loc[epoch, 'logQ']:.4f}, "
-              f"Val sMAPE: {traces_df.loc[epoch, 'sMAPE']:.4f}, "
-              f"Val MAPE: {traces_df.loc[epoch, 'MAPE']:.4f}, "
-              f"{epochs_no_improve}")
+        
         if verbose:
+            print(f"\nEpoch [{epoch + 1}/{max_epochs}], "
+                f"Loss: {traces_df.loc[epoch, 'train_loss']:.4f}, "
+                f"Val Loss: {traces_df.loc[epoch, 'val_loss']:.4f}, "
+                f"Val logQ: {traces_df.loc[epoch, 'logQ']:.4f}, "
+                f"Val sMAPE: {traces_df.loc[epoch, 'sMAPE']:.4f}, "
+                f"Val MAPE: {traces_df.loc[epoch, 'MAPE']:.4f}, "
+                f"{epochs_no_improve}")
             if config['loss_function'] == 'mse_infeasibility':
                 print(criterion.loss_values)
 

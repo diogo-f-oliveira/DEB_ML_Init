@@ -130,9 +130,6 @@ if isfolder(speciesFolder)
         [par, metaPar, ~] = feval(['pars_init_' speciesName], metaData);
     end
     
-    % Make sure both p_M and kap are free
-    par.free.p_M = 1;
-    par.free.kap = 1;
     % Replace parameters in par
     predPar = par;
     for p=1:length(predParNames)

@@ -42,7 +42,11 @@ if __name__ == '__main__':
         'use_scaling_relationships': True,
         'deb_model_factor': 0,                        
     }
-    for model_name in ['Taxo1NN', 'SRTaxo1NN']:
+    model_name_list = [
+        'SRTaxo1NN', 
+        # 'Taxo1NN'
+        ]
+    for model_name in model_name_list:
     #model_name = 'SRTaxo1NN' if search_space['use_scaling_relationships'] else 'Taxo1NN'
         if 'SR' in model_name:
             search_space['use_scaling_relationships'] = True
