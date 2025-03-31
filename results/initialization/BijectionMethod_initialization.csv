@@ -1,0 +1,139 @@
+Row,data_split,deb_loss,convergence,n_runs,n_iter,execution_time,error,error_message
+Ablennes_hians,test,0.022362771989121,0,14,7000,754.9594601,0,
+Acanthogobius_flavimanus,test,0.203531229152447,0,10,5000,263.8902046,0,
+Acanthopagrus_arabicus,test,0.0476100063279791,0,4,2000,129.2378976,0,
+Achoerodus_gouldii,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Acipenser_ruthenus,test,0.203070131439367,0,4,2000,105.078546,0,
+Acipenser_sturio,test,0,0,0,0,0.8514435,1,"The logical indices contain a true value outside of the array bounds."
+Acrocheilus_alutaceus,test,0.0996434375521313,0,7,3500,231.4436115,0,
+Aethaloperca_rogaa,test,0.0282764979698612,0,4,2000,160.4950489,0,
+Alaskozetes_antarcticus,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Ammodytes_personatus,test,0.0942609780730165,0,7,3500,215.9691601,0,
+Amphiprion_ocellaris,test,0.245372833953598,0,3,1500,100.4947179,0,
+Anchoa_panamensis,test,0.0545675796310651,0,8,4000,250.5353631,0,
+Anolis_gundlachi,test,0.0769267598504153,0,3,1500,70.3678404,0,
+Apeltes_quadracus,test,0.261749550160823,1,24,11604,988.303467,0,
+Astyanax_bimaculatus,test,0.00406568300877515,0,9,4500,777.1920264,0,
+Auxis_thazard,test,0.125569718826554,0,11,5500,927.1177657,0,
+Batagur_affinis,test,0.0554523984517937,0,6,3000,157.9342121,0,
+Brachymystax_lenok,test,0.0878677456376526,0,11,5500,336.901914,0,
+Cancer_pagurus,test,1.15863479076095,0,16,8000,2466.4721726,0,
+Caranx_ignobilis,test,0.0281822260222111,0,5,2500,324.0546397,0,
+Cephalopholis_microprion,test,0.107020031748917,0,10,5000,371.7953678,0,
+Chiromantis_rufescens,test,0.00947456497701539,0,14,7000,458.9684582,0,
+Chorismus_antarcticus,test,0.0792952067364083,0,10,5000,269.0971924,0,
+Chydorus_pubescens,test,0.122281665116417,0,8,4000,429.533017,0,
+Citharinus_citharus,test,0.0369639513912794,0,8,4000,256.356063,0,
+Crotalus_oreganus,test,0.0728189367421932,0,7,3500,253.5051723,0,
+Ctenophorus_adelaidensis,test,0.414457611733561,0,8,4000,254.4489799,0,
+Cynoscion_regalis,test,0.0399139226160206,0,19,9500,665.066017,0,
+Daphnia_obtusa,test,0.103830589679939,0,7,3500,147.2991682,0,
+Deania_calceus,test,0.253799851517287,0,7,3500,310.5771142,0,
+Decapterus_punctatus,test,0.0315987021689471,0,13,6500,683.0751175,0,
+Desmognathus_brimleyorum,test,0,0,0,0,0.5471914,1,"The logical indices contain a true value outside of the array bounds."
+Dicologlossa_cuneata,test,0.0362614021678634,0,15,7500,458.2042094,0,
+Dorosoma_cepedianum,test,0.249714723856808,0,10,5000,695.9081245,0,
+Elliptio_arca,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Emydura_macquarii,test,0.0635105626976364,0,6,3000,160.2051556,0,
+Encrasicholina_devisi,test,0.216815928593523,0,8,4000,247.1057795,0,
+Epinephelus_coioides,test,0.205204231166052,0,6,3000,445.7745395,0,
+Epinephelus_maculatus,test,0.0722392436322653,0,5,2500,173.8635081,0,
+Eremophilus_mutisii,test,0.0937792639585947,0,4,2000,201.6684538,0,
+Eretmochelys_imbricata,test,0.309669605429748,0,7,3500,144.1718177,0,
+Esox_niger,test,0.0991233617654775,0,9,4500,232.5753803,0,
+Etheostoma_trisella,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Eubleekeria_splendens,test,0.0196066379156183,0,15,7500,565.9875812,0,
+Fundulus_heteroclitus,test,0.169417784986748,0,5,2500,137.4612805,0,
+Fusconaia_cuneolus,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Gallotia_stehlini,test,0.0871661692060332,0,5,2500,145.5391441,0,
+Gambelia_sila,test,0.173934668771445,0,9,4500,1161.4815018,0,
+Gasterosteus_aculeatus,test,0.141889822154714,0,5,2500,219.6838441,0,
+Gloydius_blomhoffii,test,0.166377951629515,0,8,4000,299.4561606,0,
+Glyptemys_muhlenbergii,test,0.138703300359507,0,9,4500,271.7477248,0,
+Gobius_vittatus,test,0.234596559521589,0,5,2500,132.4225579,0,
+Halosauropsis_macrochir,test,1.05377324382919,0,25,12500,736.5824752,0,
+Hemibagrus_baramensis,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Hemitriakis_japanica,test,0.0751209620545356,0,3,1500,123.8601938,0,
+Hippocampus_erectus,test,0.472218686649336,1,29,14073,2407.5575393,0,
+Hippocampus_hippocampus,test,0.055723608168243,0,7,3500,220.2132029,0,
+Hippoglossoides_platessoides,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Homopus_signatus,test,1.05463052894832,0,5,2500,102.5005469,0,
+Hypanus_guttatus,test,0.100050107079637,0,3,1500,128.78881,0,
+Hyperolius_viridiflavus,test,0,0,0,0,0.5606981,1,"Incorrect dimensions for matrix multiplication. Check that the number of columns in the first matrix matches the number of rows in the second matrix. To operate on each element of the matrix individually, use TIMES (.*) for elementwise multiplication."
+Ictalurus_punctatus,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Karalla_dussumieri,test,0.276749502423858,0,36,18000,1477.2578897,0,
+Lampetra_planeri,test,0.455418284775236,0,42,21000,1643.2431287,0,
+Lates_longispinis,test,0.00650435361516807,0,5,2500,193.5047949,0,
+Lates_stappersii,test,0.00290245166887735,0,4,2000,113.849922,0,
+Latris_lineata,test,0.0496662479837186,1,3,1414,987.9834009,0,
+Lepidogobius_lepidus,test,0.0151666894530994,0,6,3000,145.7367061,0,
+Leptomysis_lingvura,test,0.205560281929271,0,7,3500,676.5123521,0,
+Liopholis_inornata,test,0.250312125593492,1,5,2423,142.9622731,0,
+Liparis_pulchellus,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Maccullochella_peelii,test,0.0948173534277233,0,15,7500,1037.6110227,0,
+Macquaria_ambigua,test,0.0692976138300322,0,10,5000,359.3665387,0,
+Macroramphosus_gracilis,test,0.0629414301427847,1,4,1928,77.3359452,0,
+Macroramphosus_scolopax,test,0.061991416442399,0,3,1500,60.262795,0,
+Margaritifera_margaritifera,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Micrurus_corallinus,test,0.130754500423778,0,4,2000,103.549576,0,
+Mobula_birostris,test,0.106352579111734,0,6,3000,163.7374643,0,
+Mormyrus_longirostris,test,0.0146436505376283,0,7,3500,214.9427249,0,
+Morone_mississippiensis,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Mya_arenaria,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Mytilus_trossulus,test,0.101517614895612,1,7,3480,224.987443,0,
+Neoceratodus_forsteri,test,0.469911181083974,0,4,2000,118.5454612,0,
+Neoniphon_sammara,test,0.0251992233940707,0,2,1000,48.6933288,0,
+Octopus_cyanea,test,10.5194258410609,0,2,886,1129.5350329,0,
+Octopus_vulgaris,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Oncorhynchus_gilae,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Orectolobus_halei,test,0.0204104494755831,0,2,1000,67.0369548,0,
+Orectolobus_hutchinsi,test,0.0603431265445275,0,3,1500,120.7870446,0,
+Orectolobus_maculatus,test,0.00679520211962257,0,4,2000,122.4049603,0,
+Osmerus_dentex,test,0.231232417759685,1,6,2888,146.0002299,0,
+Pagellus_bellottii,test,0.00469997621973658,0,16,8000,1968.9858597,0,
+Palaemon_elegans,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Paralabrax_auroguttatus,test,0.0303633593636654,0,21,10500,2723.4137148,0,
+Parastromateus_niger,test,0.00798548469678404,0,4,2000,248.2662558,0,
+Pecten_maximus,test,3.45577590581801,1,1,316,49.6123712,0,
+Pelophylax_epeiroticus,test,0,0,0,0,0.6611159,1,"The logical indices contain a true value outside of the array bounds."
+Pelophylax_saharicus,test,0,0,0,0,0.7695521,1,"Incorrect dimensions for matrix multiplication. Check that the number of columns in the first matrix matches the number of rows in the second matrix. To operate on each element of the matrix individually, use TIMES (.*) for elementwise multiplication."
+Percilia_irwini,test,0.00160913218516381,0,20,10000,715.6960338,0,
+Perna_viridis,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Phalacronotus_micronemus,test,0.00805207595047286,0,4,2000,134.6353511,0,
+Pholidoscelis_exsul,test,0.692319663630949,0,3,1500,61.1302308,0,
+Plagioscion_squamosissimus,test,0,0,0,0,1621.4456614,1,"The logical indices contain a true value outside of the array bounds."
+Platichthys_stellatus,test,0.693542434160347,0,117,32767,3601.5570646,0,
+Plectropomus_maculatus,test,0.0754883891238322,0,6,3000,346.1412253,0,
+Podocnemis_expansa,test,0.12946941763218,0,10,5000,308.0842754,0,
+Poecilia_latipinna,test,0.136702943376252,0,8,4000,207.3690619,0,
+Pomacentrus_moluccensis,test,0.0775897966591733,0,4,2000,150.4259916,0,
+Pristipomoides_sieboldii,test,0.0243419287126111,0,3,1500,97.1481202,0,
+Pristis_zijsron,test,0.0170853022191369,0,4,2000,241.5700828,0,
+Psammophis_sibilans,test,0.304382404234564,0,6,3000,154.0955181,0,
+Ptychocheilus_oregonensis,test,0.0622867251116812,0,5,2500,161.6988772,0,
+Raja_microocellata,test,0.0941151225379603,0,3,1500,77.7551582,0,
+Rastrelliger_faughni,test,0.061138570439325,0,10,5000,342.3993999,0,
+Rhinobatos_productus,test,0.0998707371459688,0,4,2000,128.4377317,0,
+Rhizoprionodon_oligolinx,test,0.00968067308927867,0,4,2000,216.1374611,0,
+Salpa_thompsoni,test,0,0,0,0,0.5529385,1,"The logical indices contain a true value outside of the array bounds."
+Sardinella_gibbosa,test,0.1065298976854,0,5,2500,183.9171234,0,
+Scomberomorus_niphonius,test,0.107423857168184,0,6,3000,233.8103763,0,
+Sillago_sihama,test,0.0165267361164715,0,4,2000,125.5913766,0,
+Siniperca_chuatsi,test,0.868369153321584,0,10,5000,267.5433065,0,
+Stegastes_acapulcoensis,test,0.0390081374788227,0,11,5500,561.3275946,0,
+Stegastes_flavilatus,test,0.147270355484463,0,10,5000,467.269346,0,
+Stegastes_nigricans,test,0.00709236284795134,0,15,7500,452.6672612,0,
+Stegastes_planifrons,test,0.0619393940862264,0,5,2500,183.5828104,0,
+Stolephorus_carpentariae,test,0.210906242941753,0,9,4500,262.612753,0,
+Stolephorus_indicus,test,0.0930889146687003,0,13,6500,494.3739118,0,
+Syngnathus_fuscus,test,0,0,0,0,35.3849069,1,"Arrays have incompatible sizes for this operation."
+Synodontis_membranaceus,test,0.00451887208006656,0,14,7000,416.5314503,0,
+Thryssa_hamiltonii,test,0,0,0,0,4320,1,"Maximum execution time exceeded"
+Thunnus_albacares,test,0.0941121310709731,0,9,4500,283.9200916,0,
+Thymallus_baicalensis,test,0.187909065369203,0,6,3000,172.6836778,0,
+Trygonoptera_mucosa,test,0.0454576048245089,0,3,1500,120.4246037,0,
+Typhlonarke_aysoni,test,0.115143682404012,0,6,3000,189.8681066,0,
+Urogymnus_polylepis,test,0.11207016991909,0,4,2000,109.0248682,0,
+Xiphias_gladius,test,0.276652877894134,0,5,2500,298.52416,0,
+Zapteryx_brevirostris,test,0,0,0,0,5.3987126,1,"The logical indices contain a true value outside of the array bounds."
+Zosterisessor_ophiocephalus,test,0.00440579835802866,0,4,2000,91.010897,0,
