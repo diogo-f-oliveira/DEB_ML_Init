@@ -396,34 +396,5 @@ if isfield(par, 'E_Hx') % only set in case of weaning
     par.E_Hx = E_Hx;
 end
 
-% get del_M (relates structural to physical length)
-cpar = parscomp_st(par); % compute compound parameters
-v2struct(cpar);
 
-if isfield(par, 'del_M') && free.del_M
-    if isfield(par, 'E_Hj') % in case of acceleration
-        pars_tj = [g; k; l_T; v_Hb; v_Hj; v_Hp]; % compose parameter vector for get_tj
-        [t_j, t_p, t_b, l_j, l_p, l_b, l_i] = get_tj(pars_tj, 1);
-        if exist ('Lj', 'var')
-            del_M = l_j * L_m/ Lj; % -, structural/ measured length at metam
-        elseif exist ('Li', 'var')
-            del_M = l_i * L_m/ Li; % -, ultimate structural/ measured length
-        elseif exist ('Lp', 'var')
-            del_M = l_p * L_m/ Lp; % -, structural/ measured length at puberty
-        elseif exist ('Lb', 'var')
-            del_M = l_b * L_m/ Lb; % -, structural/ measured length at birth
-        end
-    else
-        pars_tp = [g; k; l_T; v_Hb; v_Hp];                % compose parameter vector
-        [t_p, t_b, l_p, l_b] = get_tp(pars_tp, 1); % -, scaled length at birth at f
-        if exist ('Li', 'var')
-            del_M = L_m/ Li; % -, ultimate structural/ measured length
-        elseif exist ('Lp', 'var')
-            del_M = l_p * L_m/ Lp; % -, structural/ measured length at puberty
-        elseif exist ('Lb', 'var')
-            del_M = l_b * L_m/ Lb; % -, structural/ measured length at birth
-        end
-    end
-    par.del_M = del_M; % store del_M in structure
-end
 

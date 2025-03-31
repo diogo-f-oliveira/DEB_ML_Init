@@ -25,16 +25,16 @@ numSpecies = length(speciesList);
 
 
 % Initialize tables
-parameterCols = {'data_split', 'z', 'p_M', 'kap', 'v', 'E_G', 'h_a', 'E_Hb', 'E_Hj', 'E_Hx', 'E_Hp', 'k_J'};
-statsCols = {'bijection_flag', 'feasible', 'infeasibility_flag', 'error_message'};
+parameterCols = {'data_split', 'z', 'p_M', 'kap', 'v', 'E_G', 'h_a', 'E_Hb', 'E_Hj', 'E_Hx', 'E_Hp', 'k_J', 's_M'};
+statsCols = {'bijection_flag', 'feasible', 'infeasibility_flag', 'get_tj_error', 'error_message'};
 varTypesParameterTable = {
-    'string', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', ... % parameterCols
+    'string', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', 'double', ... % parameterCols
     };
 parameterPredictionTable = table('Size', [numSpecies, length(parameterCols)], 'VariableTypes', varTypesParameterTable, 'VariableNames', parameterCols, 'RowNames', speciesList);
 parameterPredictionTable{:, 'data_split'} = datasetTable{:, 'data_split'};
 
 varTypesStatsTable = {
-    'string', 'logical', 'string', 'string',
+    'string', 'logical', 'string', 'logical', 'string',
     };
 bijectionStatsTable = table('Size', [numSpecies, length(statsCols)], 'VariableTypes', varTypesStatsTable, 'VariableNames', statsCols, 'RowNames', speciesList);
 
@@ -102,6 +102,9 @@ while i <= numSpecies || ~isempty(inProgressFutures)
                 else
                     error_message = futInfo.future.Error.message;
                 end
+                if any(strcmp('get_tj', {futInfo.future.Error.stack.name}))
+                    bijectionStatsTable{futInfo.speciesName, 'get_tj_error'} = true;
+                end
                 fprintf('[%4d / %d | %50s] ERROR: %s \n', futInfo.i, numSpecies, futInfo.speciesName, error_message)
                 bijectionStatsTable{futInfo.speciesName, 'bijection_flag'} = "error";
                 bijectionStatsTable{futInfo.speciesName, 'error_message'} = string(error_message);
@@ -154,7 +157,17 @@ if isfolder(speciesFolder)
     end
     
     % Run bijection
-    [bijectionPar, ~, ~, bijectionFlag] = bijection_method(data, auxData, metaData, useDefaultParameterValues);
+    [bijectionPar, metaPar, ~, bijectionFlag] = bijection_method(data, auxData, metaData, useDefaultParameterValues);
+    
+    % Run get_tj to get prediction for s_M
+    if strcmp(metaPar.model, 'abj')
+        cPar = parscomp_st(bijectionPar);  
+        pars_tj = [cPar.g cPar.k cPar.l_T cPar.v_Hb cPar.v_Hj cPar.v_Hp];
+        [~, ~, ~, l_j, ~, l_b, ~, ~, ~, ~] = get_tj(pars_tj, bijectionPar.f);
+        bijectionPar.s_M = l_j/l_b;
+    else
+        bijectionPar.s_M = 1;
+    end
 
 else
     error('Folder for species "%s" does not exist.', speciesName);
