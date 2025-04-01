@@ -144,6 +144,10 @@ if isfolder(speciesFolder)
     predPar = par;
     for p=1:length(predParNames)
         parName = predParNames{p};
+        % Skip s_M
+        if strcmp(parName, 's_M')
+            continue
+        end
         % Only set maturities if they are part of pars_init.m
         if any(strcmp(parName, {'E_Hj', 'E_Hx'}))
             if ~isfield(par, parName)
