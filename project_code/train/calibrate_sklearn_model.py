@@ -124,7 +124,7 @@ def evaluate_config(config, base_model, col_types, data, random_state=42, n_spli
             col_types=col_types,
             model=model
         )
-        cv_metrics_df.loc[i] = fold_metrics_df.mean().rename(METRIC_LABEL_TO_NAME)
+        cv_metrics_df.loc[i] = fold_metrics_df.mean(axis=1).rename(METRIC_LABEL_TO_NAME)
         # Report metrics
         if report_metrics:
             train.report({m: cv_metrics_df[m].mean() for m in METRIC_LABEL_TO_NAME.values()})

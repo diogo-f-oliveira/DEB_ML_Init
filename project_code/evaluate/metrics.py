@@ -1,7 +1,22 @@
 import numpy as np
 
 
-def mean_deb_loss(y_true, y_pred, *, sample_weight=None, multioutput="raw_values"):
+# Aggregate over outputs based on multioutput parameter
+def aggregate(metric_values, multioutput):
+    if multioutput == "raw_values":
+        return metric_values
+    elif multioutput == "uniform_average":
+        return np.mean(metric_values)
+    elif isinstance(multioutput, (list, np.ndarray)):
+        weights = np.asarray(multioutput)
+        if weights.shape[0] != metric_values.shape[0]:
+            raise ValueError("Weights must have the same length as the number of outputs.")
+        return np.average(metric_values, weights=weights)
+    else:
+        raise ValueError("multioutput must be 'raw_values', 'uniform_average', or array-like of weights.")
+
+
+def mean_deb_loss(y_true, y_pred, *, sample_weight=None, multioutput="raw_values", return_std=False):
     """
     Compute the mean DEB loss between true and predicted values.
 
@@ -87,20 +102,21 @@ def mean_deb_loss(y_true, y_pred, *, sample_weight=None, multioutput="raw_values
     loss_per_output = np.average(raw_values, axis=0, weights=sample_weight)
 
     # Aggregate outputs according to the multioutput parameter.
-    if multioutput == "raw_values":
-        return loss_per_output
-    elif multioutput == "uniform_average":
-        return np.mean(loss_per_output)
-    elif isinstance(multioutput, (list, np.ndarray)):
-        weights = np.asarray(multioutput)
-        if weights.shape[0] != loss_per_output.shape[0]:
-            raise ValueError("Weights must have the same length as the number of outputs.")
-        return np.average(loss_per_output, weights=weights)
+    aggregated_mean = aggregate(loss_per_output, multioutput)
+
+    if return_std:
+        # Compute the weighted variance per output:
+        # variance = average((loss - mean_loss)^2, weights=sample_weight)
+        variance_per_output = np.average((raw_values - loss_per_output) ** 2, axis=0, weights=sample_weight)
+        std_loss_per_output = np.sqrt(variance_per_output)
+        aggregated_std = aggregate(std_loss_per_output, multioutput)
+        return aggregated_mean, aggregated_std
     else:
-        raise ValueError("multioutput must be 'raw_values', 'uniform_average', or array-like of weights.")
+        return aggregated_mean
 
 
-def log_accuracy_ratio(y_true, y_pred, *, sample_weight=None, exponentiate=False, multioutput='raw_values'):
+def log_accuracy_ratio(y_true, y_pred, *, sample_weight=None, exponentiate=False, multioutput='raw_values',
+                       return_std=False):
     """
     Compute the logarithm of the accuracy ratio.
 
@@ -161,9 +177,9 @@ def log_accuracy_ratio(y_true, y_pred, *, sample_weight=None, exponentiate=False
         y_pred = y_pred.reshape(-1, 1)
 
     # Ensure that all values are positive
-    #if np.any(y_true <= 0):
+    # if np.any(y_true <= 0):
     #    raise RuntimeWarning("All true values must be positive.")
-    #if np.any(y_pred <= 0):
+    # if np.any(y_pred <= 0):
     #    raise RuntimeWarning("All predicted values must be positive.")
 
     # Compute the absolute log error for each element
@@ -174,32 +190,32 @@ def log_accuracy_ratio(y_true, y_pred, *, sample_weight=None, exponentiate=False
         sample_weight = np.asarray(sample_weight)
         if sample_weight.ndim != 1 or sample_weight.shape[0] != y_true.shape[0]:
             raise ValueError("sample_weight must be a 1D array with the same length as the number of samples.")
-        mean_log_error = np.average(log_errors, axis=0, weights=sample_weight)
+        mean_log_error_per_output = np.average(log_errors, axis=0, weights=sample_weight)
     else:
-        mean_log_error = np.mean(log_errors, axis=0)
+        mean_log_error_per_output = np.mean(log_errors, axis=0)
 
     # Exponentiate the mean log error to get the geometric error factor per output
     if exponentiate:
-        log_acc_ratio = np.exp(mean_log_error)
+        log_acc_ratio = np.exp(mean_log_error_per_output)
     else:
-        log_acc_ratio = mean_log_error
+        log_acc_ratio = mean_log_error_per_output
 
     # Aggregate results according to multioutput parameter
-    if multioutput == "raw_values":
-        return log_acc_ratio
-    elif multioutput == "uniform_average":
-        return np.mean(log_acc_ratio)
-    elif isinstance(multioutput, (list, np.ndarray)):
-        weights = np.asarray(multioutput)
-        if weights.shape[0] != log_acc_ratio.shape[0]:
-            raise ValueError("Weights must have the same length as the number of outputs.")
-        return np.average(log_acc_ratio, weights=weights)
+    aggregated_mean = aggregate(log_acc_ratio, multioutput)
+
+    if return_std:
+        # Compute the weighted variance per output:
+        # variance = average((loss - mean_loss)^2, weights=sample_weight)
+        variance_per_output = np.average((log_errors - mean_log_error_per_output) ** 2, axis=0, weights=sample_weight)
+        std_loss_per_output = np.sqrt(variance_per_output)
+        aggregated_std = aggregate(std_loss_per_output, multioutput)
+        return aggregated_mean, aggregated_std
     else:
-        raise ValueError("multioutput must be 'raw_values', 'uniform_average', or array-like of weights.")
+        return aggregated_mean
 
 
 def symmetric_mean_absolute_percentage_error(y_true, y_pred, *, sample_weight=None, percentage=True, normalize=True,
-                                             multioutput='raw_values'):
+                                             multioutput='raw_values', return_std=False):
     """
     Compute the symmetric Mean Absolute Percentage Error (sMAPE).
 
@@ -283,15 +299,15 @@ def symmetric_mean_absolute_percentage_error(y_true, y_pred, *, sample_weight=No
     if percentage:
         smape_per_output = smape_per_output * 100.0
 
-    # Aggregate according to the multioutput parameter
-    if multioutput == "raw_values":
-        return smape_per_output
-    elif multioutput == "uniform_average":
-        return np.mean(smape_per_output)
-    elif isinstance(multioutput, (list, np.ndarray)):
-        weights = np.asarray(multioutput)
-        if weights.shape[0] != smape_per_output.shape[0]:
-            raise ValueError("Weights must have the same length as the number of outputs.")
-        return np.average(smape_per_output, weights=weights)
+    # Aggregate results according to multioutput parameter
+    aggregated_mean = aggregate(smape_per_output, multioutput)
+
+    if return_std:
+        # Compute the weighted variance per output:
+        # variance = average((loss - mean_loss)^2, weights=sample_weight)
+        variance_per_output = np.average((errors - smape_per_output) ** 2, axis=0, weights=sample_weight)
+        std_loss_per_output = np.sqrt(variance_per_output)
+        aggregated_std = aggregate(std_loss_per_output, multioutput)
+        return aggregated_mean, aggregated_std
     else:
-        raise ValueError("multioutput must be 'raw_values', 'uniform_average', or array-like of weights.")
+        return aggregated_mean

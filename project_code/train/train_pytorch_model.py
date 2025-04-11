@@ -133,7 +133,7 @@ def train_neural_network(config, model_class, dataset_name,
             model=model,
             print_score=verbose and (epoch + 1) % print_val_metrics_every == 0,
         )
-        traces_df.loc[epoch, metric_name_list] = epoch_metrics_df.mean().rename(METRIC_LABEL_TO_NAME)
+        traces_df.loc[epoch, metric_name_list] = epoch_metrics_df.mean(axis=1).rename(METRIC_LABEL_TO_NAME)
         
         if verbose:
             print(f"\nEpoch [{epoch + 1}/{max_epochs}], "
@@ -193,7 +193,7 @@ if __name__ == '__main__':
     config = {
         'scaling_type': 'log_standardize',
         'batch_size': 4,
-        'max_epochs': 100,
+        'max_epochs': 10,
         'learning_rate': 5e-5,
         'weight_decay': 1e-3,
         'shared_hidden_layers': 3 * [64],
@@ -214,7 +214,7 @@ if __name__ == '__main__':
 
     model_name = 'MLP'
     model_class = DEBNetHC
-    save_model = False
+    save_model = True
     save_folder = f'results/{dataset_name}'
     evaluate_on_test = True
 
@@ -256,4 +256,5 @@ if __name__ == '__main__':
             print_score=True,
             save_score=save_model,
             results_save_path=test_performance_save_file,
+            return_std=True,
         )

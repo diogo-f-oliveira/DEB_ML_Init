@@ -1,3 +1,5 @@
+import inspect
+
 import numpy as np
 import sklearn.metrics
 import pandas as pd
@@ -15,7 +17,7 @@ METRIC_LABEL_TO_NAME = {'mean_absolute_percentage_error': 'MAPE',
 
 
 def evaluate_parameter_predictions_on_data(data, col_types, model, print_score=False, save_score=False,
-                                           results_save_path=None):
+                                           results_save_path=None, return_std=None):
     n_outputs = len(col_types['output']['all'])
     y_true = data['output'].reshape(-1, n_outputs)
     y_pred = model.predict(data['input']).reshape(-1, n_outputs)
@@ -34,11 +36,15 @@ def evaluate_parameter_predictions_on_data(data, col_types, model, print_score=F
             symmetric_mean_absolute_percentage_error,
             mean_deb_loss,
             'mean_absolute_percentage_error',
-        ]
+        ],
+        return_std=return_std,
     )
     if print_score:
-        print(f"logQ: {metrics_df['log_accuracy_ratio'].mean():.4f}")
-        print(tabulate(metrics_df, headers='keys', tablefmt='simple'))
+        if return_std:
+            print(f"logQ: {metrics_df.loc['log_accuracy_ratio'].loc['mean'].mean():.4f}")
+        else:
+            print(f"logQ: {metrics_df.loc['log_accuracy_ratio'].mean():.4f}")
+        print(tabulate(metrics_df.rename(METRIC_LABEL_TO_NAME), headers='keys', tablefmt='simple'))
 
     if save_score:
         metrics_df.to_csv(results_save_path)
@@ -46,7 +52,7 @@ def evaluate_parameter_predictions_on_data(data, col_types, model, print_score=F
     return metrics_df
 
 
-def compute_metrics(y_true, y_pred, mask=None, metrics=None, output_col_names=None):
+def compute_metrics(y_true, y_pred, metrics, mask=None, output_col_names=None, return_std=False):
     if output_col_names is None:
         output_col_names = list(range(y_pred.shape[1]))
     metrics_dict = {}
@@ -54,27 +60,41 @@ def compute_metrics(y_true, y_pred, mask=None, metrics=None, output_col_names=No
     if mask is None:
         mask = np.ones_like(y_true, dtype=bool)
 
-    # Compute metrics on scaled output of the model
+    metric_function_dict = {}
     for m in metrics:
         if isinstance(m, str):
             metric_name = m
-            metric = getattr(sklearn.metrics, m)
+            metric_function = getattr(sklearn.metrics, m)
         elif callable(m):
             metric_name = m.__name__
-            metric = m
+            metric_function = m
         elif isinstance(m, (list, tuple)):
             metric_name = m[0]
-            metric = m[1]
+            metric_function = m[1]
+        metric_function_dict[metric_name] = metric_function
 
-        metric_values = np.zeros(shape=(len(output_col_names)))
-        for i in range(len(output_col_names)):
-            metric_values[i] = metric(y_true[:, i], y_pred[:, i], sample_weight=mask[:, i])
-        metrics_dict[metric_name] = {p: e for p, e in zip(output_col_names, metric_values)}
+    index = pd.MultiIndex.from_product([list(metric_function_dict.keys()), ['mean', 'std']],
+                                       names=['metric', 'agg'])
+    metrics_df = pd.DataFrame(index=index, columns=output_col_names)
 
-    # Pack into DataFrame
-    metrics_df = pd.DataFrame.from_dict(metrics_dict, orient='index').transpose()
+    # Compute metrics on scaled output of the model
+    for metric_name, metric_function in metric_function_dict.items():
+        has_return_std_arg = 'return_std' in inspect.signature(metric_function).parameters
+        if has_return_std_arg and return_std:
+            for i, p in enumerate(output_col_names):
+                mean, std = metric_function(y_true[:, i], y_pred[:, i], sample_weight=mask[:, i], return_std=return_std)
+                metrics_df.loc[(metric_name, 'mean'), p] = mean
+                metrics_df.loc[(metric_name, 'std'), p] = std
+        else:
+            for i, p in enumerate(output_col_names):
+                mean = metric_function(y_true[:, i], y_pred[:, i], sample_weight=mask[:, i])
+                metrics_df.loc[(metric_name, 'mean'), p] = mean
 
-    return metrics_df
+    # Drop agg column if
+    if return_std:
+        return metrics_df.dropna(how='all')
+    else:
+        return metrics_df.reset_index(level='agg', drop=True).dropna(how='all')
 
 
 def evaluate_pytorch_model(dataloader, model, criterion, col_types):
