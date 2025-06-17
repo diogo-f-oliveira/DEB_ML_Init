@@ -114,12 +114,10 @@ if __name__ == '__main__':
         'batch_size': tune.choice([1, 2, 4, 8, 16]),
         'learning_rate': tune.qloguniform(1e-5, 1e-2, 1e-5),
         'weight_decay': tune.qloguniform(1e-4, 1e-1, 1e-4),
-        #'max_epochs': 500,
         'max_epochs': tune.qrandint(50, 700, 25),
         'patience': 10,
         'n_epochs_gradient_descent': 0,
         'early_stopping_metric': None,
-        # 'early_stopping_metric': 'logQ',
 
         # Architecture hyperparameters
         'scaling_type': 'log_standardize',
@@ -127,15 +125,13 @@ if __name__ == '__main__':
         'shared_hidden_size': tune.choice([16, 32, 64, 96, 128]),
         'n_par_layers': tune.randint(1, 5),
         'par_hidden_size': tune.choice([8, 16, 32, 64, 96]),
-        # 'n_par_layers': 0,
-        # 'par_hidden_size': 0,
-        'use_skip_connections': tune.choice([True, False]),
+        'use_skip_connection': tune.choice([True, False]),
         'dropout_prob': tune.quniform(0, 0.4, 0.02),
-        # 'dropout_prob': 0.0,
     }
     # model_name = 'DEBNetHC'
     # for model_name in ['DEBNetHC', 'DEBNetSC','MLP', 'MLPSC']:
     for model_name in ['MLP', 'MLPSC']:
+    # for model_name in ['DEBNetHC', 'DEBNetSC']:
         if model_name == 'DEBNetHC':
             search_space['loss_function'] = 'mse'
             model_class = DEBNetHC
@@ -153,7 +149,7 @@ if __name__ == '__main__':
             use_infeasibility_loss = False
             search_space['n_par_layers'] = 0
             search_space['par_hidden_size'] = 0
-            search_space['use_skip_connections'] = False
+            search_space['use_skip_connection'] = False
         elif model_name == 'MLPSC':
             search_space['loss_function'] = 'mse_infeasibility'
             model_class = DEBNet
@@ -163,7 +159,7 @@ if __name__ == '__main__':
             use_infeasibility_loss = True
             search_space['n_par_layers'] = 0
             search_space['par_hidden_size'] = 0
-            search_space['use_skip_connections'] = False
+            search_space['use_skip_connection'] = False
 
         metric = 'logQ'
 

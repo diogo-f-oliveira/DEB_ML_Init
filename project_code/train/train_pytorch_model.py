@@ -67,7 +67,8 @@ def train_neural_network(config, model_class, dataset_name,
                       par_hidden_layers=config['par_hidden_layers'],
                       dropout_prob=config['dropout_prob'],
                       output_transformer=scalers['output'],
-                      input_transformer=scalers['input']
+                      input_transformer=scalers['input'],
+                      use_skip_connection=config['use_skip_connection'],
                       )
     if 'clamp_function' in config and 'clamp_function' in inspect.signature(model_class.__init__).parameters:
         model_args['clamp_function'] = config['clamp_function']
