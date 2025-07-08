@@ -171,6 +171,9 @@ filepaths.csv
 # MATLAB autosave files
 *.asv
 
+# Shortcuts
+*.lnk
+
 
 
 

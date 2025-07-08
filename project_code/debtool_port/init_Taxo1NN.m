@@ -1,8 +1,8 @@
-function [par, metaPar, txtPar] = pars_init_Taxo1NN(data, metaData)
+function [par, metaPar, txtPar] = init_Taxo1NN(data, metaData)
 %UNTITLED4 Summary of this function goes here
 %   Detailed explanation goes here
 
-modelFolder = '../../models/Taxo1NN/';
+% modelFolder = '../../models/Taxo1NN/';
 
 %% Get ultimate weight
 % Impute Wwi if it is missing
@@ -60,11 +60,15 @@ parValues(9) = parValues(8) / parValues(6); % approximation for s_M = E_Hj/E_Hb
 %% Load Taxo1NN model
 % Load model
 model = Taxo1NN(true, 0.551);
-model.loadTrainingData([modelFolder '/train_data.mat']);
+% model.loadTrainingData([modelFolder '/train_data.mat']);
+model.loadTrainingData('train_data.mat');
+
 
 % Load taxonomy encoding
 encoder = TaxonomicEncoder();
-encoder.loadEncoding([modelFolder '/taxonomy_encoding.mat'])
+% encoder.loadEncoding([modelFolder '/taxonomy_encoding.mat'])
+encoder.loadEncoding('taxonomy_encoding.mat')
+
 % Encode taxonomic classifications
 encodedTaxonomy = encoder.encode(metaData);
 
