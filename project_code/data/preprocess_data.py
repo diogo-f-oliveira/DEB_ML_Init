@@ -30,6 +30,10 @@ def encode_taxonomy(df: pd.DataFrame, categories: dict, include_other_col: dict)
 def encode_eco_codes(df, categories: dict, include_other_col: dict):
     """Encodes ecocodes into binary variables. For the same species, several ecocode categories can be true. Also adds
     an 'other' option if none of the provided options for the category are true."""
+    # TODO: This function is wrong when the 'other' option is set to true. The ecocodes are a list of strings that was 
+    # joined into a single string separated by spaces. This was not implemented in the original code, meaning the 
+    # 'other' ecocodes can occur in one of those strings. However, the 'other' is only set to True if neither of 
+    # the provided ecocodes are found, which is not the intended behaviour.
     dummy_cols = []
     for cat, options in categories.items():
         # Create an 'other' option if requested

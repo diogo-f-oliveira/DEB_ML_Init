@@ -32,8 +32,8 @@ method_labels = {
     'SRTaxo1NN': 'SR-Taxo1NN',
     'MultiTaskElasticNet': 'Elastic Net',
     'RandomForestRegressor': 'Random Forest',
-    'MLP': 'HC-NN',
-    'MLPSC': 'SC-NN',
+    'MLP': 'HC-InitNet',
+    'MLPSC': 'SC-InitNet',
     'BijectionMethod': 'Bijection'
 }
 
@@ -47,4 +47,5 @@ par_to_latex = {
     'E_Hp': r'E_H^p',
     'k_J': r'\dot{k}_J',
     's_M': r's_M',
+    'E_G': r'[E_G]',
 }
