@@ -5,12 +5,10 @@ clear all
 format long
 
 %% Define paths to files
-filePathsCSVPath = '..\..\filepaths.csv';
-pathsTable = readtable(filePathsCSVPath, 'Delimiter', ',', 'ReadVariableNames', true, 'ReadRowNames', true);
-allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
-saveFolder = 'test_results';
+% allSpeciesFolder = '..\..\..\..\..\AmPdata\species';
+allSpeciesFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\DEB Resources\DEBtool\AmPdata\species';
 % Output file
-outputFileName = [saveFolder '\test_init_DEBInitNet_20250706.csv'];
+outputFileName = 'test_init_DEBInitNet_20250706.csv';
 
 %% Get list of species
 speciesList = getAllSpeciesNames(allSpeciesFolder);
@@ -18,19 +16,20 @@ numSpecies = length(speciesList);
 
 %% Initialize table
 columnNames = {
-    'AmP_loss', 'init_loss', 'final_loss', 'execution_time', ...
-    'error', 'error_message', ...
+    'amp_loss', 'init_loss', 'final_loss', 'execution_time', ...
+    'predict_failed', 'estim_error', 'init_func_error', 'fetch_error', 'debnet_error', 'predict_error', 'lossfun_error', ...
+    'error', 'error_message',  ...
     };
 numCols = length(columnNames);
 varTypes = {
     'double', 'double', 'double', 'double', ...
+    'logical', 'logical', 'logical', 'logical', 'logical', 'logical', 'logical', ...
     'logical', 'string', ...
     };
 estimationResultsTable = table('Size', [numSpecies, numCols], 'VariableTypes', varTypes, 'VariableNames', columnNames, 'RowNames', speciesList);
 
 %% Settings
 saveResultsTableEvery = 30;
-includePseudoDataInLoss = true;
 
 % Max execution time per species in seconds
 maxTime = 10*60;  
@@ -60,7 +59,7 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         speciesName = speciesList{i};
 
         % Submit parfeval task
-        fut = parfeval(pool, @processSpecies, 4, speciesName, allSpeciesFolder, includePseudoDataInLoss);
+        fut = parfeval(pool, @processSpecies, 4, speciesName, allSpeciesFolder);
         % Record the future, species name, start time
         startTime = tic;
         nFutures = length(inProgressFutures);
@@ -87,22 +86,16 @@ while i <= numSpecies || ~isempty(inProgressFutures)
         if strcmp(futInfo.future.State, 'finished')
             % Fetch outputs
             try
-                [ampLoss, initLoss, finalLoss, predictError] = fetchOutputs(futInfo.future);
+                [ampLoss, initLoss, finalLoss, predictFailed] = fetchOutputs(futInfo.future);
                 executionTime = toc(futInfo.startTime);
-                fprintf('[%4d / %d | %50s] RESULT: %d %d %.2f PROGRESS (%4d/%d) \n', futInfo.i, numSpecies, futInfo.speciesName, estimStats.convergence, estimStats.numIter, executionTime, numCompleted+1, numSpecies)
+                fprintf('[%4d / %d | %50s] RESULT: %.2f PROGRESS (%4d/%d) \n', futInfo.i, numSpecies, futInfo.speciesName, executionTime, numCompleted+1, numSpecies)
 
                 % Store results
                 estimationResultsTable{futInfo.speciesName, 'execution_time'} = executionTime;
-                estimationResultsTable{futInfo.speciesName, 'ampLoss'} = ampLoss;
+                estimationResultsTable{futInfo.speciesName, 'amp_loss'} = ampLoss;
                 estimationResultsTable{futInfo.speciesName, 'init_loss'} = initLoss;
                 estimationResultsTable{futInfo.speciesName, 'final_loss'} = finalLoss;
-                if predictError
-                    estimationResultsTable{futInfo.speciesName, 'error'} = true;
-                    estimationResultsTable{futInfo.speciesName, 'error_message'} = "predict_filter";
-                else
-                    estimationResultsTable{futInfo.speciesName, 'error'} = false;
-                    estimationResultsTable{futInfo.speciesName, 'error_message'} = "";
-                end
+                estimationResultsTable{futInfo.speciesName, 'predict_failed'} = predictFailed;
 
             catch ME
                 % Handle error
@@ -116,6 +109,26 @@ while i <= numSpecies || ~isempty(inProgressFutures)
                 estimationResultsTable{futInfo.speciesName, 'execution_time'} = executionTime;
                 estimationResultsTable{futInfo.speciesName, 'error'} = true;
                 estimationResultsTable{futInfo.speciesName, 'error_message'} = string(error_message);
+
+                % Check where error ocurred
+                for e=1:length(futInfo.future.Error.stack)
+                    switch futInfo.future.Error.stack(e).name
+                        case 'petregr_f'
+                            estimationResultsTable{futInfo.speciesName, 'estim_error'} = true;
+                        case 'init_DEBInitNet'
+                            estimationResultsTable{futInfo.speciesName, 'init_func_error'} = true;
+                        case 'fetch_input_for_DEBInitNet'
+                            estimationResultsTable{futInfo.speciesName, 'fetch_error'} = true;
+                        case 'DEBNet'
+                            estimationResultsTable{futInfo.speciesName, 'debnet_error'} = true;
+                        case 'lossfun'
+                            estimationResultsTable{futInfo.speciesName, 'lossfun_error'} = true;
+                    end
+                    if strncmp(futInfo.future.Error.stack(e).name, 'predict_', length('predict_'))
+                        estimationResultsTable{futInfo.speciesName, 'predict_error'} = true;
+                    end
+                end
+
             end
             % Remove future from in-progress list
             inProgressFutures(idx) = [];
@@ -166,13 +179,13 @@ pets = {speciesName};
 end
 
 %% Function to process each species
-function [ampLoss, initLoss, finalLoss, predictError] = processSpecies(speciesName, allSpeciesFolder, includePseudoDataInLoss)
+function [ampLoss, initLoss, finalLoss, predictFailed] = processSpecies(speciesName, allSpeciesFolder)
 
 % Initialize output variables
 ampLoss = nan;
 initLoss = nan;
 finalLoss = nan;
-predictError = false;
+predictFailed = false;
 
 
 % Set up data for the species
@@ -194,8 +207,7 @@ if isfolder(speciesFolder)
 
     % Compute AmP loss
     [prdData, info] = feval(['predict_' speciesName], par, data, auxData);
-    ampLoss = deb_lossfun(data, prdData, weights, par, includePseudoDataInLoss);
-
+    ampLoss = lossfun(data, prdData, weights);
 
     % Get initial parameters with DEBInitNet
     [par, metaPar, ~] = init_DEBInitNet(data, auxData, metaData, txtData);
@@ -203,10 +215,10 @@ if isfolder(speciesFolder)
     % Compute initial loss
     [prdData, info] = feval(['predict_' speciesName], par, data, auxData);
     if ~info
-        predictError = true;
+        predictFailed = true;
         return
     end
-    initLoss = deb_lossfun(data, prdData, weights, par, includePseudoDataInLoss);
+    initLoss = lossfun(data, prdData, weights);
 
     % Format arguments for 'petregr_f'
     dataStruct = struct(speciesName, data);
@@ -216,7 +228,7 @@ if isfolder(speciesFolder)
     setGlobalPetsVar(speciesName);
 
     % Run estimation
-    [~, ~, ~, finalLoss] = petregr_f('predict_pets', estimatedPar, dataStruct, auxDataStruct, weightsStruct, filternm);     
+    [~, ~, ~, finalLoss] = petregr_f('predict_pets', par, dataStruct, auxDataStruct, weightsStruct, filternm);     
 
 else
     error('Folder for species "%s" does not exist.', speciesName);
