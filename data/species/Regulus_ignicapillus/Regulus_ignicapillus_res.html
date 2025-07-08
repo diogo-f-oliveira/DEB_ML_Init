@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+  <TITLE>Regulus_ignicapillus</TITLE>
+  <style>
+    div.prd {
+      width: 50%;
+      float: left;
+    }
+
+    div.par {
+      width: 50%;
+      float: right;
+    }
+
+    p.clear {
+      clear: both;
+    }
+
+    .head {
+      background-color: #FFE7C6
+    }
+
+    .psd {
+      color: blue
+    }
+
+    #prd {
+      border-style: solid hidden solid hidden;
+    }
+
+    #par {
+      border-style: solid hidden solid hidden;
+    }
+
+    tr:nth-child(even){background-color: #f2f2f2}
+  </style>
+</HEAD>
+
+<BODY>
+
+  <div class="prd">
+  <h1>Regulus ignicapillus</h1>
+  </div>
+
+  <div class="par">
+  <h4>COMPLETE = 2.5; MRE =    0.042; SMAE =    0.047; SMSE =    0.003 </h4>
+  </div>
+
+  <p class="clear"></p>
+
+  <div class="prd">
+  <h2>Data & predictions</h2>
+  <TABLE id="prd">
+    <TR  class="head"><TH>data</TH> <TH>prd</TH> <TH>RE</TH>  <TH>symbol</TH> <TH>units</TH> <TH>description</TH> </TR>
+    <TR><TD>15.5</TD> <TD>15.01</TD> <TD>0.03171</TD> <TD>ab</TD> <TD>d</TD> <TD>age at birth</TD></TR>
+    <TR><TD>16.5</TD> <TD>16.2</TD> <TD>0.0183</TD> <TD>tx</TD> <TD>d</TD> <TD>time since birth at fledging</TD></TR>
+    <TR><TD>330</TD> <TD>267.2</TD> <TD>0.1904</TD> <TD>tR</TD> <TD>d</TD> <TD>time since birth at first egg laying</TD></TR>
+    <TR><TD>2555</TD> <TD>2638</TD> <TD>0.03233</TD> <TD>am</TD> <TD>d</TD> <TD>life span</TD></TR>
+    <TR><TD>0.76</TD> <TD>0.7935</TD> <TD>0.04414</TD> <TD>Wwb</TD> <TD>g</TD> <TD>wet weight at birth</TD></TR>
+    <TR><TD> 10</TD> <TD>9.671</TD> <TD>0.03285</TD> <TD>Wwi</TD> <TD>g</TD> <TD>ultimate wet weight</TD></TR>
+    <TR><TD>0.06027</TD> <TD>0.06151</TD> <TD>0.02049</TD> <TD>Ri</TD> <TD>#/d</TD> <TD>maximum reprod rate</TD></TR>
+    <TR><TD colspan="2">see figure</TD> <TD>0.04762</TD> <TD>tW</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> wet weight</TD>
+    <TR class="psd"><TD>0.02</TD> <TD>0.04753</TD> <TD>1.377</TD> <TD>psd.v</TD> <TD>cm/d</TD> <TD>energy conductance</TD></TR>
+    <TR class="psd"><TD>0.8</TD> <TD>0.9379</TD> <TD>0.1724</TD> <TD>psd.kap</TD> <TD>-</TD> <TD>allocation fraction to soma</TD></TR>
+    <TR class="psd"><TD>0.95</TD> <TD>0.95</TD> <TD>  0</TD> <TD>psd.kap_R</TD> <TD>-</TD> <TD>reproduction efficiency</TD></TR>
+    <TR class="psd"><TD> 18</TD> <TD>4675</TD> <TD>258.7</TD> <TD>psd.p_M</TD> <TD>J/d.cm^3</TD> <TD>vol-spec som maint</TD></TR>
+    <TR class="psd"><TD>0.002</TD> <TD>0.002</TD> <TD>  0</TD> <TD>psd.k_J</TD> <TD>1/d</TD> <TD>maturity maint rate coefficient</TD></TR>
+    <TR class="psd"><TD>0.8</TD> <TD>0.8008</TD> <TD>0.001049</TD> <TD>psd.kap_G</TD> <TD>-</TD> <TD>growth efficiency</TD></TR>
+  </TABLE>
+  </div>
+
+  <div class="par">
+  <h2>std parameters at 20.0&deg;C</h2>
+  <TABLE id="par">
+    <TR class="head"><TH>symbol</TH> <TH>units</TH> <TH>value</TH>  <TH>free</TH> <TH>description</TH> </TR>
+    <TR><TD>T_ref</TD> <TD>K</TD> <TD>293.1</TD> <TD>0</TD> <TD>Reference temperature</TD></TR>
+    <TR><TD>T_A</TD> <TD>K</TD> <TD>9000</TD> <TD>0</TD> <TD>Arrhenius temperature</TD></TR>
+    <TR><TD>z</TD> <TD>-</TD> <TD>0.863</TD> <TD>1</TD> <TD>zoom factor</TD></TR>
+    <TR><TD>F_m</TD> <TD>l/d.cm^2</TD> <TD>6.5</TD> <TD>0</TD> <TD>{F_m}, max spec searching rate</TD></TR>
+    <TR><TD>kap_X</TD> <TD>-</TD> <TD>0.8</TD> <TD>0</TD> <TD>digestion efficiency of food to reserve</TD></TR>
+    <TR><TD>kap_P</TD> <TD>-</TD> <TD>0.1</TD> <TD>0</TD> <TD>faecation efficiency of food to faeces</TD></TR>
+    <TR><TD>v</TD> <TD>cm/d</TD> <TD>0.04753</TD> <TD>1</TD> <TD>energy conductance</TD></TR>
+    <TR><TD>kap</TD> <TD>-</TD> <TD>0.9379</TD> <TD>1</TD> <TD>allocation fraction to soma</TD></TR>
+    <TR><TD>kap_R</TD> <TD>-</TD> <TD>0.95</TD> <TD>0</TD> <TD>reproduction efficiency</TD></TR>
+    <TR><TD>p_M</TD> <TD>J/d.cm^3</TD> <TD>4675</TD> <TD>1</TD> <TD>[p_M], vol-spec somatic maint</TD></TR>
+    <TR><TD>p_T</TD> <TD>J/d.cm^2</TD> <TD>  0</TD> <TD>0</TD> <TD>{p_T}, surf-spec somatic maint</TD></TR>
+    <TR><TD>k_J</TD> <TD>1/d</TD> <TD>0.002</TD> <TD>0</TD> <TD>maturity maint rate coefficient</TD></TR>
+    <TR><TD>E_G</TD> <TD>J/cm^3</TD> <TD>7315</TD> <TD>1</TD> <TD>[E_G], spec cost for structure</TD></TR>
+    <TR><TD>E_Hb</TD> <TD>J</TD> <TD>150.6</TD> <TD>1</TD> <TD>maturity at birth</TD></TR>
+    <TR><TD>E_Hp</TD> <TD>J</TD> <TD>7.199e+04</TD> <TD>1</TD> <TD>maturity at puberty</TD></TR>
+    <TR><TD>h_a</TD> <TD>1/d^2</TD> <TD>7.118e-15</TD> <TD>1</TD> <TD>Weibull aging acceleration</TD></TR>
+    <TR><TD>s_G</TD> <TD>-</TD> <TD>0.01</TD> <TD>0</TD> <TD>Gompertz stress coefficient</TD></TR>
+    <TR><TD>E_Hx</TD> <TD>J</TD> <TD>1.327e+04</TD> <TD>1</TD> <TD>maturity at fledging</TD></TR>
+    <TR><TD>f</TD> <TD>-</TD> <TD>  1</TD> <TD>0</TD> <TD>scaled functional response for 0-var data</TD></TR>
+    <TR><TD>f_00</TD> <TD>-</TD> <TD>0.2304</TD> <TD>1</TD> <TD>scaled functional response for tW data at 00 d</TD></TR>
+    <TR><TD>f_05</TD> <TD>-</TD> <TD>1.26</TD> <TD>1</TD> <TD>scaled functional response for tW data at 05 d</TD></TR>
+    <TR><TD>f_14</TD> <TD>-</TD> <TD>0.9654</TD> <TD>1</TD> <TD>scaled functional response for tW data at 14 d</TD></TR>
+    <TR><TD>f_20</TD> <TD>-</TD> <TD>0.8758</TD> <TD>1</TD> <TD>scaled functional response for tW data at 20 d</TD></TR>
+    <TR><TD>f_30</TD> <TD>-</TD> <TD>0.9011</TD> <TD>1</TD> <TD>scaled functional response for tW data at 30 d</TD></TR>
+    <TR><TD>t_0</TD> <TD>d</TD> <TD>7.118</TD> <TD>1</TD> <TD>time at start development at T</TD></TR>
+    <TR><TD>t_N</TD> <TD>d</TD> <TD>182.5</TD> <TD>0</TD> <TD>time between clutches at T</TD></TR>
+  </TABLE>
+  </div>
+
+</BODY>
+</HTML>

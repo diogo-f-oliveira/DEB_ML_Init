@@ -1,0 +1,141 @@
+function [data, auxData, metaData, txtData, weights] = mydata_Chelidonichthys_queketti
+
+%% set metadata
+metaData.phylum     = 'Chordata'; 
+metaData.class      = 'Actinopterygii'; 
+metaData.order      = 'Perciformes'; 
+metaData.family     = 'Triglidae';
+metaData.species    = 'Chelidonichthys_queketti'; 
+metaData.species_en = 'Lesser gurnard'; 
+
+metaData.ecoCode.climate = {'MB'};
+metaData.ecoCode.ecozone = {'MISW'};
+metaData.ecoCode.habitat = {'0jMp', 'jiMd'};
+metaData.ecoCode.embryo  = {'Mp'};
+metaData.ecoCode.migrate = {};
+metaData.ecoCode.food    = {'bjPz', 'jiCi', 'jiCvf'};
+metaData.ecoCode.gender  = {'D'};
+metaData.ecoCode.reprod  = {'O'};
+
+metaData.T_typical  = C2K(16.7); % in K, body temp
+metaData.data_0     = {'ab'; 'ap'; 'am'; 'Lp'; 'Li'; 'Wwb'; 'Wwp'; 'Wwi'; 'Ri'};  
+metaData.data_1     = {'t-L'}; 
+
+metaData.COMPLETE = 2.5; % using criteria of LikaKear2011
+
+metaData.author   = {'Bas Kooijman'};        
+metaData.date_subm = [2023 11 30];                           
+metaData.email    = {'bas.kooijman@vu.nl'};                 
+metaData.address  = {'VU University, Amsterdam'}; 
+
+metaData.curator     = {'Dina Lika'};
+metaData.email_cur   = {'lika@uoc.gr'}; 
+metaData.date_acc    = [2023 11 30];
+
+%% set data
+% zero-variate data
+data.ab = 9;      units.ab = 'd';    label.ab = 'age at birth';                   bibkey.ab = 'guess';    
+  temp.ab = C2K(16.7); units.temp.ab = 'K'; label.temp.ab = 'temperature';
+data.am = 7*365;     units.am = 'd';    label.am = 'life span';                   bibkey.am = 'fishbase';  
+  temp.am = C2K(16.7); units.temp.am = 'K'; label.temp.am = 'temperature';
+
+data.Lp = 19.5;  units.Lp = 'cm';   label.Lp = 'total length at puberty';    bibkey.Lp = 'Boot1997';
+data.Li = 35;    units.Li = 'cm';   label.Li = 'ultimate total length';         bibkey.Li = 'fishbase';
+
+data.Wwb = 8.0e-4; units.Wwb = 'g';   label.Wwb = 'wet weight at birth';          bibkey.Wwb = 'Yusc1985';
+  comment.Wwb = 'based on egg diameter of 1.05-1.25 mm of Prionotus evolans: pi/6*0.115^3';
+data.Wwp = 383;   units.Wwp = 'g';   label.Wwp = 'wet weight at puberty';         bibkey.Wwp = 'fishbase';  
+  comment.Wwp = 'based on 0.02291*Li^3.21, see F1';
+data.Wwi = 4775; units.Wwi = 'g';   label.Wwi = 'ultimate female wet weight';     bibkey.Wwi = 'fishbase';     
+  comment.Wwi = 'based on 0.02291*Li^3.21, see F1';
+
+data.GSI = 0.11; units.GSI = 'g/g';  label.GSI = 'gonado somatic index';    bibkey.GSI = 'Boot1997';
+  temp.GSI = C2K(16.7); units.temp.GSI = 'K'; label.temp.GSI = 'temperature';
+
+% uni-variate data
+% time-length
+data.tL_fm = [ ... % time since birth (years), total length (cm)
+    1 14.96 15.57
+    2 20.29 21.59 
+    3 24.90 25.55
+    4 27.28 27.16
+    5 27.87 28.13
+    6 30.33 29.24
+    7 32.06 NaN];
+data.tL_fm(:,1) = 365 * (0.7+data.tL_fm(:,1)); % convert yr to d
+units.tL_fm = {'d', 'cm'}; label.tL_fm = {'time since birth', 'total length'}; 
+treat.tL_fm = {1, {'females','males'}};
+temp.tL_fm = C2K(16.7); units.temp.tL_fm = 'K'; label.temp.tL_fm = 'temperature';
+bibkey.tL_fm = 'Boot1997';
+
+%% set weights for all real data
+weights = setweights(data, []);
+weights.tL_fm = 5 * weights.tL_fm;
+
+%% set pseudodata and respective weights
+[data, units, label, weights] = addpseudodata(data, units, label, weights);
+
+%% pack auxData and txtData for output
+auxData.temp = temp;
+auxData.treat = treat;
+txtData.units = units;
+txtData.label = label;
+txtData.bibkey = bibkey;
+txtData.comment = comment;
+
+%% Discussion points
+D1 = 'males are assumed to differ from females by {p_Am} and E_Hp';
+metaData.discussion = struct('D1',D1);
+
+%% Facts
+F1 = 'Length-Weight relationship: W in g = 0.02291*(TL in cm)^3.21';
+metaData.bibkey.F1 = 'fishbase'; 
+metaData.facts = struct('F1',F1);
+
+%% Links
+metaData.links.id_CoL = '69QVL'; % Cat of Life
+metaData.links.id_ITIS = '643892'; % ITIS
+metaData.links.id_EoL = '46568654'; % Ency of Life
+metaData.links.id_Wiki = 'Chelidonichthys_queketti'; % Wikipedia
+metaData.links.id_ADW = 'Chelidonichthys_queketti'; % ADW
+metaData.links.id_Taxo = '170739'; % Taxonomicon
+metaData.links.id_WoRMS = '218121'; % WoRMS
+metaData.links.id_fishbase = 'Chelidonichthys-queketti'; % fishbase
+
+%% References
+bibkey = 'Wiki'; type = 'Misc'; bib = ...
+'howpublished = {\url{http://en.wikipedia.org/wiki/Chelidonichthys_queketti}}';
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'Kooy2010'; type = 'Book'; bib = [ ...  % used in setting of chemical parameters and pseudodata
+'author = {Kooijman, S.A.L.M.}, ' ...
+'year = {2010}, ' ...
+'title  = {Dynamic Energy Budget theory for metabolic organisation}, ' ...
+'publisher = {Cambridge Univ. Press, Cambridge}, ' ...
+'pages = {Table 4.2 (page 150), 8.1 (page 300)}, ' ...
+'howpublished = {\url{../../../bib/Kooy2010.html}}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'Boot1997'; type = 'article'; bib = [ ...
+'doi = {10.1111/j.1095-8649.1997.tb01133.x}, ' ...
+'author = {A. J. Booth}, ' ... 
+'year   = {1997}, ' ...
+'title  = {On the life history of the lesser gurnard ({S}corpaeniformes: {T}riglidae) inhabiting the {A}gulhas {B}ank, {S}outh {A}frica}, ' ...
+'journal = {Journal of Fish Biology}, ' ...
+'page = {1155–1173}, ' ...
+'volume = {51(6)}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'Yusc1985'; type = 'article'; bib = [ ...
+'author = {Paul Yuschak}, ' ... 
+'year   = {1985}, ' ...
+'title  = {Fecundity, Eggs, Larvae and Osteological Development of the Striped Searobin, (\emph{Prionotus evolans}) ({P}isces, {T}riglidae))}, ' ...
+'journal = {J Northw Atl Fish. Sci}, ' ...
+'page = {65-85}, ' ...
+'volume = {6}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'fishbase'; type = 'Misc'; bib = ...
+'howpublished = {\url{http://www.fishbase.org/summary/Chelidonichthys-queketti.html}}';
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+

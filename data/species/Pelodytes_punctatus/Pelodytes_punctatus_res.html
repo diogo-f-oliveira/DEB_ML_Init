@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+  <TITLE>Pelodytes_punctatus</TITLE>
+  <style>
+    div.prd {
+      width: 50%;
+      float: left;
+    }
+
+    div.par {
+      width: 50%;
+      float: right;
+    }
+
+    p.clear {
+      clear: both;
+    }
+
+    .head {
+      background-color: #FFE7C6
+    }
+
+    .psd {
+      color: blue
+    }
+
+    #prd {
+      border-style: solid hidden solid hidden;
+    }
+
+    #par {
+      border-style: solid hidden solid hidden;
+    }
+
+    tr:nth-child(even){background-color: #f2f2f2}
+  </style>
+</HEAD>
+
+<BODY>
+
+  <div class="prd">
+  <h1>Pelodytes punctatus</h1>
+  </div>
+
+  <div class="par">
+  <h4>COMPLETE = 2.5; MRE =    0.091; SMAE =    0.094; SMSE =    0.016 </h4>
+  </div>
+
+  <p class="clear"></p>
+
+  <div class="prd">
+  <h2>Data & predictions</h2>
+  <TABLE id="prd">
+    <TR  class="head"><TH>data</TH> <TH>prd</TH> <TH>RE</TH>  <TH>symbol</TH> <TH>units</TH> <TH>description</TH> </TR>
+    <TR><TD> 85</TD> <TD>77.73</TD> <TD>0.08547</TD> <TD>tj</TD> <TD>d</TD> <TD>time since birth at metam</TD></TR>
+    <TR><TD>230</TD> <TD>202</TD> <TD>0.1218</TD> <TD>tp</TD> <TD>d</TD> <TD>time since metam at puberty</TD></TR>
+    <TR><TD>5475</TD> <TD>5485</TD> <TD>0.001738</TD> <TD>am</TD> <TD>d</TD> <TD>life span</TD></TR>
+    <TR><TD>0.2</TD> <TD>0.1856</TD> <TD>0.07221</TD> <TD>Lb</TD> <TD>cm</TD> <TD>SVL at birth</TD></TR>
+    <TR><TD>1.8</TD> <TD>1.866</TD> <TD>0.03681</TD> <TD>Lj</TD> <TD>cm</TD> <TD>SVL of frog at metam</TD></TR>
+    <TR><TD>  4</TD> <TD>4.056</TD> <TD>0.01412</TD> <TD>Lp</TD> <TD>cm</TD> <TD>SVL at puberty for females</TD></TR>
+    <TR><TD>4.6</TD> <TD>4.515</TD> <TD>0.01847</TD> <TD>Li</TD> <TD>cm</TD> <TD>ultimate SVL for females</TD></TR>
+    <TR><TD>  4</TD> <TD>4.037</TD> <TD>0.009252</TD> <TD>Lim</TD> <TD>cm</TD> <TD>ultimate SVL for males</TD></TR>
+    <TR><TD>  7</TD> <TD>8.417</TD> <TD>0.2024</TD> <TD>Wwp</TD> <TD>g</TD> <TD>wet weight at puberty for females</TD></TR>
+    <TR><TD>13.1</TD> <TD>11.61</TD> <TD>0.114</TD> <TD>Wwi</TD> <TD>g</TD> <TD>ultimate wet weight for females</TD></TR>
+    <TR><TD>8.6</TD> <TD>7.655</TD> <TD>0.1098</TD> <TD>Wwim</TD> <TD>g</TD> <TD>ultimate wet weight for males</TD></TR>
+    <TR><TD>3.562</TD> <TD>3.471</TD> <TD>0.02552</TD> <TD>Ri</TD> <TD>#/d</TD> <TD>maximum reprod rate</TD></TR>
+    <TR><TD colspan="2">see figure</TD> <TD>0.05945</TD> <TD>tL_f</TD> <TD colspan="2">time since metam <font color="blue"><i>vs.</i></font> SVL</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.06463</TD> <TD>tL_m</TD> <TD colspan="2">time since metam <font color="blue"><i>vs.</i></font> SVL</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.114</TD> <TD>tL_tf</TD> <TD colspan="2">time since metam <font color="blue"><i>vs.</i></font> SVL tadpole</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.115</TD> <TD>tL_tm</TD> <TD colspan="2">time since metam <font color="blue"><i>vs.</i></font> SVL tadpole</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.19</TD> <TD>Tab</TD> <TD colspan="2">temperature <font color="blue"><i>vs.</i></font> age at birth</TD>
+    <TR class="psd"><TD>0.02</TD> <TD>0.05436</TD> <TD>1.718</TD> <TD>psd.v</TD> <TD>cm/d</TD> <TD>energy conductance</TD></TR>
+    <TR class="psd"><TD>0.8</TD> <TD>0.9881</TD> <TD>0.2351</TD> <TD>psd.kap</TD> <TD>-</TD> <TD>allocation fraction to soma</TD></TR>
+    <TR class="psd"><TD>0.95</TD> <TD>0.95</TD> <TD>  0</TD> <TD>psd.kap_R</TD> <TD>-</TD> <TD>reproduction efficiency</TD></TR>
+    <TR class="psd"><TD> 18</TD> <TD>638.1</TD> <TD>34.45</TD> <TD>psd.p_M</TD> <TD>J/d.cm^3</TD> <TD>vol-spec som maint</TD></TR>
+    <TR class="psd"><TD>0.002</TD> <TD>0.002</TD> <TD>  0</TD> <TD>psd.k_J</TD> <TD>1/d</TD> <TD>maturity maint rate coefficient</TD></TR>
+    <TR class="psd"><TD>0.8</TD> <TD>0.8009</TD> <TD>0.001096</TD> <TD>psd.kap_G</TD> <TD>-</TD> <TD>growth efficiency</TD></TR>
+  </TABLE>
+  </div>
+
+  <div class="par">
+  <h2>std parameters at 20.0&deg;C</h2>
+  <TABLE id="par">
+    <TR class="head"><TH>symbol</TH> <TH>units</TH> <TH>value</TH>  <TH>free</TH> <TH>description</TH> </TR>
+    <TR><TD>T_ref</TD> <TD>K</TD> <TD>293.1</TD> <TD>0</TD> <TD>Reference temperature</TD></TR>
+    <TR><TD>T_A</TD> <TD>K</TD> <TD>9000</TD> <TD>0</TD> <TD>Arrhenius temperature</TD></TR>
+    <TR><TD>z</TD> <TD>-</TD> <TD>1.464</TD> <TD>1</TD> <TD>zoom factor for toad</TD></TR>
+    <TR><TD>F_m</TD> <TD>l/d.cm^2</TD> <TD>6.5</TD> <TD>0</TD> <TD>{F_m}, max spec searching rate</TD></TR>
+    <TR><TD>kap_X</TD> <TD>-</TD> <TD>0.8</TD> <TD>0</TD> <TD>digestion efficiency of food to reserve</TD></TR>
+    <TR><TD>kap_P</TD> <TD>-</TD> <TD>0.1</TD> <TD>0</TD> <TD>faecation efficiency of food to faeces</TD></TR>
+    <TR><TD>v</TD> <TD>cm/d</TD> <TD>0.05436</TD> <TD>1</TD> <TD>energy conductance</TD></TR>
+    <TR><TD>kap</TD> <TD>-</TD> <TD>0.9881</TD> <TD>1</TD> <TD>allocation fraction to soma</TD></TR>
+    <TR><TD>kap_R</TD> <TD>-</TD> <TD>0.95</TD> <TD>0</TD> <TD>reproduction efficiency</TD></TR>
+    <TR><TD>p_M</TD> <TD>J/d.cm^3</TD> <TD>638.1</TD> <TD>1</TD> <TD>[p_M], vol-spec somatic maint</TD></TR>
+    <TR><TD>p_T</TD> <TD>J/d.cm^2</TD> <TD>  0</TD> <TD>0</TD> <TD>{p_T}, surf-spec somatic maint</TD></TR>
+    <TR><TD>k_J</TD> <TD>1/d</TD> <TD>0.002</TD> <TD>0</TD> <TD>maturity maint rate coefficient</TD></TR>
+    <TR><TD>E_G</TD> <TD>J/cm^3</TD> <TD>7314</TD> <TD>1</TD> <TD>[E_G], spec cost for structure</TD></TR>
+    <TR><TD>E_Hb</TD> <TD>J</TD> <TD>0.0209</TD> <TD>1</TD> <TD>maturity at birth</TD></TR>
+    <TR><TD>E_Hp</TD> <TD>J</TD> <TD>1948</TD> <TD>1</TD> <TD>maturity at puberty</TD></TR>
+    <TR><TD>h_a</TD> <TD>1/d^2</TD> <TD>6.934e-10</TD> <TD>1</TD> <TD>Weibull aging acceleration</TD></TR>
+    <TR><TD>s_G</TD> <TD>-</TD> <TD>0.0001</TD> <TD>0</TD> <TD>Gompertz stress coefficient</TD></TR>
+    <TR><TD>E_Hj</TD> <TD>J</TD> <TD>48.67</TD> <TD>1</TD> <TD>maturity at metam</TD></TR>
+    <TR><TD>del_M</TD> <TD>-</TD> <TD>0.3242</TD> <TD>1</TD> <TD>shape coefficient for toad</TD></TR>
+    <TR><TD>f</TD> <TD>-</TD> <TD>  1</TD> <TD>0</TD> <TD>scaled functional response for 0-var data</TD></TR>
+    <TR><TD>f_00</TD> <TD>-</TD> <TD>0.07076</TD> <TD>1</TD> <TD>scaled functional response for tL_t data</TD></TR>
+    <TR><TD>f_20</TD> <TD>-</TD> <TD>0.01651</TD> <TD>1</TD> <TD>scaled functional response for tL_t data</TD></TR>
+    <TR><TD>f_40</TD> <TD>-</TD> <TD>0.8115</TD> <TD>1</TD> <TD>scaled functional response for tL_t data</TD></TR>
+    <TR><TD>f_70</TD> <TD>-</TD> <TD>0.873</TD> <TD>1</TD> <TD>scaled functional response for tL_t data</TD></TR>
+    <TR><TD>f_90</TD> <TD>-</TD> <TD>0.0002907</TD> <TD>1</TD> <TD>scaled functional response for tL_t data</TD></TR>
+    <TR><TD>f_tL</TD> <TD>-</TD> <TD>  1</TD> <TD>0</TD> <TD>scaled functional response for tL data</TD></TR>
+    <TR><TD>z_m</TD> <TD>-</TD> <TD>1.309</TD> <TD>1</TD> <TD>zoom factor for male</TD></TR>
+  </TABLE>
+  </div>
+
+</BODY>
+</HTML>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+  <TITLE>Daphnia_magna</TITLE>
+  <style>
+    div.prd {
+      width: 50%;
+      float: left;
+    }
+
+    div.par {
+      width: 50%;
+      float: right;
+    }
+
+    p.clear {
+      clear: both;
+    }
+
+    .head {
+      background-color: #FFE7C6
+    }
+
+    .psd {
+      color: blue
+    }
+
+    #prd {
+      border-style: solid hidden solid hidden;
+    }
+
+    #par {
+      border-style: solid hidden solid hidden;
+    }
+
+    tr:nth-child(even){background-color: #f2f2f2}
+  </style>
+</HEAD>
+
+<BODY>
+
+  <div class="prd">
+  <h1>Daphnia magna</h1>
+  </div>
+
+  <div class="par">
+  <h4>COMPLETE = 6.0; MRE =    0.194; SMAE =    0.285; SMSE =    0.135 </h4>
+  </div>
+
+  <p class="clear"></p>
+
+  <div class="prd">
+  <h2>Data & predictions</h2>
+  <TABLE id="prd">
+    <TR  class="head"><TH>data</TH> <TH>prd</TH> <TH>RE</TH>  <TH>symbol</TH> <TH>units</TH> <TH>description</TH> </TR>
+    <TR><TD>  1</TD> <TD>0.6206</TD> <TD>0.3794</TD> <TD>ab</TD> <TD>d</TD> <TD>age at birth</TD></TR>
+    <TR><TD> 45</TD> <TD>43.65</TD> <TD>0.02993</TD> <TD>am</TD> <TD>d</TD> <TD>life span</TD></TR>
+    <TR><TD>0.1</TD> <TD>0.09765</TD> <TD>0.02348</TD> <TD>Lb</TD> <TD>cm</TD> <TD>total length at birth</TD></TR>
+    <TR><TD>0.25</TD> <TD>0.2626</TD> <TD>0.05025</TD> <TD>Lp</TD> <TD>cm</TD> <TD>total length at puberty</TD></TR>
+    <TR><TD>8.2</TD> <TD>7.277</TD> <TD>0.1126</TD> <TD>Wd0</TD> <TD>mug</TD> <TD>initial dry weight</TD></TR>
+    <TR><TD>6.6</TD> <TD>4.51</TD> <TD>0.3166</TD> <TD>Wdb</TD> <TD>mug</TD> <TD>dry weight at birth</TD></TR>
+    <TR><TD>600</TD> <TD>245.3</TD> <TD>0.5911</TD> <TD>Wd37</TD> <TD>mug</TD> <TD>dry weight at L = 3.7 mm</TD></TR>
+    <TR><TD colspan="2">see figure</TD> <TD>0.2289</TD> <TD>LpX</TD> <TD colspan="2">length <font color="blue"><i>vs.</i></font> ingestion rate</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.5522</TD> <TD>LJO</TD> <TD colspan="2">length <font color="blue"><i>vs.</i></font> O2 consumption</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.08652</TD> <TD>LJO_extra</TD> <TD colspan="2">length <font color="blue"><i>vs.</i></font> O2 consumption</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.141</TD> <TD>tN</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> cumulative # of eggs</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.08607</TD> <TD>tL_f</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.05875</TD> <TD>tL_m</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.0586</TD> <TD>tL1</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.08433</TD> <TD>tL2</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.0688</TD> <TD>tL3</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.07532</TD> <TD>tL4</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.06933</TD> <TD>tL5</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.2726</TD> <TD>tWd</TD> <TD colspan="2">starvation time <font color="blue"><i>vs.</i></font> dry weight</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.2553</TD> <TD>tProt</TD> <TD colspan="2">starvation time <font color="blue"><i>vs.</i></font> protein</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.2009</TD> <TD>tCarb</TD> <TD colspan="2">starvation time <font color="blue"><i>vs.</i></font> weight</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.2892</TD> <TD>tGlyc</TD> <TD colspan="2">starvation time <font color="blue"><i>vs.</i></font> weight</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.2569</TD> <TD>tLipi</TD> <TD colspan="2">starvation time <font color="blue"><i>vs.</i></font> weight</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.3927</TD> <TD>tTrig</TD> <TD colspan="2">starvation time <font color="blue"><i>vs.</i></font> weight</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.05955</TD> <TD>tS_f</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> surviving fraction</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.1859</TD> <TD>tS_m</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> surviving fraction</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.1075</TD> <TD>tL_SK1</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.1035</TD> <TD>tN_SK1</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> cumulative # of eggs</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.09787</TD> <TD>tL_SK2</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.0913</TD> <TD>tN_SK2</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> cumulative # of eggs</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.05526</TD> <TD>tL_SK3</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.4458</TD> <TD>tN_SK3</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> cumulative # of eggs</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.04861</TD> <TD>tL_SK4</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.4595</TD> <TD>tN_SK4</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> cumulative # of eggs</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.2487</TD> <TD>xf</TD> <TD colspan="2">algae density <font color="blue"><i>vs.</i></font> ingestion rate</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.04904</TD> <TD>tL_C1</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.215</TD> <TD>tN_C1</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> cumulative # of eggs</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.04301</TD> <TD>tL_C2</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.3824</TD> <TD>tN_C2</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> cumulative # of eggs</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.02102</TD> <TD>tL_C3</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> length</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.2821</TD> <TD>tN_C3</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> cumulative # of eggs</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.2198</TD> <TD>LFx</TD> <TD colspan="2">length <font color="blue"><i>vs.</i></font> filtration rate</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.6016</TD> <TD>LDw</TD> <TD colspan="2">length <font color="blue"><i>vs.</i></font> dry weight</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.2387</TD> <TD>LDwA</TD> <TD colspan="2">length <font color="blue"><i>vs.</i></font> dry weight</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.1303</TD> <TD>tS</TD> <TD colspan="2">starvation time <font color="blue"><i>vs.</i></font> survival</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.1603</TD> <TD>Tap</TD> <TD colspan="2">temperature <font color="blue"><i>vs.</i></font> time since birth at puberty</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.1332</TD> <TD>Tab</TD> <TD colspan="2">temperature <font color="blue"><i>vs.</i></font> time between broods</TD>
+    <TR class="psd"><TD>0.02</TD> <TD>0.1858</TD> <TD>8.29</TD> <TD>psd.v</TD> <TD>cm/d</TD> <TD>energy conductance</TD></TR>
+    <TR class="psd"><TD>0.8</TD> <TD>0.5809</TD> <TD>0.2739</TD> <TD>psd.kap</TD> <TD>-</TD> <TD>allocation fraction to soma</TD></TR>
+    <TR class="psd"><TD>0.95</TD> <TD>0.95</TD> <TD>  0</TD> <TD>psd.kap_R</TD> <TD>-</TD> <TD>reproduction efficiency</TD></TR>
+    <TR class="psd"><TD> 18</TD> <TD>1200</TD> <TD>65.67</TD> <TD>psd.p_M</TD> <TD>J/d.cm^3</TD> <TD>vol-spec som maint</TD></TR>
+    <TR class="psd"><TD>0.002</TD> <TD>0.2537</TD> <TD>125.8</TD> <TD>psd.k_J</TD> <TD>1/d</TD> <TD>maturity maint rate coefficient</TD></TR>
+    <TR class="psd"><TD>0.8</TD> <TD>0.9034</TD> <TD>0.1292</TD> <TD>psd.kap_G</TD> <TD>-</TD> <TD>growth efficiency</TD></TR>
+  </TABLE>
+  </div>
+
+  <div class="par">
+  <h2>std parameters at 20.0&deg;C</h2>
+  <TABLE id="par">
+    <TR class="head"><TH>symbol</TH> <TH>units</TH> <TH>value</TH>  <TH>free</TH> <TH>description</TH> </TR>
+    <TR><TD>z</TD> <TD>-</TD> <TD>0.1516</TD> <TD>1</TD> <TD>zoom factor for female</TD></TR>
+    <TR><TD>F_m</TD> <TD>l/d.cm^2</TD> <TD>30.17</TD> <TD>1</TD> <TD>{F_m}, max spec searching rate</TD></TR>
+    <TR><TD>kap_X</TD> <TD>-</TD> <TD>0.9</TD> <TD>0</TD> <TD>digestion efficiency of food to reserve</TD></TR>
+    <TR><TD>kap_P</TD> <TD>-</TD> <TD>0.05</TD> <TD>0</TD> <TD>faecation efficiency of food to faeces</TD></TR>
+    <TR><TD>v</TD> <TD>cm/d</TD> <TD>0.1858</TD> <TD>1</TD> <TD>energy conductance</TD></TR>
+    <TR><TD>kap</TD> <TD>-</TD> <TD>0.5809</TD> <TD>1</TD> <TD>allocation fraction to soma</TD></TR>
+    <TR><TD>kap_R</TD> <TD>-</TD> <TD>0.95</TD> <TD>0</TD> <TD>reproduction efficiency</TD></TR>
+    <TR><TD>p_M</TD> <TD>J/d.cm^3</TD> <TD>1200</TD> <TD>1</TD> <TD>[p_M], vol-spec somatic maint</TD></TR>
+    <TR><TD>p_T</TD> <TD>J/d.cm^2</TD> <TD>  0</TD> <TD>0</TD> <TD>{p_T}, surf-spec somatic maint</TD></TR>
+    <TR><TD>k_J</TD> <TD>1/d</TD> <TD>0.2537</TD> <TD>1</TD> <TD>maturity maint rate coefficient</TD></TR>
+    <TR><TD>E_G</TD> <TD>J/cm^3</TD> <TD>4400</TD> <TD>1</TD> <TD>[E_G], spec cost for structure</TD></TR>
+    <TR><TD>E_Hb</TD> <TD>J</TD> <TD>0.05464</TD> <TD>1</TD> <TD>maturity at birth</TD></TR>
+    <TR><TD>E_Hp</TD> <TD>J</TD> <TD>1.09</TD> <TD>1</TD> <TD>maturity at puberty</TD></TR>
+    <TR><TD>h_a</TD> <TD>1/d^2</TD> <TD>0.0002794</TD> <TD>1</TD> <TD>Weibull aging acceleration</TD></TR>
+    <TR><TD>s_G</TD> <TD>-</TD> <TD>-0.3</TD> <TD>0</TD> <TD>Gompertz stress coefficient for female</TD></TR>
+    <TR><TD>T_A</TD> <TD>K</TD> <TD>6400</TD> <TD>0</TD> <TD>Arrhenius temperature</TD></TR>
+    <TR><TD>T_ref</TD> <TD>K</TD> <TD>293.1</TD> <TD>0</TD> <TD>Reference temperature</TD></TR>
+    <TR><TD>del_M</TD> <TD>-</TD> <TD>0.264</TD> <TD>1</TD> <TD>shape coefficient</TD></TR>
+    <TR><TD>eR0</TD> <TD>-</TD> <TD>  1</TD> <TD>0</TD> <TD>eR at start starvation </TD></TR>
+    <TR><TD>f</TD> <TD>-</TD> <TD>  1</TD> <TD>0</TD> <TD>scaled functional response for 0-var data</TD></TR>
+    <TR><TD>f_LJO</TD> <TD>-</TD> <TD>0.78</TD> <TD>0</TD> <TD>scaled functional response for LJO data</TD></TR>
+    <TR><TD>f_tN</TD> <TD>-</TD> <TD>1.343</TD> <TD>1</TD> <TD>scaled functional response for tN data</TD></TR>
+    <TR><TD>f_tL</TD> <TD>-</TD> <TD>0.8404</TD> <TD>1</TD> <TD>scaled functional response for tL_f, tL_m data</TD></TR>
+    <TR><TD>f_tL1</TD> <TD>-</TD> <TD>1.031</TD> <TD>1</TD> <TD>scaled functional response for tL1 data</TD></TR>
+    <TR><TD>f_tL2</TD> <TD>-</TD> <TD>0.9601</TD> <TD>1</TD> <TD>scaled functional response for tL2 data</TD></TR>
+    <TR><TD>f_tL3</TD> <TD>-</TD> <TD>0.8563</TD> <TD>1</TD> <TD>scaled functional response for tL3 data</TD></TR>
+    <TR><TD>f_tL4</TD> <TD>-</TD> <TD>0.724</TD> <TD>1</TD> <TD>scaled functional response for tL4 data</TD></TR>
+    <TR><TD>f_tL5</TD> <TD>-</TD> <TD>0.6297</TD> <TD>1</TD> <TD>scaled functional response for tL5 data</TD></TR>
+    <TR><TD>s_Gm</TD> <TD>-</TD> <TD>-0.2</TD> <TD>0</TD> <TD>Gompertz stress coefficient for male</TD></TR>
+    <TR><TD>z_m</TD> <TD>-</TD> <TD>0.08759</TD> <TD>0</TD> <TD>zoom factor for male</TD></TR>
+    <TR><TD>f_SK1</TD> <TD>-</TD> <TD>1.244</TD> <TD>0</TD> <TD>scaled functional response for tL_SK1, tN_SK1 data</TD></TR>
+    <TR><TD>f_SK2</TD> <TD>-</TD> <TD>1.096</TD> <TD>0</TD> <TD>scaled functional response for tL_SK2, tN_SK2 data</TD></TR>
+    <TR><TD>f_SK3</TD> <TD>-</TD> <TD>0.6747</TD> <TD>0</TD> <TD>scaled functional response for tL_SK3, tN_SK3 data</TD></TR>
+    <TR><TD>f_SK4</TD> <TD>-</TD> <TD>0.497</TD> <TD>0</TD> <TD>scaled functional response for tL_SK2, tN_SK2 data</TD></TR>
+    <TR><TD>f_ap</TD> <TD>-</TD> <TD>0.8293</TD> <TD>0</TD> <TD>scaled functional response for Tap data</TD></TR>
+    <TR><TD>s_shrink</TD> <TD>-</TD> <TD>4.38</TD> <TD>0</TD> <TD>shrinking stress coefficient</TD></TR>
+    <TR><TD>f_LW</TD> <TD>-</TD> <TD>  1</TD> <TD>0</TD> <TD>scaled functional response for LW data</TD></TR>
+    <TR><TD>t_0</TD> <TD>d</TD> <TD>2.324</TD> <TD>0</TD> <TD>time for egg production at 20�C</TD></TR>
+    <TR><TD>L_01</TD> <TD>d</TD> <TD>0.313</TD> <TD>0</TD> <TD>initial size for Coors data</TD></TR>
+    <TR><TD>L_02</TD> <TD>d</TD> <TD>0.313</TD> <TD>0</TD> <TD>initial size for Coors data</TD></TR>
+    <TR><TD>L_03</TD> <TD>d</TD> <TD>0.11</TD> <TD>0</TD> <TD>initial size for Coors data</TD></TR>
+    <TR><TD>fF_m</TD> <TD>-</TD> <TD>1.5</TD> <TD>0</TD> <TD>increase in filtration rate at low food density, approximated from Lampert W. Limnol. Oceanogr., 39(5), 1994,997-1006</TD></TR>
+  </TABLE>
+  </div>
+
+</BODY>
+</HTML>

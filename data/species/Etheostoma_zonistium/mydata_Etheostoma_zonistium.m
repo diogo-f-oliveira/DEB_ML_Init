@@ -1,0 +1,165 @@
+  function [data, auxData, metaData, txtData, weights] = mydata_Etheostoma_zonistium
+%% set metadata
+metaData.phylum     = 'Chordata'; 
+metaData.class      = 'Actinopterygii'; 
+metaData.order      = 'Perciformes'; 
+metaData.family     = 'Percidae';
+metaData.species    = 'Etheostoma_zonistium'; 
+metaData.species_en = 'Bandfin darter'; 
+
+metaData.ecoCode.climate = {'Cfa'};
+metaData.ecoCode.ecozone = {'THn'};
+metaData.ecoCode.habitat = {'0iFr', '0iFc'};
+metaData.ecoCode.embryo  = {'Fh','Fg'};
+metaData.ecoCode.migrate = {};
+metaData.ecoCode.food    = {'biCi'};
+metaData.ecoCode.gender  = {'D'};
+metaData.ecoCode.reprod  = {'O'};
+
+metaData.T_typical  = C2K(21); % K, body temp
+metaData.data_0     = {'ab'; 'am'; 'Lp'; 'Li'; 'Wwb'; 'Wwp'; 'Wwi'; 'Ri'};  
+metaData.data_1     = {'t-L'}; 
+
+metaData.COMPLETE = 2.5; % using criteria of LikaKear2011
+
+metaData.author   = {'Bas Kooijman','Starrlight Augustine'};        
+metaData.date_subm = [2020 07 24];                           
+metaData.email    = {'bas.kooijman@vu.nl'};                 
+metaData.address  = {'VU University Amsterdam'}; 
+
+metaData.curator     = {'Starrlight Augustine'};
+metaData.email_cur   = {'starrlight.augustine@akvaplan.niva.no'}; 
+metaData.date_acc    = [2020 07 24]; 
+
+%% set data
+% zero-variate data
+data.ab = 167/24;   units.ab = 'd';  label.ab = 'age at birth';              bibkey.ab = 'CarnBurr1989';   
+  temp.ab = C2K(20); units.temp.ab = 'K'; label.temp.ab = 'temperature';
+data.am = 3*365;   units.am = 'd';  label.am = 'life span';                  bibkey.am = 'CarnBurr1989';   
+  temp.am = C2K(21); units.temp.am = 'K'; label.temp.am = 'temperature';
+
+data.Lp = 3.1;  units.Lp = 'cm'; label.Lp = 'standard length at puberty';    bibkey.Lp = 'CarnBurr1989'; 
+data.Li = 5.0;   units.Li = 'cm'; label.Li = 'ultimate standard length';     bibkey.Li = 'CarnBurr1989';
+
+data.Wwb = 7.0e-4;  units.Wwb = 'g';  label.Wwb = 'wet weight at birth';     bibkey.Wwb = 'CarnBurr1989';
+  comment.Wwb = 'based on egg diameter of 1.1 mm: pi/6*0.11^3';
+data.Wwp = 0.1075;  units.Wwp = 'g';  label.Wwp = 'wet weight at puberty';   bibkey.Wwp = {'fishbase','CarnBurr1989'};
+  comment.Wwp = 'based on 0.00513*(Lp*0.85)^3.14, see F1, F2';
+data.Wwi = 0.48;  units.Wwi = 'g';  label.Wwi = 'ultimate wet weight';       bibkey.Wwi = {'fishbase','CarnBurr1989'};
+  comment.Wwi = 'based on 0.00513*(Li*0.85)^3.14, see F1, F2';
+ 
+data.Ri = 135/365;units.Ri = '#/d'; label.Ri = 'maximum reprod rate';        bibkey.Ri = 'CarnBurr1989';   
+  temp.Ri = C2K(21);  units.temp.Ri = 'K'; label.temp.Ri = 'temperature';
+  
+% univariate data
+% time-length
+data.tL = [ ... % time since birth (yr), std length (mm)
+0.505	31.755
+0.505	30.505
+0.564	33.002
+0.582	33.894
+0.749	29.955
+0.754	31.205
+0.850	30.663
+0.933	32.266
+0.933	30.658
+0.992	33.512
+0.998	31.547
+1.081	35.828
+1.081	30.471
+1.164	32.430
+1.176	37.072
+1.259	34.568
+1.259	36.532
+1.503	37.946
+1.503	42.053
+1.562	38.300
+1.592	42.762
+1.735	46.861
+1.764	42.037
+1.830	41.319
+1.836	42.033
+1.901	39.529
+1.913	42.386
+2.002	40.952
+2.079	36.126
+2.234	40.581
+2.489	46.994
+2.590	43.774
+2.721	46.445
+2.750	49.657
+2.822	43.582
+2.822	46.439
+2.905	48.577
+2.911	44.469];
+data.tL(:,1) = (0.3 + data.tL(:,1)) * 365; % convert yr to d
+data.tL(:,2) = data.tL(:,2)/ 10; % convert mm to cm
+units.tL = {'d', 'cm'}; label.tL = {'time since birth', 'standard length'};  
+temp.tL = C2K(21);  units.temp.tL = 'K'; label.temp.tL = 'temperature';
+bibkey.tL = 'CarnBurr1989';
+
+%% set weights for all real data
+weights = setweights(data, []);
+weights.tL =  3 * weights.tL;
+
+%% set pseudodata and respective weights
+[data, units, label, weights] = addpseudodata(data, units, label, weights);
+weights.psd.v =  2 * weights.psd.v;
+weights.psd.p_M =  5 * weights.psd.p_M;
+
+%% pack auxData and txtData for output
+auxData.temp = temp;
+txtData.units = units;
+txtData.label = label;
+txtData.bibkey = bibkey;
+txtData.comment = comment;
+
+%% Discussion points
+D1 = 'Males are assumed not to differ from females';
+D2 = 'Mean temperature is guessed, but varied between 8 and 25 C';
+metaData.discussion = struct('D1',D1, 'D2',D2);
+
+%% Facts
+F1 = 'length-length from photo: SL = 0.85 * TL';
+metaData.bibkey.F1 = 'fishbase'; 
+F2 = 'length-weight: Ww in g = 0.00513*(TL in cm)^3.14';
+metaData.bibkey.F2 = 'fishbase'; 
+metaData.facts = struct('F1',F1, 'F2',F2);
+
+%% Links
+metaData.links.id_CoL = '3BL88'; % Cat of Life
+metaData.links.id_ITIS = '168467'; % ITIS
+metaData.links.id_EoL = '218651'; % Ency of Life
+metaData.links.id_Wiki = 'Etheostoma_zonistium'; % Wikipedia
+metaData.links.id_ADW = 'Etheostoma_zonistium'; % ADW
+metaData.links.id_Taxo = '174175'; % Taxonomicon
+metaData.links.id_WoRMS = '1011779'; % WoRMS
+metaData.links.id_fishbase = 'Etheostoma-zonistium'; % fishbase
+
+
+%% References
+bibkey = 'Wiki'; type = 'Misc'; bib = ...
+'howpublished = {\url{https://en.wikipedia.org/wiki/Etheostoma_zonistium}}';  
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'Kooy2010'; type = 'Book'; bib = [ ...  % used in setting of chemical parameters and pseudodata
+'author = {Kooijman, S.A.L.M.}, ' ...
+'year = {2010}, ' ...
+'title  = {Dynamic Energy Budget theory for metabolic organisation}, ' ...
+'publisher = {Cambridge Univ. Press, Cambridge}, ' ...
+'pages = {Table 4.2 (page 150), 8.1 (page 300)}, ' ...
+'howpublished = {\url{../../../bib/Kooy2010.html}}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'CarnBurr1989'; type = 'Techreport'; bib = [ ... 
+'author = {Douglas A. Carney and Brooks M. Burr}, ' ...
+'year = {1989}, ' ...
+'title = {Life Histories of the Bandfin Darter, \emph{Etheostoma zonistium}, and the Firebelly Darter, \emph{Etheostoma pyrrhogaster}, in {W}estern {K}entucky}, ' ... 
+'institution = {Illinois Natural History Survey}, ' ...
+'series = {Biological notes}, ' ...
+'volume = {134}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'fishbase'; type = 'Misc'; bib = ...
+'howpublished = {\url{https://www.fishbase.se/summary/Etheostoma-zonistium.html}}';  
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];

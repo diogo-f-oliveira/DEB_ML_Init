@@ -1,0 +1,60 @@
+Successful convergence 
+Perna_viridis 
+COMPLETE = 2.5 
+MRE =    0.149 
+SMSE =    0.145 
+
+
+data and predictions (relative error) 
+0.9 0.9261 (0.02895) ab, d, age at birth
+ 12 3.652 (0.6956) tj, d, time since birth at metam
+ 75 60.59 (0.1921) tp, d, time since birth at puberty
+1825 1825 (1.555e-09) am, d, life span
+0.008 0.007527 (0.05916) Lb, cm, shell lenght at birth
+0.04 0.05437 (0.3592) Lj, cm, shell lenght at metam
+1.5 1.261 (0.159) Lp, cm, shell lenght at puberty
+ 18 12.12 (0.3269) Li, cm, ultimate shell lenght
+3e-08 3.031e-08 (0.01028) Wdb, g, dry weight at birth
+3e-06 2.732e-06 (0.08917) Wdj, g, dry weight at metam
+0.03 0.03413 (0.1377) Wdp, g, dry weight at puberty
+ 28 30.23 (0.07979) Wdi, g, ultimate dry weight
+1.59e+05 1.591e+05 (0.0004826) Ri, #/d, maximum reprod rate
+see figure (0.126) tL, time since birth vs. shell lenght
+see figure (0.4499) tL2, age vs. shell lenght
+see figure (0.1687) tW, time since birth vs. dry weight
+see figure (0.2002) LW2, shell lenght vs. wet weight
+0.02 0.02635 (0.3177) psd.v, cm/d, energy conductance
+0.8 0.9697 (0.2122) psd.kap, -, allocation fraction to soma
+0.95 0.95 (  0) psd.kap_R, -, reproduction efficiency
+ 18  18 (  0) psd.p_M, J/d.cm^3, vol-spec som maint
+0.002 0.002 (  0) psd.k_J, 1/d, maturity maint rate coefficient
+0.8 0.7991 (0.001135) psd.kap_G, -, growth efficiency
+
+Parameters 
+z, - 1.365 1 
+F_m, l/d.cm^2 6.5 0 
+kap_X, - 0.5049 1 
+kap_P, - 0.1 0 
+v, cm/d 0.02635 1 
+kap, - 0.9697 1 
+kap_R, - 0.95 0 
+p_M, J/d.cm^3  18 0 
+p_T, J/d.cm^2   0 0 
+k_J, 1/d 0.002 0 
+E_G, J/cm^3 2356 1 
+E_Hb, J 1.695e-05 1 
+E_Hj, J 0.001533 1 
+E_Hp, J 20.7 1 
+h_a, 1/d^2 3.477e-08 1 
+s_G, - 0.0001 0 
+T_A, K 6446 1 
+T_L, K 219.8 1 
+T_H, K 361.9 1 
+T_AL, K 4463 1 
+T_AH, K 1.315e+04 1 
+T_ref, K 299.9 1 
+del_M, - 0.5053 1 
+del_Mb, - 0.814 0 
+f, -   1 0 
+f_tW, - 1.2 0 
+t_0, - -50 0 

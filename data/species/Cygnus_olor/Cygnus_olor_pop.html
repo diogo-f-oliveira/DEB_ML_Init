@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+  <TITLE>Cygnus_olor pop</TITLE>
+  <style>
+    #InputSymbol {
+      background-image: url('../../img/searchicon.png');
+      background-position: 2px -10px;
+      background-repeat: no-repeat;
+      width: 15%; /* Width of search field */
+      font-size: 14px; /* Increase font-size */
+      padding: 5px 10px 7px 40px;
+      border: 1px solid #ddd; /* Add a grey border */
+      margin-bottom: 12px; /* Add some space below the input */
+    }
+
+    #InputUnits {
+      background-image: url('../../img/searchicon.png');
+      background-position: 2px -10px;
+      background-repeat: no-repeat;
+      width: 15%; /* Width of search field */
+      font-size: 14px; /* Increase font-size */
+      padding: 5px 10px 7px 40px;
+      border: 1px solid #ddd; /* Add a grey border */
+      margin-bottom: 12px; /* Add some space below the input */
+    }
+
+    #InputLabel {
+      background-image: url('../../img/searchicon.png');
+      background-position: 2px -10px;
+      background-repeat: no-repeat;
+      width: 15%; /* Width of search field */
+      font-size: 14px; /* Increase font-size */
+      padding: 5px 10px 7px 40px;
+      border: 1px solid #ddd; /* Add a grey border */
+      margin-bottom: 12px; /* Add some space below the input */
+    }
+
+    #InputShort {
+      background-image: url('../../img/searchicon.png');
+      background-position: 2px -10px;
+      background-repeat: no-repeat;
+      width: 15%; /* Width of search field */
+      font-size: 14px; /* Increase font-size */
+      padding: 5px 10px 7px 40px;
+      border: 1px solid #ddd; /* Add a grey border */
+      margin-bottom: 12px; /* Add some space below the input */
+    }
+
+    #head0 {
+      background-color: #FFE7C6;
+    }
+
+    #head1 {
+      background-color: #FFE7C6;
+    }
+
+    #head2 {
+      background-color: #FFE7C6;
+    }
+
+    #caption {
+      width: 425px;
+      padding-top: 15px;
+    }
+
+    div.fig {
+      width: 50%;
+      float: left;
+      padding-top: 25px;
+      padding-bottom: 25px;
+    }
+
+    #Table {
+      border-style: solid hidden solid hidden;
+    }
+
+    tr:nth-child(even){background-color: #f2f2f2};
+    td:nth-child(odd){border-left: solid 1px black};
+
+  </style>
+
+</HEAD>
+
+<BODY>
+
+    <h1 align="center">Cygnus olor: Population traits</h1>
+    <h3 align="center">at T = 39.5 &deg;C with background hazards for embryo, juv, adult: 0, 0, 0 1/d</h3>
+      <div class="fig">
+        <img src="Cygnus_olor_pop_01.png" width="425px"> 
+        <div id="caption">
+          Ln survival probability as function of age, 
+          with (dashed) and without (solid) thinning at max (red) and min (blue) scaled functional response for females.
+        </div>
+      </div>
+
+      <div class="fig">
+        <img src="Cygnus_olor_pop_02.png" width="425px"> 
+        <div id="caption">
+          Ln survivor function of the stable age distribution as function of age, 
+          with (dashed) and without (solid) thinning at max (red) and min (blue) scaled functional response for females.
+        </div>
+      </div>
+
+      <div>
+        <input type="text" id="InputSymbol" onkeyup="FunctionSymbol()" placeholder="Search for symbol ..">
+        <input type="text" id="InputUnits"  onkeyup="FunctionUnits()"  placeholder="Search for units ..">
+        <input type="text" id="InputLabel"  onkeyup="FunctionLabel()"  placeholder="Search for label ..">
+        <input type="text" id="InputShort"  onkeyup="FunctionShort()"  placeholder="Short/Medium/Yields" title="Type S or M or Y">
+      </div>
+
+      <TABLE id="Table">
+        <TR id="head0"> <TH  colspan="2">model std</TH> <TH colspan="4">f_min</TH> <TH colspan="4">f</TH> <TH colspan="4">f_max</TH> <TH>date: 2020/12/04</TH></TR>
+        <TR id="head1"> <TH>symbol</TH> <TH>units</TH> <TH colspan="2">thinning false</TH><TH colspan="2">thinning true</TH>  <TH colspan="2">thinning false</TH><TH colspan="2">thinning true</TH>  <TH colspan="2">thinning false</TH><TH colspan="2">thinning true</TH>  <TH>description</TH></TR>
+        <TR id="head2"> <TH></TH> <TH></TH>  <TH>female</TH><TH>male</TH> <TH>female</TH><TH>male</TH> <TH>female</TH><TH>male</TH> <TH>female</TH><TH>male</TH> <TH>female</TH><TH>male</TH> <TH>female</TH><TH>male</TH> <TH></TH></TR>
+
+        <TR id="f"> <TD>f</TD> <TD>-</TD>
+          <TD>0.972188</TD> <TD>0.972188</TD> <TD>0.973865</TD> <TD>0.973865</TD> <TD>0.986932</TD> <TD>0.986932</TD> <TD>0.986932</TD> <TD>0.986932</TD> <TD>1</TD> <TD>1</TD> <TD>1</TD> <TD>1</TD>   <TD>scaled functional response</TD>
+        </TR>
+        <TR id="r"> <TD>r</TD> <TD>1/d</TD>
+          <TD>0</TD> <TD>0</TD> <TD>0</TD> <TD>0</TD> <TD>0.00276855</TD> <TD>0.00276855</TD> <TD>0.000449766</TD> <TD>0.000449766</TD> <TD>0.0039707</TD> <TD>0.0039707</TD> <TD>0.000762371</TD> <TD>0.000762371</TD>   <TD>spec pop growth rate</TD>
+        </TR>
+        <TR id="t2"> <TD>t2</TD> <TD>d</TD>
+          <TD>NaN</TD> <TD>NaN</TD> <TD>NaN</TD> <TD>NaN</TD> <TD>250.364</TD> <TD>250.364</TD> <TD>1541.13</TD> <TD>1541.13</TD> <TD>174.565</TD> <TD>174.565</TD> <TD>909.199</TD> <TD>909.199</TD>   <TD>population doubling time</TD>
+        </TR>
+        <TR id="a_b"> <TD>a_b</TD> <TD>d</TD>
+          <TD>10.3663</TD> <TD>10.2482</TD> <TD>10.3639</TD> <TD>10.246</TD> <TD>10.3459</TD> <TD>10.2287</TD> <TD>10.3459</TD> <TD>10.2287</TD> <TD>10.3282</TD> <TD>10.2118</TD> <TD>10.3282</TD> <TD>10.2118</TD>   <TD>age at birth</TD>
+        </TR>
+        <TR id="t_p"> <TD>t_p</TD> <TD>d</TD>
+          <TD>794.184</TD> <TD>242.814</TD> <TD>569.924</TD> <TD>241.214</TD> <TD>392.962</TD> <TD>229.825</TD> <TD>392.962</TD> <TD>229.825</TD> <TD>339.715</TD> <TD>220.015</TD> <TD>339.715</TD> <TD>220.015</TD>   <TD>time since birth at puberty</TD>
+        </TR>
+        <TR id="S_b"> <TD>S_b</TD> <TD>-</TD>
+          <TD>1</TD> <TD>1</TD> <TD>1</TD> <TD>1</TD> <TD>1</TD> <TD>1</TD> <TD>1</TD> <TD>1</TD> <TD>1</TD> <TD>1</TD> <TD>1</TD> <TD>1</TD>   <TD>survival probability at birth</TD>
+        </TR>
+        <TR id="S_p"> <TD>S_p</TD> <TD>-</TD>
+          <TD>1</TD> <TD>1</TD> <TD>0.515555</TD> <TD>0.49613</TD> <TD>1</TD> <TD>1</TD> <TD>0.512558</TD> <TD>0.493318</TD> <TD>1</TD> <TD>1</TD> <TD>0.509628</TD> <TD>0.490569</TD>   <TD>survival probability at puberty</TD>
+        </TR>
+        <TR id="theta_0b"> <TD>theta_0b</TD> <TD>-</TD>
+          <TD>0.000658789</TD> <TD>0.000604331</TD> <TD>0.00980073</TD> <TD>0.0106792</TD> <TD>0.0282261</TD> <TD>0.0279117</TD> <TD>0.0603694</TD> <TD>0.069106</TD> <TD>0.0401658</TD> <TD>0.0397234</TD> <TD>0.0931963</TD> <TD>0.105234</TD>   <TD>fraction of individuals that is embryo</TD>
+        </TR>
+        <TR id="theta_bp"> <TD>theta_bp</TD> <TD>-</TD>
+          <TD>0.000659052</TD> <TD>0.000604556</TD> <TD>0.00698399</TD> <TD>0.00746481</TD> <TD>0.0274397</TD> <TD>0.0271422</TD> <TD>0.0427053</TD> <TD>0.0479601</TD> <TD>0.0385666</TD> <TD>0.0381585</TD> <TD>0.0655382</TD> <TD>0.0726116</TD>   <TD>fraction of individuals that is juvenile</TD>
+        </TR>
+        <TR id="theta_pi"> <TD>theta_pi</TD> <TD>-</TD>
+          <TD>0.998682</TD> <TD>0.998791</TD> <TD>0.983215</TD> <TD>0.981856</TD> <TD>0.944334</TD> <TD>0.944946</TD> <TD>0.896925</TD> <TD>0.882934</TD> <TD>0.921268</TD> <TD>0.922118</TD> <TD>0.841266</TD> <TD>0.822154</TD>   <TD>fraction of individuals that is adult</TD>
+        </TR>
+        <TR id="L_bi"> <TD>L_bi</TD> <TD>cm</TD>
+          <TD>16.6483</TD> <TD>18.1934</TD> <TD>16.5161</TD> <TD>18.0288</TD> <TD>14.8568</TD> <TD>16.0877</TD> <TD>15.5537</TD> <TD>16.7695</TD> <TD>14.3083</TD> <TD>15.4428</TD> <TD>14.9346</TD> <TD>15.9837</TD>   <TD>mean structural length of post-natals</TD>
+        </TR>
+        <TR id="L2_bi"> <TD>L2_bi</TD> <TD>cm^2</TD>
+          <TD>277.512</TD> <TD>331.425</TD> <TD>274.666</TD> <TD>327.584</TD> <TD>230.826</TD> <TD>271.873</TD> <TD>252.767</TD> <TD>296.486</TD> <TD>217.323</TD> <TD>254.649</TD> <TD>239.018</TD> <TD>277.502</TD>   <TD>mean squared structural length of post-natals</TD>
+        </TR>
+        <TR id="L3_bi"> <TD>L3_bi</TD> <TD>cm^3</TD>
+          <TD>4628.81</TD> <TD>6041.28</TD> <TD>4580.52</TD> <TD>5970.06</TD> <TD>3675.99</TD> <TD>4717.86</TD> <TD>4186.06</TD> <TD>5356.75</TD> <TD>3415.19</TD> <TD>4355.28</TD> <TD>3946.05</TD> <TD>4992.39</TD>   <TD>mean cubed structural length of post-natals</TD>
+        </TR>
+        <TR id="Ww_bi"> <TD>Ww_bi</TD> <TD>g</TD>
+          <TD>9384.22</TD> <TD>12823.7</TD> <TD>9294.43</TD> <TD>12684.1</TD> <TD>7509.79</TD> <TD>10094.8</TD> <TD>8551.84</TD> <TD>11461.9</TD> <TD>7024.17</TD> <TD>9384.76</TD> <TD>8116</TD> <TD>10757.6</TD>   <TD>mean wet weight of post-natals</TD>
+        </TR>
+        <TR id="L_pi"> <TD>L_pi</TD> <TD>cm</TD>
+          <TD>16.6559</TD> <TD>18.2013</TD> <TD>16.5975</TD> <TD>18.127</TD> <TD>15.1388</TD> <TD>16.3999</TD> <TD>16.0533</TD> <TD>17.4026</TD> <TD>14.6913</TD> <TD>15.8656</TD> <TD>15.7032</TD> <TD>16.9429</TD>   <TD>mean structural length of adults</TD>
+        </TR>
+        <TR id="L2_pi"> <TD>L2_pi</TD> <TD>cm^2</TD>
+          <TD>277.678</TD> <TD>331.609</TD> <TD>276.434</TD> <TD>329.875</TD> <TD>236.754</TD> <TD>278.893</TD> <TD>263.57</TD> <TD>311.155</TD> <TD>225.296</TD> <TD>264.045</TD> <TD>255.618</TD> <TD>299.669</TD>   <TD>mean squared structural length of adults</TD>
+        </TR>
+        <TR id="L3_pi"> <TD>L3_pi</TD> <TD>cm^3</TD>
+          <TD>4631.77</TD> <TD>6044.85</TD> <TD>4612.11</TD> <TD>6014.41</TD> <TD>3778.72</TD> <TD>4849.17</TD> <TD>4379.03</TD> <TD>5640.22</TD> <TD>3552.25</TD> <TD>4529.42</TD> <TD>4243.02</TD> <TD>5421.06</TD>   <TD>mean cubed structural length of adults</TD>
+        </TR>
+        <TR id="Ww_pi"> <TD>Ww_pi</TD> <TD>g</TD>
+          <TD>9390.22</TD> <TD>12831.3</TD> <TD>9358.54</TD> <TD>12778.3</TD> <TD>7719.67</TD> <TD>10375.8</TD> <TD>8946.05</TD> <TD>12068.4</TD> <TD>7306.06</TD> <TD>9759.99</TD> <TD>8726.8</TD> <TD>11681.3</TD>   <TD>mean wet weight of adults</TD>
+        </TR>
+        <TR id="R"> <TD>R</TD> <TD>1/d</TD>
+          <TD>0</TD> <TD>0.0525408</TD> <TD>0</TD> <TD>0.0515329</TD> <TD>0</TD> <TD>0.013367</TD> <TD>0</TD> <TD>0.0392971</TD> <TD>0</TD> <TD>0.00342643</TD> <TD>0</TD> <TD>0.0324156</TD>   <TD>mean reproduction rate of adults</TD>
+        </TR>
+        <TR id="J_X"> <TD>J_X</TD> <TD>g/d</TD>
+          <TD>579.551</TD> <TD>756.368</TD> <TD>574.596</TD> <TD>748.892</TD> <TD>489.363</TD> <TD>629.871</TD> <TD>535.879</TD> <TD>686.893</TD> <TD>466.838</TD> <TD>597.778</TD> <TD>513.44</TD> <TD>651.423</TD>   <TD>mean ingestion rate of wet food by post-natals</TD>
+        </TR>
+        <TR id="Y_PX"> <TD>Y_PX</TD> <TD>mol/mol</TD>
+          <TD>0.109375</TD> <TD>0.109375</TD> <TD>0.109375</TD> <TD>0.109375</TD> <TD>0.109375</TD> <TD>0.109375</TD> <TD>0.109375</TD> <TD>0.109375</TD> <TD>0.109375</TD> <TD>0.109375</TD> <TD>0.109375</TD> <TD>0.109375</TD>   <TD>yield of faeces on food</TD>
+        </TR>
+        <TR id="Y_VX"> <TD>Y_VX</TD> <TD>mol/mol</TD>
+          <TD>0.000503049</TD> <TD>0.00595542</TD> <TD>0.0011401</TD> <TD>0.00648627</TD> <TD>0.0203514</TD> <TD>0.0220211</TD> <TD>0.00782422</TD> <TD>0.0123222</TD> <TD>0.0283779</TD> <TD>0.0288396</TD> <TD>0.0130139</TD> <TD>0.0169641</TD>   <TD>yield of living structure on food</TD>
+        </TR>
+        <TR id="Y_VX_d"> <TD>Y_VX_d</TD> <TD>mol/mol</TD>
+          <TD>0.000511684</TD> <TD>0.000474723</TD> <TD>0.0012709</TD> <TD>0.00119943</TD> <TD>1.1015e-09</TD> <TD>9.67762e-10</TD> <TD>0.00522143</TD> <TD>0.00535679</TD> <TD>4.69037e-10</TD> <TD>4.17193e-10</TD> <TD>0.00867615</TD> <TD>0.00889692</TD>   <TD>yield of dead structure on food</TD>
+        </TR>
+        <TR id="Y_EX"> <TD>Y_EX</TD> <TD>mol/mol</TD>
+          <TD>0.000516808</TD> <TD>0.00668604</TD> <TD>0.0011733</TD> <TD>0.00729457</TD> <TD>0.0212251</TD> <TD>0.0250976</TD> <TD>0.00816014</TD> <TD>0.0140437</TD> <TD>0.0299881</TD> <TD>0.0333039</TD> <TD>0.0137523</TD> <TD>0.0195902</TD>   <TD>yield of living reserve on food</TD>
+        </TR>
+        <TR id="Y_EX_d"> <TD>Y_EX_d</TD> <TD>mol/mol</TD>
+          <TD>0.000525679</TD> <TD>0.000532963</TD> <TD>0.00130791</TD> <TD>0.0013489</TD> <TD>1.14879e-09</TD> <TD>1.10297e-09</TD> <TD>0.00544559</TD> <TD>0.00610517</TD> <TD>4.95651e-10</TD> <TD>4.81774e-10</TD> <TD>0.00916845</TD> <TD>0.0102742</TD>   <TD>yield of dead reserve on food</TD>
+        </TR>
+        <TR id="Y_CX"> <TD>Y_CX</TD> <TD>mol/mol</TD>
+          <TD>0.721961</TD> <TD>0.712543</TD> <TD>0.719658</TD> <TD>0.710365</TD> <TD>0.689852</TD> <TD>0.685349</TD> <TD>0.701979</TD> <TD>0.692898</TD> <TD>0.67621</TD> <TD>0.673141</TD> <TD>0.687387</TD> <TD>0.678356</TD>   <TD>yield of CO2 on food</TD>
+        </TR>
+        <TR id="Y_HX"> <TD>Y_HX</TD> <TD>mol/mol</TD>
+          <TD>0.768611</TD> <TD>0.758584</TD> <TD>0.766159</TD> <TD>0.756266</TD> <TD>0.734427</TD> <TD>0.729633</TD> <TD>0.747337</TD> <TD>0.73767</TD> <TD>0.719904</TD> <TD>0.716636</TD> <TD>0.731802</TD> <TD>0.722188</TD>   <TD>yield of H2O on food</TD>
+        </TR>
+        <TR id="Y_OX"> <TD>Y_OX</TD> <TD>mol/mol</TD>
+          <TD>-0.916336</TD> <TD>-0.904381</TD> <TD>-0.913412</TD> <TD>-0.901618</TD> <TD>-0.875581</TD> <TD>-0.869866</TD> <TD>-0.890973</TD> <TD>-0.879447</TD> <TD>-0.858267</TD> <TD>-0.854372</TD> <TD>-0.872452</TD> <TD>-0.86099</TD>   <TD>yield of O2 on food</TD>
+        </TR>
+        <TR id="Y_NX"> <TD>Y_NX</TD> <TD>mol/mol</TD>
+          <TD>0.166606</TD> <TD>0.164433</TD> <TD>0.166075</TD> <TD>0.16393</TD> <TD>0.159197</TD> <TD>0.158157</TD> <TD>0.161995</TD> <TD>0.159899</TD> <TD>0.156049</TD> <TD>0.15534</TD> <TD>0.158628</TD> <TD>0.156544</TD>   <TD>yield of N-waste on food</TD>
+        </TR>
+        <TR id="mu_TX"> <TD>mu_TX</TD> <TD>J/mol</TD>
+          <TD>463289</TD> <TD>457290</TD> <TD>461825</TD> <TD>455903</TD> <TD>442882</TD> <TD>439968</TD> <TD>450589</TD> <TD>444776</TD> <TD>434202</TD> <TD>432182</TD> <TD>441308</TD> <TD>435505</TD>   <TD>yield of heat on food</TD>
+        </TR>
+      </TABLE>
+
+      <div>
+        <h2>Remarks</h2>
+        <ul>
+          <li>Reprod-code O applies. Sex ratio is assumed to be 1:1. Parameters of male and female differ.</li>
+          <li>Buffer handling rule: release each egg as soon as reproduction buffer allows</li>
+          <li>Weights of adults do not include reproduction buffer</li>
+        </ul>
+      </div>
+      <script>
+        function FunctionSymbol() {
+          // Declare variables
+          var input, filter, table, tr, td, i;
+          input = document.getElementById("InputSymbol");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("Table");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and hide those who don't match the search query
+          for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[0];
+          if (td) {
+            if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+
+        function FunctionUnits() {
+          // Declare variables
+          var input, filter, table, tr, td, i;
+          input = document.getElementById("InputUnits");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("Table");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and hide those who don't match the search query
+          for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[1];
+          if (td) {
+            if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+
+        function FunctionLabel() {
+          // Declare variables
+          var input, filter, table, tr, td, i;
+          input = document.getElementById("InputLabel");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("Table");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and hide those who don't match the search query
+          for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[8];
+          if (td) {
+            if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+
+        function FunctionShort() {
+          // Declare variables
+          var input, filter, table, tr, td, i;
+          input = document.getElementById("InputShort");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("Table");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and show some from the long list
+          if (filter == "S") {
+            for (i = 0; i < tr.length; i++) {
+              td = tr[i].getElementsByTagName("td")[0];
+              if (td) {
+                if (
+                    td.innerHTML == "f" ||
+                    td.innerHTML == "r" ||
+                    td.innerHTML == "t2" ||
+                    td.innerHTML == "Ww_bi" ||
+                    td.innerHTML == "R" ||
+                    td.innerHTML == "J_X" 
+                  ) {
+                  tr[i].style.display = "";
+                } else {
+                  tr[i].style.display = "none";
+                }
+              }
+            }
+          } else if (filter == "M") {
+            for (i = 0; i < tr.length; i++) {
+              td = tr[i].getElementsByTagName("td")[0];
+              if (td) {
+                if (
+                    td.innerHTML == "f" ||
+                    td.innerHTML == "r" ||
+                    td.innerHTML == "t2" ||
+                    td.innerHTML == "S_b" ||
+                    td.innerHTML == "S_p" ||
+                    td.innerHTML == "theta_0b" ||
+                    td.innerHTML == "theta_bp" ||
+                    td.innerHTML == "theta_pi" ||
+                    td.innerHTML == "Ww_bi" ||
+                    td.innerHTML == "R" ||
+                    td.innerHTML == "J_X" 
+                  ) {
+                  tr[i].style.display = "";
+                } else {
+                  tr[i].style.display = "none";
+                }
+              }
+            }
+          } else if (filter == "Y") {
+            for (i = 0; i < tr.length; i++) {
+              td = tr[i].getElementsByTagName("td")[0];
+              if (td) {
+                if (
+                    td.innerHTML == "f" ||
+                    td.innerHTML == "r" ||
+                    td.innerHTML == "Y_PX" ||
+                    td.innerHTML == "Y_VX" ||
+                    td.innerHTML == "Y_VX_d" ||
+                    td.innerHTML == "Y_EX" ||
+                    td.innerHTML == "Y_EX_d" ||
+                    td.innerHTML == "mu_hX" ||
+                    td.innerHTML == "Y_CX" ||
+                    td.innerHTML == "Y_HX" ||
+                    td.innerHTML == "Y_OX" ||
+                    td.innerHTML == "Y_NX" 
+                  ) {
+                  tr[i].style.display = "";
+                } else {
+                  tr[i].style.display = "none";
+                }
+              }
+            }
+          } else {
+            for (i = 0; i < tr.length; i++) {
+              tr[i].style.display = "";
+            }
+          }
+        }
+      </script>
+</BODY>
+</HTML>

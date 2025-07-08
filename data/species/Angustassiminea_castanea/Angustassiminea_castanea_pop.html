@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+  <TITLE>Angustassiminea_castanea pop</TITLE>
+  <style>
+    #InputSymbol {
+      background-image: url('../../img/searchicon.png');
+      background-position: 2px -10px;
+      background-repeat: no-repeat;
+      width: 15%; /* Width of search field */
+      font-size: 14px; /* Increase font-size */
+      padding: 5px 10px 7px 40px;
+      border: 1px solid #ddd; /* Add a grey border */
+      margin-bottom: 12px; /* Add some space below the input */
+    }
+
+    #InputUnits {
+      background-image: url('../../img/searchicon.png');
+      background-position: 2px -10px;
+      background-repeat: no-repeat;
+      width: 15%; /* Width of search field */
+      font-size: 14px; /* Increase font-size */
+      padding: 5px 10px 7px 40px;
+      border: 1px solid #ddd; /* Add a grey border */
+      margin-bottom: 12px; /* Add some space below the input */
+    }
+
+    #InputLabel {
+      background-image: url('../../img/searchicon.png');
+      background-position: 2px -10px;
+      background-repeat: no-repeat;
+      width: 15%; /* Width of search field */
+      font-size: 14px; /* Increase font-size */
+      padding: 5px 10px 7px 40px;
+      border: 1px solid #ddd; /* Add a grey border */
+      margin-bottom: 12px; /* Add some space below the input */
+    }
+
+    #InputShort {
+      background-image: url('../../img/searchicon.png');
+      background-position: 2px -10px;
+      background-repeat: no-repeat;
+      width: 15%; /* Width of search field */
+      font-size: 14px; /* Increase font-size */
+      padding: 5px 10px 7px 40px;
+      border: 1px solid #ddd; /* Add a grey border */
+      margin-bottom: 12px; /* Add some space below the input */
+    }
+
+    #head0 {
+      background-color: #FFE7C6;
+    }
+
+    #head1 {
+      background-color: #FFE7C6;
+    }
+
+    #head2 {
+      background-color: #FFE7C6;
+    }
+
+    #caption {
+      width: 425px;
+      padding-top: 15px;
+    }
+
+    div.fig {
+      width: 50%;
+      float: left;
+      padding-top: 25px;
+      padding-bottom: 25px;
+    }
+
+    #Table {
+      border-style: solid hidden solid hidden;
+    }
+
+    tr:nth-child(even){background-color: #f2f2f2};
+    td:nth-child(odd){border-left: solid 1px black};
+
+  </style>
+
+</HEAD>
+
+<BODY>
+
+    <h1 align="center">Angustassiminea castanea: Population traits</h1>
+    <h3 align="center">at T = 17 &deg;C with background hazards for embryo, larva, juv, adult: 0, 0, 0, 0 1/d</h3>
+      <div class="fig">
+        <img src="Angustassiminea_castanea_pop_01.png" width="425px"> 
+        <div id="caption">
+          Ln survival probability as function of age, 
+          with (dashed) and without (solid) thinning at max (red) and min (blue) scaled functional response for females.
+        </div>
+      </div>
+
+      <div class="fig">
+        <img src="Angustassiminea_castanea_pop_02.png" width="425px"> 
+        <div id="caption">
+          Ln survivor function of the stable age distribution as function of age, 
+          with (dashed) and without (solid) thinning at max (red) and min (blue) scaled functional response for females.
+        </div>
+      </div>
+
+      <div>
+        <input type="text" id="InputSymbol" onkeyup="FunctionSymbol()" placeholder="Search for symbol ..">
+        <input type="text" id="InputUnits"  onkeyup="FunctionUnits()"  placeholder="Search for units ..">
+        <input type="text" id="InputLabel"  onkeyup="FunctionLabel()"  placeholder="Search for label ..">
+        <input type="text" id="InputShort"  onkeyup="FunctionShort()"  placeholder="Short/Medium/Yields" title="Type S or M or Y">
+      </div>
+
+      <TABLE id="Table">
+        <TR id="head0"> <TH  colspan="2">model abj</TH> <TH colspan="2">f_min</TH><TH colspan="2">f</TH> <TH colspan="2">f_max</TH> <TH>date: 2021/01/27</TH></TR>
+        <TR id="head1"> <TH>symbol</TH> <TH>units</TH> <TH>thin false</TH><TH>thin true</TH><TH>thin false</TH><TH>thin true</TH><TH>thin false</TH><TH>thin true</TH><TH>description</TH></TR>
+
+        <TR id="f"> <TD>f</TD> <TD>-</TD>
+          <TD>0.511075</TD> <TD>NaN</TD> <TD>0.755537</TD> <TD>NaN</TD>  <TD>1</TD> <TD>1</TD>  <TD>scaled functional response</TD>
+        </TR>
+        <TR id="r"> <TD>r</TD> <TD>1/d</TD>
+          <TD>0</TD> <TD>0</TD> <TD>0.00234411</TD> <TD>NaN</TD>  <TD>0.00397186</TD> <TD>NaN</TD>  <TD>spec pop growth rate</TD>
+        </TR>
+        <TR id="t2"> <TD>t2</TD> <TD>d</TD>
+          <TD>NaN</TD> <TD>NaN</TD> <TD>295.698</TD> <TD>NaN</TD>  <TD>174.514</TD> <TD>NaN</TD>  <TD>population doubling time</TD>
+        </TR>
+        <TR id="a_b"> <TD>a_b</TD> <TD>d</TD>
+          <TD>6.43365</TD> <TD>NaN</TD> <TD>6.11125</TD> <TD>NaN</TD>  <TD>5.88105</TD> <TD>NaN</TD>  <TD>age at birth</TD>
+        </TR>
+        <TR id="t_j"> <TD>t_j</TD> <TD>d</TD>
+          <TD>628.572</TD> <TD>NaN</TD> <TD>355.383</TD> <TD>NaN</TD>  <TD>248.813</TD> <TD>NaN</TD>  <TD>time since birth at metam</TD>
+        </TR>
+        <TR id="t_p"> <TD>t_p</TD> <TD>d</TD>
+          <TD>2734.85</TD> <TD>NaN</TD> <TD>1107.75</TD> <TD>NaN</TD>  <TD>723.194</TD> <TD>NaN</TD>  <TD>time since birth at puberty</TD>
+        </TR>
+        <TR id="S_b"> <TD>S_b</TD> <TD>-</TD>
+          <TD>0.999998</TD> <TD>NaN</TD> <TD>0.999998</TD> <TD>NaN</TD>  <TD>0.999998</TD> <TD>NaN</TD>  <TD>survival probability at birth</TD>
+        </TR>
+        <TR id="S_j"> <TD>S_j</TD> <TD>-</TD>
+          <TD>0.999985</TD> <TD>NaN</TD> <TD>0.999987</TD> <TD>NaN</TD>  <TD>0.999988</TD> <TD>NaN</TD>  <TD>survival probability at metam</TD>
+        </TR>
+        <TR id="S_p"> <TD>S_p</TD> <TD>-</TD>
+          <TD>0.962651</TD> <TD>NaN</TD> <TD>0.98967</TD> <TD>NaN</TD>  <TD>0.995244</TD> <TD>NaN</TD>  <TD>survival probability at puberty</TD>
+        </TR>
+        <TR id="theta_0b"> <TD>theta_0b</TD> <TD>-</TD>
+          <TD>0.00271009</TD> <TD>NaN</TD> <TD>0.0143833</TD> <TD>NaN</TD>  <TD>0.0229812</TD> <TD>NaN</TD>  <TD>frac of ind that is embryo</TD>
+        </TR>
+        <TR id="theta_bj"> <TD>theta_bj</TD> <TD>-</TD>
+          <TD>0.00277108</TD> <TD>NaN</TD> <TD>0.014412</TD> <TD>NaN</TD>  <TD>0.0227471</TD> <TD>NaN</TD>  <TD>frac of ind that is pre-metam juvenile</TD>
+        </TR>
+        <TR id="theta_jp"> <TD>theta_jp</TD> <TD>-</TD>
+          <TD>0.26418</TD> <TD>NaN</TD> <TD>0.556513</TD> <TD>NaN</TD>  <TD>0.594854</TD> <TD>NaN</TD>  <TD>frac of ind that is post-metam juvenile</TD>
+        </TR>
+        <TR id="theta_pi"> <TD>theta_pi</TD> <TD>-</TD>
+          <TD>0.730339</TD> <TD>NaN</TD> <TD>0.414692</TD> <TD>NaN</TD>  <TD>0.359417</TD> <TD>NaN</TD>  <TD>frac of ind that is adult</TD>
+        </TR>
+        <TR id="L_bi"> <TD>L_bi</TD> <TD>cm</TD>
+          <TD>0.043846</TD> <TD>NaN</TD> <TD>0.0330454</TD> <TD>NaN</TD>  <TD>0.0316469</TD> <TD>NaN</TD>  <TD>mean structural length of post-natals</TD>
+        </TR>
+        <TR id="L2_bi"> <TD>L2_bi</TD> <TD>cm^2</TD>
+          <TD>0.00222583</TD> <TD>NaN</TD> <TD>0.00149877</TD> <TD>NaN</TD>  <TD>0.00143554</TD> <TD>NaN</TD>  <TD>mean squared structural length of post-natals</TD>
+        </TR>
+        <TR id="L3_bi"> <TD>L3_bi</TD> <TD>cm^3</TD>
+          <TD>0.000122094</TD> <TD>NaN</TD> <TD>8.48471e-05</TD> <TD>NaN</TD>  <TD>8.57563e-05</TD> <TD>NaN</TD>  <TD>mean cubed structural length of post-natals</TD>
+        </TR>
+        <TR id="Ww_bi"> <TD>Ww_bi</TD> <TD>g</TD>
+          <TD>0.000123071</TD> <TD>NaN</TD> <TD>8.58505e-05</TD> <TD>NaN</TD>  <TD>8.70986e-05</TD> <TD>NaN</TD>  <TD>mean wet weight of post-natals</TD>
+        </TR>
+        <TR id="L_pi"> <TD>L_pi</TD> <TD>cm</TD>
+          <TD>0.0527394</TD> <TD>NaN</TD> <TD>0.0528149</TD> <TD>NaN</TD>  <TD>0.0540435</TD> <TD>NaN</TD>  <TD>mean structural length of adults</TD>
+        </TR>
+        <TR id="L2_pi"> <TD>L2_pi</TD> <TD>cm^2</TD>
+          <TD>0.00289097</TD> <TD>NaN</TD> <TD>0.00304591</TD> <TD>NaN</TD>  <TD>0.00326142</TD> <TD>NaN</TD>  <TD>mean squared structural length of adults</TD>
+        </TR>
+        <TR id="L3_pi"> <TD>L3_pi</TD> <TD>cm^3</TD>
+          <TD>0.00016345</TD> <TD>NaN</TD> <TD>0.00019057</TD> <TD>NaN</TD>  <TD>0.00021933</TD> <TD>NaN</TD>  <TD>mean cubed structural length of adults</TD>
+        </TR>
+        <TR id="Ww_pi"> <TD>Ww_pi</TD> <TD>g</TD>
+          <TD>0.000164757</TD> <TD>NaN</TD> <TD>0.000192824</TD> <TD>NaN</TD>  <TD>0.000222763</TD> <TD>NaN</TD>  <TD>mean wet weight of adults</TD>
+        </TR>
+        <TR id="R"> <TD>R</TD> <TD>1/d</TD>
+          <TD>0</TD> <TD>NaN</TD> <TD>0.0138473</TD> <TD>NaN</TD>  <TD>0.0374668</TD> <TD>NaN</TD>  <TD>mean reproduction rate of adults</TD>
+        </TR>
+        <TR id="J_X"> <TD>J_X</TD> <TD>g/d</TD>
+          <TD>8.13889e-07</TD> <TD>NaN</TD> <TD>8.10358e-07</TD> <TD>NaN</TD>  <TD>1.03475e-06</TD> <TD>NaN</TD>  <TD>mean ingestion rate of wet food by post-natals</TD>
+        </TR>
+        <TR id="Y_PX"> <TD>Y_PX</TD> <TD>mol/mol</TD>
+          <TD>0.109375</TD> <TD>NaN</TD> <TD>0.109375</TD> <TD>NaN</TD>  <TD>0.109375</TD> <TD>NaN</TD>  <TD>yield of faeces on food</TD>
+        </TR>
+        <TR id="Y_VX"> <TD>Y_VX</TD> <TD>mol/mol</TD>
+          <TD>0.118078</TD> <TD>NaN</TD> <TD>0.275714</TD> <TD>NaN</TD>  <TD>0.355546</TD> <TD>NaN</TD>  <TD>yield of living structure on food</TD>
+        </TR>
+        <TR id="Y_VX_d"> <TD>Y_VX_d</TD> <TD>mol/mol</TD>
+          <TD>0.119015</TD> <TD>NaN</TD> <TD>0.0228301</TD> <TD>NaN</TD>  <TD>0.00967066</TD> <TD>NaN</TD>  <TD>yield of dead structure on food</TD>
+        </TR>
+        <TR id="Y_EX"> <TD>Y_EX</TD> <TD>mol/mol</TD>
+          <TD>0.000944582</TD> <TD>NaN</TD> <TD>0.00326062</TD> <TD>NaN</TD>  <TD>0.00556522</TD> <TD>NaN</TD>  <TD>yield of living reserve on food</TD>
+        </TR>
+        <TR id="Y_EX_d"> <TD>Y_EX_d</TD> <TD>mol/mol</TD>
+          <TD>0.000952076</TD> <TD>NaN</TD> <TD>0.000269991</TD> <TD>NaN</TD>  <TD>0.000151371</TD> <TD>NaN</TD>  <TD>yield of dead reserve on food</TD>
+        </TR>
+        <TR id="Y_CX"> <TD>Y_CX</TD> <TD>mol/mol</TD>
+          <TD>0.651635</TD> <TD>NaN</TD> <TD>0.58855</TD> <TD>NaN</TD>  <TD>0.519691</TD> <TD>NaN</TD>  <TD>yield of CO2 on food</TD>
+        </TR>
+        <TR id="Y_HX"> <TD>Y_HX</TD> <TD>mol/mol</TD>
+          <TD>0.470625</TD> <TD>NaN</TD> <TD>0.425064</TD> <TD>NaN</TD>  <TD>0.375333</TD> <TD>NaN</TD>  <TD>yield of H2O on food</TD>
+        </TR>
+        <TR id="Y_OX"> <TD>Y_OX</TD> <TD>mol/mol</TD>
+          <TD>-0.708653</TD> <TD>NaN</TD> <TD>-0.640048</TD> <TD>NaN</TD>  <TD>-0.565164</TD> <TD>NaN</TD>  <TD>yield of O2 on food</TD>
+        </TR>
+        <TR id="Y_NX"> <TD>Y_NX</TD> <TD>mol/mol</TD>
+          <TD>0.0977453</TD> <TD>NaN</TD> <TD>0.0882825</TD> <TD>NaN</TD>  <TD>0.0779537</TD> <TD>NaN</TD>  <TD>yield of N-waste on food</TD>
+        </TR>
+        <TR id="mu_TX"> <TD>mu_TX</TD> <TD>J/mol</TD>
+          <TD>352910</TD> <TD>NaN</TD> <TD>321286</TD> <TD>NaN</TD>  <TD>286747</TD> <TD>NaN</TD>  <TD>yield of heat on food</TD>
+        </TR>
+      </TABLE>
+
+      <div>
+        <h2>Remarks</h2>
+        <ul>
+          <li>Reprod-code O applies. Sex ratio is assumed to be 1:1. Parameters of male and female are the same.</li>
+          <li>Buffer handling rule: release each egg as soon as reproduction buffer allows</li>
+          <li>Weights of adults do not include reproduction buffer</li>
+        </ul>
+      </div>
+      <script>
+        function FunctionSymbol() {
+          // Declare variables
+          var input, filter, table, tr, td, i;
+          input = document.getElementById("InputSymbol");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("Table");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and hide those who don't match the search query
+          for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[0];
+          if (td) {
+            if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+
+        function FunctionUnits() {
+          // Declare variables
+          var input, filter, table, tr, td, i;
+          input = document.getElementById("InputUnits");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("Table");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and hide those who don't match the search query
+          for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[1];
+          if (td) {
+            if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+
+        function FunctionLabel() {
+          // Declare variables
+          var input, filter, table, tr, td, i;
+          input = document.getElementById("InputLabel");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("Table");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and hide those who don't match the search query
+          for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[8];
+          if (td) {
+            if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+
+        function FunctionShort() {
+          // Declare variables
+          var input, filter, table, tr, td, i;
+          input = document.getElementById("InputShort");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("Table");
+          tr = table.getElementsByTagName("tr");
+
+          // Loop through all table rows, and show some from the long list
+          if (filter == "S") {
+            for (i = 0; i < tr.length; i++) {
+              td = tr[i].getElementsByTagName("td")[0];
+              if (td) {
+                if (
+                    td.innerHTML == "f" ||
+                    td.innerHTML == "r" ||
+                    td.innerHTML == "t2" ||
+                    td.innerHTML == "Ww_bi" ||
+                    td.innerHTML == "R" ||
+                    td.innerHTML == "J_X" 
+                  ) {
+                  tr[i].style.display = "";
+                } else {
+                  tr[i].style.display = "none";
+                }
+              }
+            }
+          } else if (filter == "M") {
+            for (i = 0; i < tr.length; i++) {
+              td = tr[i].getElementsByTagName("td")[0];
+              if (td) {
+                if (
+                    td.innerHTML == "f" ||
+                    td.innerHTML == "r" ||
+                    td.innerHTML == "t2" ||
+                    td.innerHTML == "S_b" ||
+                    td.innerHTML == "S_j" ||
+                    td.innerHTML == "S_p" ||
+                    td.innerHTML == "theta_0b" ||
+                    td.innerHTML == "theta_bj" ||
+                    td.innerHTML == "theta_jp" ||
+                    td.innerHTML == "theta_pi" ||
+                    td.innerHTML == "Ww_bi" ||
+                    td.innerHTML == "R" ||
+                    td.innerHTML == "J_X" 
+                  ) {
+                  tr[i].style.display = "";
+                } else {
+                  tr[i].style.display = "none";
+                }
+              }
+            }
+          } else if (filter == "Y") {
+            for (i = 0; i < tr.length; i++) {
+              td = tr[i].getElementsByTagName("td")[0];
+              if (td) {
+                if (
+                    td.innerHTML == "f" ||
+                    td.innerHTML == "r" ||
+                    td.innerHTML == "Y_PX" ||
+                    td.innerHTML == "Y_VX" ||
+                    td.innerHTML == "Y_VX_d" ||
+                    td.innerHTML == "Y_EX" ||
+                    td.innerHTML == "Y_EX_d" ||
+                    td.innerHTML == "mu_hX" ||
+                    td.innerHTML == "Y_CX" ||
+                    td.innerHTML == "Y_HX" ||
+                    td.innerHTML == "Y_OX" ||
+                    td.innerHTML == "Y_NX" 
+                  ) {
+                  tr[i].style.display = "";
+                } else {
+                  tr[i].style.display = "none";
+                }
+              }
+            }
+          } else {
+            for (i = 0; i < tr.length; i++) {
+              tr[i].style.display = "";
+            }
+          }
+        }
+      </script>
+</BODY>
+</HTML>

@@ -1,0 +1,100 @@
+function [prdData, info] = predict_Hynobius_kimurae(par, data, auxData)
+  
+  % unpack par, data, auxData
+  cPar = parscomp_st(par); vars_pull(par); 
+  vars_pull(cPar);  vars_pull(data);  vars_pull(auxData);
+
+  if E_Hj < E_Hb || E_Hj > E_Hp || E_Hj > E_Hpm
+    prdData = []; info = 0; return
+  end
+  
+  % compute temperature correction factors
+  TC_ab = tempcorr(temp.ab, T_ref, T_A);
+  TC    = tempcorr(temp.am, T_ref, T_A); kT_M = TC * k_M;
+  
+% zero-variate data
+
+  % life cycle
+  pars_tj = [g; k; l_T; v_Hb; v_Hj];               % compose parameter vector
+  [t_j, t_b, l_j, l_b, info] = get_tp(pars_tj, f); % -, scaled times & lengths at f
+  pars_tp = [g; k; l_T; v_Hb; v_Hp];               % compose parameter vector
+  [t_p, t_b, l_p, l_b, info] = get_tp(pars_tp, f); % -, scaled times & lengths at f
+  
+  % birth
+  L_b = L_m * l_b;                  % cm, structural length at birth at f
+  Lw_b = L_b/ del_M;                % cm, physical length at birth at f
+  aT_b = t_b/ k_M/ TC_ab;           % d, age at birth at f and T
+  Ww_b = L_b^3 * (1 + f * w);       % g, wet weight at birth
+  
+  % metam
+  L_j = L_m * l_j;                  % cm, structural length at metam at f
+  Lw_j = L_j/ del_M;                % cm, physical length at metam at f
+
+  
+  % puberty 
+  L_p = L_m * l_p;                  % cm, structural length at puberty at f
+  Lw_p = L_p/ del_M;                % cm, physical length at puberty at f
+  tT_p = (t_p - t_b)/ kT_M;         % d, age at puberty at f and T
+
+  % ultimate
+  l_i = f - l_T;                    % -, scaled ultimate length
+  L_i = L_m * l_i;                  % cm, ultimate structural length at f
+  Lw_i = L_i/ del_M;                % cm, ultimate physical length at f
+  Ww_i = L_i^3 * (1 + f * w);       % g, ultimate wet weight 
+
+  % reproduction
+  pars_R = [kap; kap_R; g; k_J; k_M; L_T; v; U_Hb; U_Hp]; % compose parameter vector at T
+  RT_i = TC * reprod_rate(L_i, f, pars_R);                % #/d, ultimate reproduction rate at T
+
+  % life span
+  pars_tm = [g; l_T; h_a/ k_M^2; s_G];  % compose parameter vector at T_ref
+  t_m = get_tm_s(pars_tm, f, l_b);      % -, scaled mean life span at T_ref
+  aT_m = t_m/ kT_M;                     % d, mean life span at T
+  
+  % males
+  p_Am_m = z_m * p_M/ kap;             % J/d.cm^2, {p_Am} spec assimilation flux
+  E_m_m = p_Am_m/ v;                   % J/cm^3, reserve capacity [E_m]
+  g_m = E_G/ (kap* E_m_m);             % -, energy investment ratio
+  m_Em_m = y_E_V * E_m_m/ E_G;         % mol/mol, reserve capacity 
+  w_m = m_Em_m * w_E/ w_V;             % -, contribution of reserve to weight
+  L_mm = v/ k_M/ g_m;                  % cm, max struct length
+  L_im = f * L_mm;                     % cm, ultimate struct length
+  pars_tpm = [g_m k l_T v_Hb v_Hpm];
+  [t_pm, t_bm, l_pm, l_bm, info] = get_tp(pars_tpm, f);
+  if ~info; prdData = []; return; end
+  tT_pm = (t_pm - t_bm)/ kT_M;;        % d, time since birth at puberty
+
+  % pack to output
+  prdData.ab = aT_b;
+  prdData.tp = tT_p;
+  prdData.tpm = tT_pm;
+  prdData.am = aT_m;
+  prdData.Lb = Lw_b;
+  prdData.Lj = Lw_j;
+  prdData.Li = Lw_i;
+  prdData.Wwb = Ww_b;
+  prdData.Wwi = Ww_i;
+  prdData.Ri = RT_i;
+  
+  % univariate data
+
+  % time-length
+  % female T
+  [tvel, t_p, t_b, l_p, l_b] = get_tp(pars_tp, f_T, [], tL_fT(:,1)*kT_M);
+  ELw_fT = L_m * tvel(:,4)/ del_M;   % cm, length 
+  % male T
+  tvel = get_tpm(pars_tpm, f_T, [t_b, f_T*z/z_m, l_b*z/z_m], tL_mT(:,1)*kT_M);
+  ELw_mT = L_mm * tvel(:,4)/ del_M;   % cm, length 
+  % female K
+  [tvel, t_p, t_b, l_p, l_b] = get_tp(pars_tp, f_K, [], tL_fK(:,1)*kT_M);
+  ELw_fK = L_m * tvel(:,4)/ del_M;   % cm, length 
+  % male K
+  tvel = get_tpm(pars_tpm, f_K, [t_b, f_K*z/z_m, l_b*z/z_m], tL_mK(:,1)*kT_M);
+  ELw_mK = L_mm * tvel(:,4)/ del_M;   % cm, length 
+ 
+  %% pack to output
+  prdData.tL_fT = ELw_fT;
+  prdData.tL_mT = ELw_mT;
+  prdData.tL_fK = ELw_fK;
+  prdData.tL_mK = ELw_mK;
+  

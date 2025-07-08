@@ -1,0 +1,244 @@
+function [data, auxData, metaData, txtData, weights] = mydata_Wallabia_bicolor
+
+%% set metaData
+metaData.phylum     = 'Chordata'; 
+metaData.class      = 'Mammalia'; 
+metaData.order      = 'Diprotodontia'; 
+metaData.family     = 'Macropodidae';
+metaData.species    = 'Wallabia_bicolor'; 
+metaData.species_en = 'Swamp wallaby'; 
+
+metaData.ecoCode.climate = {'Aw', 'Cfa', 'Cfb'};
+metaData.ecoCode.ecozone = {'TA'};
+metaData.ecoCode.habitat = {'0iTh', '0iTf'};
+metaData.ecoCode.embryo  = {'Tv'};
+metaData.ecoCode.migrate = {};
+metaData.ecoCode.food    = {'bxM', 'xiHl'};
+metaData.ecoCode.gender  = {'Dg'};
+metaData.ecoCode.reprod  = {'O'};
+
+metaData.T_typical  = C2K(36.5); % K, body temp
+metaData.data_0     = {'tg'; 'ax'; 'ap'; 'am'; 'Wwb'; 'Wwx'; 'Wwp'; 'Wwi'; 'Ri'; 'pL'}; 
+metaData.data_1     = {'t-Ww'}; 
+
+metaData.COMPLETE = 2.5; % using criteria of LikaKear2011
+
+metaData.author   = {'Jessica Ridenour'};    
+metaData.date_subm = [2013 06 11];              
+metaData.email    = {'jessroberts09@gmail.com'};            
+metaData.address  = {'Melbourne University'};   
+
+metaData.author_mod_1   = {'Bas Kooijman'};    
+metaData.date_mod_1 = [2021 11 08];              
+metaData.email    = {'bas.kooijman@vu.nl'};            
+metaData.address  = {'VU University Amsterdam'};   
+
+metaData.author_mod_2   = {'Bas Kooijman'};    
+metaData.date_mod_2     = [2023 04 11];              
+metaData.email_mod_2    = {'bas.kooijman@vu.nl'};            
+metaData.address_mod_2  = {'VU University, Amsterdam'};   
+
+metaData.curator     = {'Starrlight Augustine'};
+metaData.email_cur   = {'starrlight@tecnico.ulisboa.pt'}; 
+metaData.date_acc    = [2023 04 11];
+
+%% set data
+% zero-variate data
+
+data.tg = 35;   units.tg = 'd';    label.tg = 'gestation time';              bibkey.tg = 'HaysTien1993';   
+  temp.tg = C2K(36.5);  units.temp.tg = 'K'; label.temp.tg = 'temperature';
+  comment.tg = 'temp from DawsDenn1969';
+data.tx = 150;  units.tx = 'd';    label.tx = 'time since birth at weaning'; bibkey.tx = 'MercShar1966';   
+  temp.tx = C2K(36.5);  units.temp.tx = 'K'; label.temp.tx = 'temperature';
+data.tp = 638;  units.tp = 'd';    label.tp = 'time since birth at puberty'; bibkey.tp = 'Russ1982';
+  temp.tp = C2K(36.5);  units.temp.tp = 'K'; label.temp.tp = 'temperature';
+data.am = 15.4*365;    units.am = 'd';    label.am = 'life span';            bibkey.am = 'WeigJone2005';   
+  temp.am = C2K(36.5);  units.temp.am = 'K'; label.temp.am = 'temperature'; 
+
+data.Wwb = .61; units.Wwb = 'g';   label.Wwb = 'wet weight at birth';        bibkey.Wwb = 'Russ1982';
+data.Wwx = 385; units.Wwx = 'g';   label.Wwx = 'wet weight at weaning';      bibkey.Wwx = 'MercShar1966';
+data.Wwp = 7000; units.Wwp = 'g';  label.Wwp = 'wet weight at puberty';      bibkey.Wwp = 'RobiMorr1957';
+data.Wwi = 14625; units.Wwi = 'g'; label.Wwi = 'ultimate wet weight';        bibkey.Wwi = 'Russ1982';
+
+data.Ri  = 365/243/365; units.Ri  = '#/d'; label.Ri  = 'maximum reprod rate'; bibkey.Ri  = 'AnAge';   
+  temp.Ri = C2K(36.5);  units.temp.Ri = 'K'; label.temp.Ri = 'temperature';
+ 
+data.pL  = .1*2.08e7*data.Ri*data.Wwi/1000; units.pL  = 'J/d'; label.pL  = 'average yearly milk production'; bibkey.pL  = 'CorkDove1989';   
+  temp.pL = C2K(36.5);  units.temp.pL = 'K'; label.temp.pL = 'temperature';
+
+% uni-variate data
+% time-weigth
+data.tWw_f = [ ... % time since birth (d), wet weight (g)
+78.011	74.182
+91.971	61.719
+99.028	94.973
+108.298	110.265
+112.908	134.794
+120.253	158.247
+126.761	192.588
+134.084	230.201
+140.853	273.257
+147.608	325.028
+151.892	383.867];
+units.tWw_f   = {'d', 'g'};  label.tWw_f = {'time since birth', 'wet weight', 'female'};  
+temp.tWw_f    = C2K(36.5);  units.temp.tWw_f = 'K'; label.temp.tWw_f = 'temperature';
+bibkey.tWw_f  = 'MercShar1966';
+comment.tWw_f = 'Data for females';
+% 
+data.tWw_m = [ ... % time since birth (d), wet weight (g)
+69.307	46.367
+76.385	65.461
+82.644	83.462
+90.271	101.469
+96.520	126.551
+104.407	152.729
+110.917	185.981
+118.238	225.227
+124.441	280.263
+131.957	370.705];
+units.tWw_m   = {'d', 'g'};  label.tWw_m = {'time since birth', 'wet weight', 'male'};  
+temp.tWw_m    = C2K(36.5);  units.temp.tWw_m = 'K'; label.temp.tWw_m = 'temperature';
+bibkey.tWw_m  = 'MercShar1966';
+comment.tWw_m = 'Data for males';
+
+%% set weights for all real data
+weights = setweights(data, []);
+weights.tWw_f = 5 * weights.tWw_f;
+weights.tWw_m = 5 * weights.tWw_m;
+
+%% set pseudodata and respective weights
+[data, units, label, weights] = addpseudodata(data, units, label, weights);
+data.psd.t_0 = 0;  units.psd.t_0 = 'd'; label.psd.t_0 = 'time at start development';
+weights.psd.t_0 = 0.1;
+
+%% set weights for all real data
+weights = setweights(data, []);
+
+%% set pseudodata and respective weights
+[data, units, label, weights] = addpseudodata(data, units, label, weights);
+data.psd.t_0 = 0;  units.psd.t_0 = 'd'; label.psd.t_0 = 'time at start development';
+weights.psd.t_0 = 0.1;
+
+%% pack auxData and txtData for output
+auxData.temp = temp;
+txtData.units = units;
+txtData.label = label;
+txtData.bibkey = bibkey;
+txtData.comment = comment;
+
+%% Group plots
+set1 = {'tWw_f','tWw_m'}; subtitle1 = {'Data for females, males'};
+metaData.grp.sets = {set1};
+metaData.grp.subtitle = {subtitle1};
+  
+%% Discussion points
+D1 = 'Males are assumed to differ from females by {p_Am}, kap_Lm and kap_RL only';
+D2 = '90 percent of milk production originates from upregulation';
+D3 = 'mod_1: males are assumed to differ from femlase by {p_Am} only';
+D4 = 'mod_1: t-Ww data added';
+D5 = 'mod_2: males have equal state variables at b, compared to females';
+metaData.discussion = struct('D1',D1, 'D2',D2, 'D3',D3, 'D4',D4, 'D5',D5);
+
+%% Links
+metaData.links.id_CoL = '7G6MC'; % Cat of Life
+metaData.links.id_ITIS = '552759'; % ITIS
+metaData.links.id_EoL = '310755'; % Ency of Life
+metaData.links.id_Wiki = 'Wallabia_bicolor'; % Wikipedia
+metaData.links.id_ADW = 'Wallabia_bicolor'; % ADW
+metaData.links.id_Taxo = '60392'; % Taxonomicon
+metaData.links.id_WoRMS = ''; % WoRMS
+metaData.links.id_MSW3 = '11000314'; % MSW3
+metaData.links.id_AnAge = 'Wallabia_bicolor'; % AnAge
+
+
+%% References
+bibkey = 'Wiki'; type = 'Misc'; bib = ...
+'howpublished = {\url{http://en.wikipedia.org/wiki/Wallabia_bicolor}}';
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'Kooy2010'; type = 'Book'; bib = [ ...  % used in setting of chemical parameters and pseudodata
+'author = {Kooijman, S.A.L.M.}, ' ...
+'year = {2010}, ' ...
+'title  = {Dynamic Energy Budget theory for metabolic organisation}, ' ...
+'publisher = {Cambridge Univ. Press, Cambridge}, ' ...
+'pages = {Table 4.2 (page 150), 8.1 (page 300)}, ' ...
+'howpublished = {\url{../../../bib/Kooy2010.html}}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'CorkDove1989'; type = 'Article'; bib = [ ... 
+'author = {Cork, S. J. and Dove, H.}, ' ... 
+'year = {1989}, ' ...
+'title = {Lactation in the tammar wallaby (\emph{Macropus eugenii}). II. {I}ntake of milk components and maternal allocation of energy}, ' ...
+'journal = {Journal of Zoology, London}, ' ...
+'volume = {219}, ' ...
+'pages = {399--409}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'DawsDenn1969'; type = 'Article'; bib = [ ... 
+'author = {Dawson, T. J. and Denny, M. J. S. and Hulbert, A. J.}, ' ... 
+'year = {1969}, ' ...
+'title = {Thermal balance of the macropod marsupial \emph{Macropus eugenii} {D}esmarest}, ' ...
+'journal = {Comparative Biochemistry and Physiology}, ' ...
+'volume = {31}, ' ...
+'pages = {645--653}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'WeigJone2005'; type = 'Book'; bib = [ ... 
+'author = {Weigl, R. and Jones, M. L.}, ' ... 
+'year = {2005}, ' ...
+'title = {Longevity of mammals in captivity: from the living collections of the world: a list of mammalian longevity in captivity}, ' ...
+'series = {Kleine Senckenberg-Reihe}, ' ...
+'volume = {48}, ' ...
+'publisher = { E. Schweizerbartsche.}, '...
+'isbn = {ISBN 978-3-510-61379-3}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'HaysTien1993'; type = 'Book'; bib = [ ... 
+'author = {Hayssen, V. D. and Van Tienhoven, A. and Van Tienhoven, A.}, ' ... 
+'year = {1993}, ' ...
+'title = {Asdell''s patterns of mammalian reproduction: a compendium of species-specific data}, ' ...
+'publisher = {Cornell University Press}, ' ...
+'address = {Ithaca, New York}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'MercShar1966'; type = 'Article'; bib = [ ... 
+'author = {Merchant, J. and Sharman, G.}, ' ... 
+'year = {1966}, ' ...
+'title = {Observations on the attatchment of marsupial pouch young to the teats and on the rearing of pouch young by foster-mothers of the same or different species}, ' ...
+'journal = {Australian Journal of Zoology}, ' ...
+'volume = {14}, ' ...
+'pages = {593--609}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'Russ1982'; type = 'Article'; bib = [ ... 
+'author = {Russell, E.M.}, ' ... 
+'year = {1982}, ' ...
+'title = {Parental investment and desertion of young in marsupials}, ' ...
+'journal = {American Naturalist}, ' ...
+'volume = {119}, ' ...
+'pages = {744--748}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'RobiMorr1957'; type = 'Article'; bib = [ ... 
+'author = {Robinson, K. W. and Morrison, P. R.}, ' ... 
+'year = {1957}, ' ...
+'title = {The reaction to hot atmospheres of various species of {A}ustralian marsupial and placental animals}, ' ...
+'journal = {Journal of Cellular and Comparative Physiology}, ' ...
+'volume = {49}, ' ...
+'pages = {455--478}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'MercShar1966'; type = 'Article'; bib = [ ... 
+'doi = {10.1071/zo9660593}, ' ...
+'author = {Merchant, J. C. and Sharman, G. B.}, ' ... 
+'year = {1966}, ' ...
+'title = {Observations on the attatchment of marsupial pouch young to the teats and on the rearing of pouch young by foster-mothers of the same or different species}, ' ...
+'journal = {Australian Journal of Zoology}, ' ...
+'volume = {14(4)}, ' ...
+'pages = {593-609}'];
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+%
+bibkey = 'AnAge'; type = 'Misc'; bib = ...
+'howpublished = {\url{http://genomics.senescence.info/species/entry.php?species=Wallabia_bicolor}}';
+metaData.biblist.(bibkey) = ['''@', type, '{', bibkey, ', ' bib, '}'';'];
+

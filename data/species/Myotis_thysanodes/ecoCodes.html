@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ecoCodes</title>
+  <link rel="stylesheet" type="text/css" href="sys/style.css">
+  <script src="sys/jscripts.js"></script>
+  <style id="myStyleSheet">
+    body {
+      background-color: #ffffff;
+    }
+
+    div.tab {
+      margin: auto;
+      padding-top: 90px;
+    }
+
+    .head {
+      background-color: #ffe7c6;
+      color: blue;
+    }
+
+    #tabEco {
+      border-style: solid hidden solid hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      color: blue;
+    }
+
+    .Search {
+      background-image: url('img/searchicon.png'); /* Add a search icon to input */
+      background-position: 2px -10px; /* Position the search icon */
+      background-repeat: no-repeat; /* Do not repeat the icon image */
+      width: 70%; /* Width of search field */
+      font-size: 14px; /* Increase font-size */
+      padding: 5px 10px 7px 40px; /* Add some padding */
+      border: 1px solid #ddd; /* Add a grey border */
+      margin-bottom: 12px; /* Add some space below the input */
+    }
+
+    tr:nth-child(even){background-color: #f2f2f2}
+
+  </style>
+</head>
+
+<body>
+
+  <div class="tab">
+  <table id="tabEco">
+    <tr class="head">
+       <th><a class="head" onclick="undoHide()">AmP 2022/06/29</a></th>
+       <th><a class="head" onclick="hideCol(2)">climate</a></th>
+       <th><a class="head" onclick="hideCol(3)">ecozone</a></th>
+       <th><a class="head" onclick="hideCol(4)">habitat</a></th>
+       <th><a class="head" onclick="hideCol(5)">embryo</a></th>
+       <th><a class="head" onclick="hideCol(6)">migrate</a></th>
+       <th><a class="head" onclick="hideCol(7)">food</a></th>
+       <th><a class="head" onclick="hideCol(8)">gender</a></th>
+       <th><a class="head" onclick="hideCol(9)">reprod</a></th>
+    </tr>
+
+    <tr>
+      <td>Cynopterus_sphinx</td> <td>Aw,Am</td> <td>TPi</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TW</td> <td>bxM,xiHs,xiHn</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Penthetor_lucasi</td> <td>A</td> <td>TPi</td> <td>0iTh,0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiHs,xiHn</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Eidolon_dupreanum</td> <td>A</td> <td>TPa</td> <td>0iTh,0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiHs,xiHn</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Eidolon_helvum</td> <td>Aw,BSh</td> <td>TPa</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TW</td> <td>bxM,xiHs,xiHn</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Pteropus_alecto</td> <td>A</td> <td>TA</td> <td>0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiHn,xiHs</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Pteropus_rufus</td> <td>A</td> <td>TPa</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td></td> <td>bxM,xiHs,xiHn</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Rousettus_aegyptiacus</td> <td>Aw,BWh,BWk,BSh,BSk</td> <td>THp,TPa</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TW</td> <td>bxM,xiHs</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Rousettus_leschenaultii</td> <td>A</td> <td>TPi</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Rousettus_madagascariensis</td> <td>A</td> <td>TPa</td> <td>0iTh,0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiHs,xiHn</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Epomops_buettikoferi</td> <td>Am</td> <td>TPa</td> <td>0iTf,0iTi</td> <td>Tv</td> <td>TW</td> <td>bxM,xiHs,xiHn</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Micropteropus_pusillus</td> <td>Am</td> <td>TPa</td> <td>0iTf,0iTi</td> <td>Tv</td> <td>TW</td> <td>bxM,xiHs,xiHn,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Megaderma_lyra</td> <td>Am,Csa</td> <td>THp</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCi,xiCv</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Hipposideros_armiger</td> <td>A</td> <td>TPi</td> <td>0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Hipposideros_cineraceus</td> <td>A</td> <td>TPi</td> <td>0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Hipposideros_larvatus</td> <td>A</td> <td>TPi</td> <td>0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Hipposideros_pomona</td> <td>A</td> <td>TPi</td> <td>0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Hipposideros_speoris</td> <td>A</td> <td>TPi</td> <td>0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Rhinolophus_cornutus</td> <td>Cfa,Dfa</td> <td>THp</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Rhinolophus_euryale</td> <td>BSk,BWk,Csa,Cfb</td> <td>THp</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Rhinolophus_ferrumequinum</td> <td>BWk,BSk,BSh,Cwa,Csa,Cfb,Dfb</td> <td>THp,TPa</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Rhinolophus_hipposideros</td> <td>BSk,Csa</td> <td>THp</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Rhinolophus_marshalli</td> <td>A</td> <td>TPi</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td></td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Rhinolophus_mehelyi</td> <td>BSk,BWk,Csa,Cfb</td> <td>THp</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Miniopterus_schreibersii</td> <td>BSk,BSh,BWk,Csa</td> <td>THp,TPa,TA</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Noctilio_albiventris</td> <td>A</td> <td>TN</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Mystacina_tuberculata</td> <td>Cfb</td> <td>TAz</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Thyroptera_tricolor</td> <td>A</td> <td>TN</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Artibeus_watsoni</td> <td>A</td> <td>TN</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiHs,xiHn,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Carollia_perspicillata</td> <td>A</td> <td>TN</td> <td>0iTf,0iTi</td> <td>Tv</td> <td>TW</td> <td>bxM,xiHs,xiHn,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Desmodus_rotundus</td> <td>A</td> <td>TN</td> <td>0iTf,0iTi</td> <td>Tv</td> <td>TW</td> <td>bxM,xiTvm</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Phyllostomus_hastatus</td> <td>A</td> <td>TN</td> <td>0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiO</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Uroderma_bilobatum</td> <td>A</td> <td>TPi</td> <td>0iTh,0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiHs,xiHn</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Molossus_molossus</td> <td>A</td> <td>TN</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Tadarida_brasiliensis</td> <td>BSk,Cfa,Cwa,Cwb</td> <td>THn,TN</td> <td>0iTf,0iTi</td> <td>Tv</td> <td>Ms</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Coleura_seychellensis</td> <td>A</td> <td>TPa</td> <td>0iTh,0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Taphozous_longimanus</td> <td>A</td> <td>TPi</td> <td>0iTf</td> <td>Tv</td> <td></td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Natalus_mexicanus</td> <td>A</td> <td>TN</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Myotis_blythii</td> <td>BSk,BWk,Csa,Cfb</td> <td>THp</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Myotis_capaccinii</td> <td>BSk,Csa</td> <td>THp</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Myotis_emarginatus</td> <td>BSk,Csa</td> <td>THp</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Myotis_grisescens</td> <td>Cfa</td> <td>THn</td> <td>0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Myotis_lucifugus</td> <td>Cfa,Dfa,Dfb,Dfc</td> <td>THn</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Myotis_macrodactylus</td> <td>Dfb,Dfc</td> <td>THp</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Myotis_myotis</td> <td>Cfa,Dfa,Dfb</td> <td>THp</td> <td>0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Myotis_septentrionalis</td> <td>Cfa,Dfa,Dfb,Dfc</td> <td>THn</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Myotis_thysanodes</td> <td>BWh,BSk</td> <td>THp</td> <td>0iTh,0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Myotis_velifer</td> <td>Am,BSk,Cfa</td> <td>THn</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Antrozous_pallidus</td> <td>BWh,BSk</td> <td>THn</td> <td>0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Eptesicus_fuscus</td> <td>A,B,Cfa,Df</td> <td>THn</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Eptesicus_serotinus</td> <td>B,Cfa,Df</td> <td>THp</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Aeorestes_cinereus</td> <td>BSk,Cfa,Dfa,Dfb,Dfc</td> <td>THn</td> <td>0iTf</td> <td>Tv</td> <td>Ml</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Nycticeius_humeralis</td> <td>BSk,Cfa,Dfa</td> <td>THn</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TW</td> <td>bxM,xiCi</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Nyctalus_lasiopterus</td> <td>BSk,Dfb</td> <td>THp</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TW</td> <td>bxM,xiCi,xiCvb</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Nyctalus_noctula</td> <td>Cfa,Cwc,Df</td> <td>THp</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Nyctalus_plancyi</td> <td>Cfa,Cfb</td> <td>THp</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Pipistrellus_kuhlii</td> <td>BWk,BSk,BSh,Csa,Cfb,Dfb</td> <td>THp,TPa</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Pipistrellus_pipistrellus</td> <td>B,C,D</td> <td>THp</td> <td>0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Pipistrellus_subflavus</td> <td>Cfa,Dfa,Dfb</td> <td>THn</td> <td>0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Pipistrellus_tenuis</td> <td>A</td> <td>TPi</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Corynorhinus_rafinesquii</td> <td>Cfa,Dfa</td> <td>THn</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Plecotus_auritus</td> <td>C,D</td> <td>THp</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Scotophilus_kuhlii</td> <td>A</td> <td>TPi</td> <td>0iTf</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Hypsugo_savii</td> <td>BSk,Csa</td> <td>THp</td> <td>0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+    <tr>
+      <td>Vespertilio_sinensis</td> <td>BSk,BWk,Csa,Cfb</td> <td>THp</td> <td>0iTh,0iTf,0iTi</td> <td>Tv</td> <td>TT</td> <td>bxM,xiCii</td> <td>Dg</td> <td>O</td>   
+    </tr>
+
+  </table>
+  </div>
+
+  <script>
+    function undoHide() {
+      var styleSheet = document.getElementById("myStyleSheet").sheet;
+
+      if (styleSheet.cssRules.length > 6){
+        styleSheet.deleteRule(0);
+      }
+    }
+
+    function hideCol(col) {
+      var table = document.getElementById("tabId");
+      var styleSheet = document.getElementById("myStyleSheet").sheet;
+
+      var rule = "table td:nth-child("+ col +"), table th:nth-child("+ col +") {display: none;}";
+      styleSheet.insertRule(rule);
+    }
+
+    function searchList() {
+      var input, filter, table, tr, td, i;
+      input = document.getElementById("Species");
+      filter = input.value.toUpperCase();
+      table = document.getElementById("tabId");
+      tr = table.getElementsByTagName("tr");
+      for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+          if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
+  </script>
+
+</body>
+</html>

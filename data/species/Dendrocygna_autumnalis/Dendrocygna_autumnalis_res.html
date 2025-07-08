@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+  <TITLE>Dendrocygna_autumnalis</TITLE>
+  <style>
+    div.prd {
+      width: 50%;
+      float: left;
+    }
+
+    div.par {
+      width: 50%;
+      float: right;
+    }
+
+    p.clear {
+      clear: both;
+    }
+
+    .head {
+      background-color: #FFE7C6
+    }
+
+    .psd {
+      color: blue
+    }
+
+    #prd {
+      border-style: solid hidden solid hidden;
+    }
+
+    #par {
+      border-style: solid hidden solid hidden;
+    }
+
+    tr:nth-child(even){background-color: #f2f2f2}
+  </style>
+</HEAD>
+
+<BODY>
+
+  <div class="prd">
+  <h1>Dendrocygna autumnalis</h1>
+  </div>
+
+  <div class="par">
+  <h4>COMPLETE = 2.8; MRE =    0.143; SMAE =    0.167; SMSE =    0.058 </h4>
+  </div>
+
+  <p class="clear"></p>
+
+  <div class="prd">
+  <h2>Data & predictions</h2>
+  <TABLE id="prd">
+    <TR  class="head"><TH>data</TH> <TH>prd</TH> <TH>RE</TH>  <TH>symbol</TH> <TH>units</TH> <TH>description</TH> </TR>
+    <TR><TD> 27</TD> <TD>27.02</TD> <TD>0.00068</TD> <TD>ab</TD> <TD>d</TD> <TD>age at birth</TD></TR>
+    <TR><TD> 56</TD> <TD>52.83</TD> <TD>0.05666</TD> <TD>tx</TD> <TD>d</TD> <TD>time since birth at fledching</TD></TR>
+    <TR><TD>365</TD> <TD>420.3</TD> <TD>0.1516</TD> <TD>tR</TD> <TD>d</TD> <TD>time since birth at 1st brood</TD></TR>
+    <TR><TD>2993</TD> <TD>2990</TD> <TD>0.001143</TD> <TD>am</TD> <TD>d</TD> <TD>life span</TD></TR>
+    <TR><TD> 22</TD> <TD>21.26</TD> <TD>0.0335</TD> <TD>Wwb</TD> <TD>g</TD> <TD>wet weight at birth</TD></TR>
+    <TR><TD>660</TD> <TD>637.6</TD> <TD>0.03394</TD> <TD>Wwi</TD> <TD>g</TD> <TD>ultimate wet weight for females</TD></TR>
+    <TR><TD>0.03836</TD> <TD>0.03756</TD> <TD>0.0208</TD> <TD>Ri</TD> <TD>#/d</TD> <TD>maximum reprod rate</TD></TR>
+    <TR><TD colspan="2">see figure</TD> <TD>0.2654</TD> <TD>tW</TD> <TD colspan="2">time since birth <font color="blue"><i>vs.</i></font> wet weight</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.1235</TD> <TD>WpX</TD> <TD colspan="2">wet weight <font color="blue"><i>vs.</i></font> energy intake</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.415</TD> <TD>WpP</TD> <TD colspan="2">wet weight <font color="blue"><i>vs.</i></font> excretory energy</TD>
+    <TR><TD colspan="2">see figure</TD> <TD>0.4906</TD> <TD>WpA</TD> <TD colspan="2">wet weight <font color="blue"><i>vs.</i></font> metablized energy</TD>
+    <TR class="psd"><TD>0.02</TD> <TD>0.04343</TD> <TD>1.172</TD> <TD>psd.v</TD> <TD>cm/d</TD> <TD>energy conductance</TD></TR>
+    <TR class="psd"><TD>0.8</TD> <TD>0.9804</TD> <TD>0.2254</TD> <TD>psd.kap</TD> <TD>-</TD> <TD>allocation fraction to soma</TD></TR>
+    <TR class="psd"><TD>0.95</TD> <TD>0.95</TD> <TD>  0</TD> <TD>psd.kap_R</TD> <TD>-</TD> <TD>reproduction efficiency</TD></TR>
+    <TR class="psd"><TD> 18</TD> <TD>2760</TD> <TD>152.4</TD> <TD>psd.p_M</TD> <TD>J/d.cm^3</TD> <TD>vol-spec som maint</TD></TR>
+    <TR class="psd"><TD>0.002</TD> <TD>0.002</TD> <TD>  0</TD> <TD>psd.k_J</TD> <TD>1/d</TD> <TD>maturity maint rate coefficient</TD></TR>
+    <TR class="psd"><TD>0.8</TD> <TD>0.7993</TD> <TD>0.0009128</TD> <TD>psd.kap_G</TD> <TD>-</TD> <TD>growth efficiency</TD></TR>
+  </TABLE>
+  </div>
+
+  <div class="par">
+  <h2>std parameters at 20.0&deg;C</h2>
+  <TABLE id="par">
+    <TR class="head"><TH>symbol</TH> <TH>units</TH> <TH>value</TH>  <TH>free</TH> <TH>description</TH> </TR>
+    <TR><TD>T_ref</TD> <TD>K</TD> <TD>293.1</TD> <TD>0</TD> <TD>Reference temperature</TD></TR>
+    <TR><TD>T_A</TD> <TD>K</TD> <TD>9000</TD> <TD>0</TD> <TD>Arrhenius temperature</TD></TR>
+    <TR><TD>z</TD> <TD>-</TD> <TD>2.797</TD> <TD>1</TD> <TD>zoom factor</TD></TR>
+    <TR><TD>F_m</TD> <TD>l/d.cm^2</TD> <TD>6.5</TD> <TD>0</TD> <TD>{F_m}, max spec searching rate</TD></TR>
+    <TR><TD>kap_X</TD> <TD>-</TD> <TD>0.4109</TD> <TD>1</TD> <TD>digestion efficiency of food to reserve</TD></TR>
+    <TR><TD>kap_P</TD> <TD>-</TD> <TD>0.1969</TD> <TD>1</TD> <TD>faecation efficiency of food to faeces</TD></TR>
+    <TR><TD>v</TD> <TD>cm/d</TD> <TD>0.04343</TD> <TD>0</TD> <TD>energy conductance</TD></TR>
+    <TR><TD>kap</TD> <TD>-</TD> <TD>0.9804</TD> <TD>1</TD> <TD>allocation fraction to soma</TD></TR>
+    <TR><TD>kap_R</TD> <TD>-</TD> <TD>0.95</TD> <TD>0</TD> <TD>reproduction efficiency</TD></TR>
+    <TR><TD>p_M</TD> <TD>J/d.cm^3</TD> <TD>2760</TD> <TD>1</TD> <TD>[p_M], vol-spec somatic maint</TD></TR>
+    <TR><TD>p_T</TD> <TD>J/d.cm^2</TD> <TD>  0</TD> <TD>0</TD> <TD>{p_T}, surf-spec somatic maint</TD></TR>
+    <TR><TD>k_J</TD> <TD>1/d</TD> <TD>0.002</TD> <TD>0</TD> <TD>maturity maint rate coefficient</TD></TR>
+    <TR><TD>E_G</TD> <TD>J/cm^3</TD> <TD>7329</TD> <TD>1</TD> <TD>[E_G], spec cost for structure</TD></TR>
+    <TR><TD>E_Hb</TD> <TD>J</TD> <TD>841.6</TD> <TD>1</TD> <TD>maturity at birth</TD></TR>
+    <TR><TD>E_Hp</TD> <TD>J</TD> <TD>1.651e+05</TD> <TD>1</TD> <TD>maturity at puberty</TD></TR>
+    <TR><TD>h_a</TD> <TD>1/d^2</TD> <TD>7.161e-13</TD> <TD>1</TD> <TD>Weibull aging acceleration</TD></TR>
+    <TR><TD>s_G</TD> <TD>-</TD> <TD>0.02</TD> <TD>0</TD> <TD>Gompertz stress coefficient</TD></TR>
+    <TR><TD>E_Hx</TD> <TD>J</TD> <TD>1.651e+05</TD> <TD>1</TD> <TD>maturity at fledging</TD></TR>
+    <TR><TD>f</TD> <TD>-</TD> <TD>  1</TD> <TD>0</TD> <TD>scaled functional response for 0-var data</TD></TR>
+    <TR><TD>t_0</TD> <TD>d</TD> <TD>18.56</TD> <TD>1</TD> <TD>time at start development at T</TD></TR>
+    <TR><TD>t_N</TD> <TD>d</TD> <TD>365</TD> <TD>0</TD> <TD>time between clutches at T</TD></TR>
+  </TABLE>
+  </div>
+
+</BODY>
+</HTML>

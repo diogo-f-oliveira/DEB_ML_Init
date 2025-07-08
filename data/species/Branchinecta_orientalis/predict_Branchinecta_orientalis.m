@@ -1,0 +1,87 @@
+function [prdData, info] = predict_Branchinecta_orientalis(par, data, auxData)
+  
+  % unpack par, data, auxData
+  cPar = parscomp_st(par); vars_pull(par); 
+  vars_pull(cPar);  vars_pull(data);  vars_pull(auxData);
+  
+  % compute temperature correction factors
+  TC = tempcorr(C2K(Tab(:,1)), T_ref, T_A); 
+  
+  % zero-variate data
+
+  % life cycle
+  pars_tj = [g k l_T v_Hb v_Hj v_Hp];
+  [tau_j, tau_p, tau_b, l_j, l_p, l_b, l_i, rho_i, rho_rB, info] = get_tj(pars_tj, f);
+  
+  % birth
+  L_b = L_m * l_b;                  % cm, structural length at birth at f
+  Lw_b = L_b/ del_M;                % cm, length at birth
+  Ww_b = L_b^3 * (1 + f * ome);     % g, wet weight at birth
+  a_b = t_0 + tau_b/ k_M;           % d, age at birth at f and T_ref
+  
+  % puberty 
+  L_p = L_m * l_p;                  % cm, structural length at puberty at f
+  Lw_p = L_p/ del_M;                % cm, total length at puberty at f
+  t_p = (tau_p - tau_b)/ k_M;       % d, time since birth at puberty
+  
+  % ultimate
+  L_i = L_m * l_i;                    % cm, ultimate structural length at f
+  Lw_i = L_i/ del_M;                % cm, ultimate total length at f
+  Wd_i = L_i^3 * d_V * (1 + f * ome); % g, ultimate dry weight
+ 
+  % reprod
+  pars_R = [kap; kap_R; g; k_J; k_M; L_T; v; U_Hb; U_Hj; U_Hp]; % compose parameter vector at T
+  R_i = reprod_rate_j(L_i, f, pars_R); % #/d, max reprod rate
+
+  % life span
+  pars_tm = [g; l_T; h_a/ k_M^2; s_G];  % compose parameter vector at T_ref
+  tau_m = get_tm_s(pars_tm, f, l_b); % -, scaled mean life span at T_ref
+  a_m = tau_m/ k_M;                     % d, mean life span at T
+  
+  % pack to output
+  prdData.Lb = Lw_b;
+  prdData.Lp = Lw_p;
+  prdData.Li = Lw_i;
+  prdData.Wwb = Ww_b;
+  prdData.Wdi = Wd_i;
+  
+  % uni-variate data
+  
+  % time-length
+  tvel = get_tj(pars_tj, f_tL,[],tL(:,1)*k_M*TC(1)); 
+  ELw_12 = L_m*tvel(:,4)/del_M;
+  %
+  tvel = get_tj(pars_tj, f_tL,[],tL(:,1)*k_M*TC(2)); 
+  ELw_15 = L_m*tvel(:,4)/del_M;
+  %
+  tvel = get_tj(pars_tj, f_tL,[],tL(:,1)*k_M*TC(3)); 
+  ELw_18 = L_m*tvel(:,4)/del_M;
+  %
+  tvel = get_tj(pars_tj, f_tL,[],tL(:,1)*k_M*TC(4)); 
+  ELw_21 = L_m*tvel(:,4)/del_M;
+  %
+  tvel = get_tj(pars_tj, f_tL,[],tL(:,1)*k_M*TC(5)); 
+  ELw_24 = L_m*tvel(:,4)/del_M;
+  %
+  tvel = get_tj(pars_tj, f_tL,[],tL(:,1)*k_M*TC(6)); 
+  ELw_27 = L_m*tvel(:,4)/del_M;
+
+  % temperature-age at birth
+  Ea_b = a_b./TC;
+  
+  % temperature-time since birth at puberty
+  Et_p = t_p./TC;
+
+  % temperature-life span
+  Ea_m = a_m./TC;
+
+  % temperature-reprod rate
+  ER_i = R_i*TC;
+  
+  % pack to output
+  prdData.tL = [ELw_27 ELw_24 ELw_21 ELw_18 ELw_15 ELw_12];
+  prdData.Tab = Ea_b;
+  prdData.Ttp = Et_p;
+  prdData.Tam = Ea_m;
+  prdData.TRi = ER_i;
+  

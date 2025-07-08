@@ -1,0 +1,31 @@
+Dear Bas,
+
+Thank you for your contribution. Before we can accept the entry could you please send a rebuttal to the following questions :
+
+
+Q1)
+
+
+metaData.data_1 has Ri
+
+but it is written data.Ni with unit #/d
+
+in predict it is written 
+
+NT_i = cum_reprod(aT_m, f, pars_R);             % #/d, ultimate reproduction rate at T
+
+so it should be cumulated reproduction in number right ? or what are we calculating ? can you please specify if it is cumulated reprodution over what period this is computed ?
+
+
+
+Q2) 
+
+
+the model is 'std' so t_0 is an extra parameter. At what temperature in the pars_init file is this parameter ? have we decided on a general policy ? 
+in the statistics file we don't check for the presence of t_0 when we have an std model.so the age at birth which is printed in the statisics page ignores the t_0 while in the results page
+the age at birth will include t_0 - this inconsitency has already been brough up by previous users
+
+Kind regards,
+
+
+
