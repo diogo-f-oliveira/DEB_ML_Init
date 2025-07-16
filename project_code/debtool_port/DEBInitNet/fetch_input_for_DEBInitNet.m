@@ -1,4 +1,7 @@
-function [inputData, flag] = fetch_input_for_DEBInitNet(data, auxData, metaData, par, metaPar)
+%% fetch_input_for_DEBInitNet
+% Fetches data and metadata for the DEBInitNet initialization method
+
+function [inputData, flag] = fetch_input_for_DEBInitNet(data, auxData, metaData, txtData, par, metaPar)
 % created 2025/06/20 by Diogo F. Oliveira
 
 %% Syntax
@@ -6,7 +9,11 @@ function [inputData, flag] = fetch_input_for_DEBInitNet(data, auxData, metaData,
 
 %% Description
 % Fetches data and metadata from the mydata_my_pet.m file and formats it so it can be used as input 
-% for the DEBInitNet parameter initialization method. Assumes data are in standard units (d, g, cm).
+% for the DEBInitNet parameter initialization method.
+% 
+% Tries to convert data to standard units (g, cm, d, mol, K) with the function <convert_data_to_standard_units.html convert_data_to_standard_units>.
+% This function requires functions from the Symbolic Math Toolbox. 
+% If the toolbox is not available, then it assumes the data is in standard units.
 % 
 % The following datasets are required to exist
 %   ab, am, Wwb, Wwp, Wwi, Ri
@@ -30,6 +37,7 @@ function [inputData, flag] = fetch_input_for_DEBInitNet(data, auxData, metaData,
 % * data: structure with values of data (only zero-variate data are used)
 % * auxData: structure with auxiliary data (includes temperatures)
 % * metaData: structure with info about data
+% * txtData: structure with information on the data (used to convert data to standard units)
 % * par: structure with parameter values (used to get T_A and T_ref)
 % * metaPar: structure with information on metaparameters (used to get the model type)
 %
@@ -52,17 +60,29 @@ inputData = zeros(34, 1);
 % TODO: Other temperature corrections
 pars_T = [par.T_A];
 
+
+%% Convert data to standard units 
+% Can only be done if the Symbolic Math Toolbox is installed.
+v=ver;
+if any(strcmp({v.Name}, 'Symbolic Math Toolbox'))
+    sudata = convert_data_to_standard_units(data, txtData);
+else
+    sudata = data;
+    fprintf(['Symbolic Math Toolbox is not installed, so automatic unit conversion cannot be ' ...
+        'performed. Assuming that data is in DEB standard units (g, cm, d, mol, K).'])
+end
+
 %% Zero-variate data
 % age at birth, ab
-if isfield(data, 'ab')
-    ab = data.ab;
+if isfield(sudata, 'ab')
+    ab = sudata.ab;
     temp = auxData.temp.ab;
-elseif isfield(data, 'tg')
+elseif isfield(sudata, 'tg')
     temp = auxData.temp.tg;
-    if isfield(data, 't_0')
-        ab = data.tg + data.t_0;
+    if isfield(par, 't_0')
+        ab = sudata.tg + par.t_0;
     else
-        ab = data.tg;
+        ab = sudata.tg;
     end
 else % Missing ab
     flag = 1; return;
@@ -70,8 +90,8 @@ end
 abT = ab / tempcorr(temp, par.T_ref, pars_T);
 
 % lifespan, am
-if isfield(data, 'am')
-    amT = data.am / tempcorr(auxData.temp.am, par.T_ref, pars_T);
+if isfield(sudata, 'am')
+    amT = sudata.am / tempcorr(auxData.temp.am, par.T_ref, pars_T);
 else % Missing am
     flag = 2; return
 end
@@ -80,16 +100,22 @@ end
 d_V = get_d_V(metaData.phylum, metaData.class);
 
 % Weights at birth, puberty and ultimate
-WLFactor = get_weight_length_proportion(data);
+WLFactor = getWeightLengthProportion(sudata);
 transitions = {'b', 'p', 'i'};
 transitionWeights = struct('Wwb', nan, 'Wwp', nan, 'Wwi', nan);
 for t=1:numel(transitions)
-    wtr = ['Ww' transitions{t}];
+    wwtr = ['Ww' transitions{t}];
+    wdtr = ['Wd' transitions{t}];
     ltr = ['L' transitions{t}];
-    if isfield(data, wtr) % Check if weight at transition exists
-        transitionWeights.(wtr) = data.(wtr);
-    elseif ~isnan(WLFactor) && isfield(data, ltr) % Check if length exists and convert to weight
-        transitionWeights.(wtr) = WLFactor * data.(ltr)^3; 
+    if isfield(sudata, wwtr) 
+        % Check if wet weight at transition exists
+        transitionWeights.(wwtr) = sudata.(wwtr);
+    elseif isfield(sudata, wdtr) 
+        % Check if dry weight at transition exists and convert to wet weight
+        transitionWeights.(wwtr) = sudata.(wdtr) / d_V;
+    elseif ~isnan(WLFactor) && isfield(sudata, ltr)
+        % Check if length exists and convert to weight
+        transitionWeights.(wwtr) = WLFactor * sudata.(ltr)^3; 
     end
 end
 % For Aves species, impute Wwp with 0.95 * Wwi
@@ -102,10 +128,10 @@ if any(isnan(struct2array(transitionWeights)))
 end
 
 % Reproduction rate
-if isfield(data, 'Ri')
-    RiT = data.Ri * tempcorr(auxData.temp.Ri, par.T_ref, pars_T);
-elseif isfield(data, 'Ni')
-    RiT = data.Ni / amT * tempcorr(auxData.temp.Ni, par.T_ref, pars_T);
+if isfield(sudata, 'Ri')
+    RiT = sudata.Ri * tempcorr(auxData.temp.Ri, par.T_ref, pars_T);
+elseif isfield(sudata, 'Ni')
+    RiT = sudata.Ni / amT * tempcorr(auxData.temp.Ni, par.T_ref, pars_T);
 else
     flag = 4; return
 end
@@ -189,18 +215,23 @@ inputData = [abT, amT, d_V, ...
 
 end
 
-function WLFactor = get_weight_length_proportion(data)
-    transitions = {'b', 'j', 'x', 'p', 'i'};
-    WLFactor = nan;
-    factors = [];
-    for t=1:numel(transitions)
-        wtr = ['Ww' transitions{t}];
-        ltr = ['L' transitions{t}];
-        if isfield(data, {wtr, ltr})
-            factors(end+1) = data.(wtr) / (data.(ltr)^3);
-        end
-    end
-    if numel(factors)
-        WLFactor = mean(factors);
+
+
+function WLFactor = getWeightLengthProportion(data, d_V)
+transitions = {'b', 'j', 'x', 'p', 'i'};
+factors = [];
+for t=1:numel(transitions)
+    wwtr = ['Ww' transitions{t}];
+    dwtr = ['Wd' transitions{t}];
+    ltr = ['L' transitions{t}];
+    if isfield(data, {wwtr, ltr}) 
+        % Get ratio between wet weight and length cubed
+        factors(end+1) = data.(wwtr) / (data.(ltr)^3);
+    elseif isfield(data, {dwtr, ltr}) 
+        % Get ratio between dry weight converted to wet weight and length cubed
+        factors(end+1) = data.(dwtr) / (data.(ltr)^3) / d_V;
     end
 end
+WLFactor = mean(factors);
+end
+

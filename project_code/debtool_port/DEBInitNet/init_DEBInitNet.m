@@ -1,4 +1,7 @@
-function [par, metaPar, txtPar] = init_DEBInitNet(data, auxData, metaData)
+%% init_DEBInitNet
+% Runs the DEBInitNet initialization method
+
+function [par, metaPar, txtPar] = init_DEBInitNet(data, auxData, metaData, txtData)
 % created 2025/06/20 by Diogo F. Oliveira
 
 %% Syntax
@@ -20,7 +23,9 @@ function [par, metaPar, txtPar] = init_DEBInitNet(data, auxData, metaData)
 %
 % The method is only implemented for typified models std, stf, stx, and abj. 
 %
-% Assumes data are in standard units (d, g, cm). The following datasets are required to exist
+% Converts data to standard units using the Symbolic Math Toolbox. If the toolbox is not available,
+% then it assumes the data is in standard units.
+% The following datasets are required to exist
 %   ab, am, Wwb, Wwp, Wwi, Ri
 % More details on the datasets used for input are given in <fetch_input_for_DEBInitNet.m *fetch_input_for_DEBInitNet*>
 %
@@ -28,7 +33,8 @@ function [par, metaPar, txtPar] = init_DEBInitNet(data, auxData, metaData)
 %
 % * data: structure with values of data (only zero-variate data are used)
 % * auxData: structure with auxiliary data (includes temperatures)
-% * metaData: structure with info about data
+% * metaData: structure with ecocode data (used as input)
+% * txtData: structure with information on the data (used to convert data to standard units)
 %
 % Output
 % * par: structure with parameter values (only modifies the parameters above)
@@ -39,7 +45,7 @@ function [par, metaPar, txtPar] = init_DEBInitNet(data, auxData, metaData)
 % Called by <../pet/html/estim_pars.html *estim_pars*> if pars_init_method = 3.
 % txtPar and metaPar are set in <pars_init_my_pet.html *pars_init_my_pet*> and not modified.
 %
-% Description of the DEBInitMethod is given in Oliveira et al. (in prep)
+% Description of the DEBInitNet is given in Oliveira et al. (2025) (in prep)
 %
 % Only sets parameters with the corresponding name. For example, if parameters for males exist, they
 % are not automatically set. A warning will be issued to make the user aware of this. Best practice
@@ -56,7 +62,7 @@ if ~any(strcmp(metaPar.model, {'std', 'stf', 'stx', 'abj'}))
 end
 
 %% Get input from AmP files
-[inputData, flag] = fetch_input_for_DEBInitNet(data, auxData, metaData, par, metaPar);
+[inputData, flag] = fetch_input_for_DEBInitNet(data, auxData, metaData, txtData, par, metaPar);
 tryOtherMethodString = [
     'DEBInitNet initialization method cannot be applied. ' ...
     'If the data exists, check that it follows the naming convention. ' ...
@@ -74,12 +80,11 @@ switch flag
 end
 
 %% Load model
-% modelStructureFile = '../../models/DEBInitNet/deb_init_net.mat';
 modelStructureFile = 'deb_init_net.mat';
-model = DEBInitNet(modelStructureFile);
+nn = DEBInitNet(modelStructureFile);
 
 %% Model predictions
-yPred = model.predict(inputData);
+yPred = nn.predict(inputData);
 
 %% Convert model predictions to initial parameters
 predPar = struct();
@@ -154,10 +159,12 @@ predPar.E_G = par.mu_V * d_V / kap_G / w_V;
 
 
 %% Set parameter values in par struct if they exist and are free
+fprintf('Computed parameters: \n')
 predParNames = fieldnames(predPar);
 for p=1:numel(predParNames)
     parName = predParNames{p};
     if isfield(par, parName) && par.free.(parName)
+        fprintf('%-4s - %.4e\n', parName, predPar.(parName))
         par.(parName) = predPar.(parName);
     end
 end
