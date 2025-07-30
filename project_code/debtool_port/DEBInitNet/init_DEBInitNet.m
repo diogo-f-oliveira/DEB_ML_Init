@@ -159,7 +159,7 @@ predPar.E_G = par.mu_V * d_V / kap_G / w_V;
 
 
 %% Set parameter values in par struct if they exist and are free
-fprintf('Computed parameters: \n')
+fprintf('\nInitial parameters computed by DEBInitNet: \n')
 predParNames = fieldnames(predPar);
 for p=1:numel(predParNames)
     parName = predParNames{p};
@@ -168,3 +168,4 @@ for p=1:numel(predParNames)
         par.(parName) = predPar.(parName);
     end
 end
+fprintf('\n')

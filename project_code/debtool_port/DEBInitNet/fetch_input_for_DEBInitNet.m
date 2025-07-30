@@ -64,7 +64,7 @@ pars_T = [par.T_A];
 %% Convert data to standard units
 % Can only be done if the Symbolic Math Toolbox is installed.
 v=ver;
-if any(strcmp({v.Name}, 'Symbolic Math Toolbox'))
+if ~isMATLABReleaseOlderThan('R2018b') && any(strcmp({v.Name}, 'Symbolic Math Toolbox'))
     sudata = convert_data_to_standard_units(data, txtData);
 else
     sudata = data;
@@ -139,7 +139,7 @@ if isnan(transitionWeights.Wwp) && ~isnan(transitionWeights.Wwi) && strcmp(metaD
     transitionWeights.Wwp = 0.95 * transitionWeights.Wwi;
 end
 % Check if any weight is missing
-if any(isnan(struct2array(transitionWeights)))
+if any(cellfun(@(x) isnan(x), struct2cell(transitionWeights)))
     flag = 3; return
 end
 
