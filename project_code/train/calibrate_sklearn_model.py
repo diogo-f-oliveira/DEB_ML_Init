@@ -254,9 +254,7 @@ if __name__ == '__main__':
     np.random.seed(seed)
     random.seed(seed)
 
-    dataset_name = 'final'
-    dataset_name += '_taxonomy'
-    dataset_name += '_ecocodes'
+    dataset_name = 'init_net'
 
     # Load the data
     dfs, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_test')

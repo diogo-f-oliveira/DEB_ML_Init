@@ -12,11 +12,12 @@ filePathsCSVPath = '..\..\filepaths.csv';
 pathsTable = readtable(filePathsCSVPath, 'Delimiter', ',', 'ReadVariableNames', true, 'ReadRowNames', true);
 allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 
-% AmPDataFolder = 'C:\Users\diogo\OneDrive - Universidade de Lisboa\Terraprima\DEB Resources\DEBtool\AmPdata\';
-% allStatPath = [AmPDataFolder 'allStat.mat'];
-% allspeciesFolder = [AmPDataFolder 'species\'];
 saveFolder = [pathsTable{'root', 'path'}{:} '\data\raw';];
-tableSavePath = [saveFolder '\dataset_matlab_20250324.csv'];
+tableSavePath = [saveFolder '\raw_amp_dataset.csv'];
+
+todayDate = datetime('today');
+formattedDate = datestr(todayDate, 'yyyymmdd');
+tableDatenameSavePath = [saveFolder '\raw_amp_dataset_' formattedDate '.csv' ];
 
 %% Get list of species
 
@@ -255,12 +256,14 @@ for i=1:numSpecies
         break;
     end
 end
+delete(h)
 
 
 %% Save the table as a .csv file
 writetable(T, tableSavePath,'WriteRowNames',true);
 fprintf('Table saved in %s\n', tableSavePath);
-delete(h)
+writetable(T, tableDatenameSavePath,'WriteRowNames',true);
+fprintf('Table saved in %s\n', tableDatenameSavePath);
 
 %% Functions
 

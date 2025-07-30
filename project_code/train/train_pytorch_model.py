@@ -182,14 +182,8 @@ def train_neural_network(config, model_class, dataset_name,
 
 
 if __name__ == '__main__':
-    # dataset_name = 'no_pub_age'
-    # dataset_name = 'ratio_output_no_pub_age'
-    # dataset_name = 'kappa_complement_no_pub_age'
-    # dataset_name = 'all_constraints_no_pub_age'
-    dataset_name = 'final'
-    # dataset_name += 'no_k_J'
-    dataset_name += '_taxonomy'
-    dataset_name += '_ecocodes'
+    dataset_name = 'init_net'
+
 
     config = {
         'scaling_type': 'log_standardize',
@@ -205,7 +199,7 @@ if __name__ == '__main__':
         # 'dropout_prob': 0,
         'dropout_prob': 0.1,
         'clamp_function': 'logsigmoid',
-        'use_skip_connections': False,
+        'use_skip_connection': False,
         'n_epochs_gradient_descent': 0,
         'patience': 10,
         # 'early_stopping_metric': 'logQ',

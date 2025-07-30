@@ -104,10 +104,7 @@ if __name__ == '__main__':
 
     device = torch.device('cpu')
 
-    dataset_name = 'final'
-    # dataset_name += '_no_k_J'
-    dataset_name += '_taxonomy'
-    dataset_name += '_ecocodes'
+    dataset_name = 'init_net'
 
     search_space = {
         # Optimizer hyperparameters

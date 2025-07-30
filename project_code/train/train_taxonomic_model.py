@@ -10,8 +10,7 @@ from ..data.load_data import load_dataframes
 from ..algorithms.taxonomic_1nn import TaxonomicKNNRegressor, TaxonomicLabelEncoder
 
 if __name__ == '__main__':
-    base_dataset_name = 'no_pub_age'
-    dataset_name = 'biologist_' + base_dataset_name
+    dataset_name = 'taxo1nn'
 
     # Load the data
     dfs, col_types = load_dataframes(dataset_name=dataset_name, data_split='train_test')
