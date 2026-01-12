@@ -10,26 +10,11 @@ pathsTable = readtable(filePathsCSVPath, 'Delimiter', ',', 'ReadVariableNames', 
 allSpeciesFolder = pathsTable{'species_folder', 'path'}{:};
 saveFolder = '..\..\data\estimation_runs';
 % Output file
-% outputFileName = [saveFolder '\full_estimation_from_AmP_pars_subset_test_set.csv'];
-outputFileName = [saveFolder '\run_new_species_20250303_2_larger_simplex_size.csv'];
+outputFileName = [saveFolder '\full_estimation_from_AmP_pars.csv'];
 
 %% Get list of species
 
-% speciesList = getAllSpeciesNames(allSpeciesFolder);
-speciesList = {};
-datasetSplits = {
-    % 'train', 
-    % 'val',
-    % 'test',
-    };
-for s=1:length(datasetSplits)
-    sp = datasetSplits{s};
-    datasetPath = ['../../data/processed/biologist_no_pub_age/' sp '.csv'];
-    datasetTable = readtable(datasetPath, 'Delimiter', ',', 'ReadVariableNames', true);
-    speciesList = [speciesList; datasetTable.species];
-end
-speciesList = {'Cheilopogon_cyanopterus', 'Perna_viridis'};
-numSpecies = length(speciesList);
+speciesList = getAllSpeciesNames(allSpeciesFolder);
 
 
 %% Initialize table
